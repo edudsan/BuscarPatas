@@ -33,7 +33,14 @@ model Adotante {
   nome     String
   email    String   @unique
   telefone String
-  endereco String
+  
+  // Endereço foi dividido em campos compostos
+  rua      String
+  numero   String? // Opcional, pois pode não ter número
+  bairro   String
+  cidade   String
+  uf       String   @db.VarChar(2) // Limita a 2 caracteres, ex: "DF"
+
   adocoes  Adocao[]
 }
 
