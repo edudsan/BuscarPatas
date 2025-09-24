@@ -140,10 +140,15 @@ O servidor estará disponível em `http://localhost:3000`
 ## 👨‍💻 Autores
 
 **Alicia Estefany** - [user-git](https://github.com/user-git)
+
 **Daniele Santos** - [danieleksantos](https://github.com/danieleksantos)
+
 **Edilton Junior** - [ediltonx](https://github.com/ediltonx)
+
 **Eduardo Schuindt** - [edudsan](https://github.com/edudsan)
+
 **J. Garreto** - [user-git](https://github.com/user-git)
+
 **Vivian Maria** - [user-git](https://github.com/user-git)
 
 
