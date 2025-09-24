@@ -56,6 +56,7 @@ export const getAllAdoptedPets = async (req, res) => {
   }
 };
 
+// UPDATE
 export const updatePet = async (req, res) => {
   try {
     const { id } = req.params;
@@ -86,13 +87,12 @@ export const updatePet = async (req, res) => {
     }
 
     const petAtualizado = await prisma.pet.update({
-      where: { id: parseInt(id) },
-      data: dadosParaAtualizar, // Usamos o objeto com os dados validados
+      where: { pet_id: parseInt(id) }, 
+      data: dadosParaAtualizar, 
     });
 
     res.status(200).json(petAtualizado);
   } catch (error) {
-    // Adicionamos um log para ver o erro detalhado no terminal do servidor
     console.error(error); 
     res.status(500).json({ error: 'Não foi possível atualizar o pet.' });
   }
@@ -102,12 +102,31 @@ export const updatePet = async (req, res) => {
 export const deletePet = async (req, res) => {
   try {
     const { id } = req.params;
-    await prisma.pet.delete({
-      where: { id: parseInt(id) },
+
+    // Verifica se o pet está associado a alguma adoção
+    const adocaoExistente = await prisma.adocao.findFirst({
+      where: {
+        pet_id: parseInt(id),
+      },
     });
+
+    // Se uma adoção for encontrada, retorna um erro e impede a exclusão
+    if (adocaoExistente) {
+      return res.status(409).json({
+        error: 'Este pet não pode ser excluído pois já possui um registro de adoção.',
+      });
+    }
+    // Se não houver adoção, prossegue com a exclusão
+    await prisma.pet.delete({
+      where: { pet_id: parseInt(id) }, 
+    });
+
     res.status(204).send();
   } catch (error) {
+    // Trata o caso em que o pet com o ID fornecido não é encontrado
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Pet não encontrado.' });
+    }
     res.status(500).json({ error: 'Não foi possível remover o pet.' });
   }
 };
-

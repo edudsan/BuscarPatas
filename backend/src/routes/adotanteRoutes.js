@@ -1,16 +1,16 @@
 import { Router } from 'express';
-import { createAdotante, getAllAdotantes, getAdotantesSemAdocao, updateAdotante } from '../controllers/adotanteController.js';
+import { 
+  createAdotante, getAllAdotantes, getAdotantesSemAdocao,updateAdotante, deleteAdotante} from '../controllers/adotanteController.js';
 
 const router = Router();
 
-// Rota para listar pessoas que não adotaram
 router.get('/sem-adocao', getAdotantesSemAdocao);
-
-// Rotas existentes
-router.post('/', createAdotante);
 router.get('/', getAllAdotantes);
 
-// Rota para atualização parcial
+router.post('/', createAdotante);
+
 router.put('/:id', updateAdotante);
+
+router.delete('/:id', deleteAdotante);
 
 export default router;

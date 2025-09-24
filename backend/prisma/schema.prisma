@@ -18,7 +18,7 @@ enum StatusPet {
 
 // Modelo para os Pets
 model Pet {
-  id              Int        @id @default(autoincrement())
+  pet_id              Int        @id @default(autoincrement())
   nome            String
   especie         String
   data_nascimento DateTime?  @db.Date // Opcional, pois pode ser aproximada
@@ -29,7 +29,7 @@ model Pet {
 
 // Modelo para os Adotantes
 model Adotante {
-  id       Int      @id @default(autoincrement())
+  adotante_id       Int      @id @default(autoincrement())
   nome     String
   email    String   @unique
   telefone String
@@ -46,11 +46,11 @@ model Adotante {
 
 // Modelo para as Adoções
 model Adocao {
-  id          Int      @id @default(autoincrement())
+  adocao_id          Int      @id @default(autoincrement())
   data_adocao DateTime @default(now()) @db.Date
   pet_id      Int      @unique // Garante que um pet só pode ser adotado uma vez
   adotante_id Int
 
-  pet      Pet      @relation(fields: [pet_id], references: [id])
-  adotante Adotante @relation(fields: [adotante_id], references: [id])
+  pet      Pet      @relation(fields: [pet_id], references: [pet_id])
+  adotante Adotante @relation(fields: [adotante_id], references: [adotante_id])
 }
