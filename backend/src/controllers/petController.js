@@ -32,6 +32,29 @@ export const getAllAvailablePets = async (req, res) => {
     res.status(500).json({ error: 'Não foi possível listar os pets.' });
   }
 };
+// READ (Listar TODOS os pets)
+export const getAllPets = async (req, res) => {
+  try {
+    const pets = await prisma.pet.findMany();
+    res.status(200).json(pets);
+  } catch (error) {
+    res.status(500).json({ error: 'Não foi possível listar todos os pets.' });
+  }
+};
+
+// READ (Listar pets adotados)
+export const getAllAdoptedPets = async (req, res) => {
+  try {
+    const petsAdotados = await prisma.pet.findMany({
+      where: {
+        status: 'ADOTADO',
+      },
+    });
+    res.status(200).json(petsAdotados);
+  } catch (error) {
+    res.status(500).json({ error: 'Não foi possível listar os pets adotados.' });
+  }
+};
 
 export const updatePet = async (req, res) => {
   try {
@@ -88,26 +111,3 @@ export const deletePet = async (req, res) => {
   }
 };
 
-// READ (Listar TODOS os pets)
-export const getAllPets = async (req, res) => {
-  try {
-    const pets = await prisma.pet.findMany();
-    res.status(200).json(pets);
-  } catch (error) {
-    res.status(500).json({ error: 'Não foi possível listar todos os pets.' });
-  }
-};
-
-// READ (Listar pets adotados)
-export const getAllAdoptedPets = async (req, res) => {
-  try {
-    const petsAdotados = await prisma.pet.findMany({
-      where: {
-        status: 'ADOTADO',
-      },
-    });
-    res.status(200).json(petsAdotados);
-  } catch (error) {
-    res.status(500).json({ error: 'Não foi possível listar os pets adotados.' });
-  }
-};
