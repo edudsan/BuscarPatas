@@ -69,9 +69,9 @@ export const updateAdocao = async (req, res) => {
       const petIdAntigo = adocaoOriginal.pet_id;
       const petIdNovo = pet_id ? parseInt(pet_id) : null;
 
-      
+
       if (petIdNovo && petIdNovo !== petIdAntigo) {
-        
+
         await prisma.pet.update({
           where: { pet_id: petIdAntigo },
           data: { status: 'DISPONIVEL' },
@@ -88,7 +88,7 @@ export const updateAdocao = async (req, res) => {
       if (adotante_id) dadosParaAtualizar.adotante_id = parseInt(adotante_id);
       if (data_adocao) dadosParaAtualizar.data_adocao = new Date(data_adocao);
 
-      
+
       const adocao = await prisma.adocao.update({
         where: { adocao_id: parseInt(id) },
         data: dadosParaAtualizar,
@@ -117,7 +117,7 @@ export const deleteAdocao = async (req, res) => {
     const adocaoDeletada = await prisma.$transaction(async (prisma) => {
       // Encontra a adoção para saber qual pet está associado a ela
       const adocao = await prisma.adocao.findUnique({
-        where: { id: parseInt(id) },
+        where: { adocao_id: parseInt(id) },
       });
 
       if (!adocao) {
@@ -133,7 +133,7 @@ export const deleteAdocao = async (req, res) => {
 
       //  Deleta o registro da adoção
       return await prisma.adocao.delete({
-        where: { id: parseInt(id) },
+        where: { adocao_id: parseInt(id) },
       });
     });
 

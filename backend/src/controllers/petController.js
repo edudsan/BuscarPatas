@@ -4,8 +4,15 @@ const prisma = new PrismaClient();
 // CREATE
 export const createPet = async (req, res) => {
   try {
-    const { nome, especie, data_nascimento, descricao } = req.body;
-    // Padroniza os campos opcionais se eles forem enviados
+    const { nome, especie, data_nascimento, descricao, status, tamanho, personalidade } = req.body;
+
+    const dadosCriacao = {
+      nome,
+      especie,
+      data_nascimento: data_nascimento ? new Date(data_nascimento) : null,
+      descricao,
+    };
+
     if (status) {
       dadosCriacao.status = status.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
@@ -15,14 +22,11 @@ export const createPet = async (req, res) => {
     if (personalidade) {
       dadosCriacao.personalidade = personalidade.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
+
     const novoPet = await prisma.pet.create({
-      data: {
-        nome,
-        especie,
-        data_nascimento: new Date(data_nascimento),
-        descricao,
-      },
+      data: dadosCriacao,
     });
+
     res.status(201).json(novoPet);
   } catch (error) {
     res.status(500).json({ error: 'Não foi possível cadastrar o pet.' });
