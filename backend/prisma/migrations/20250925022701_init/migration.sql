@@ -1,6 +1,12 @@
 -- CreateEnum
 CREATE TYPE "StatusPet" AS ENUM ('DISPONIVEL', 'ADOTADO');
 
+-- CreateEnum
+CREATE TYPE "TamanhoPet" AS ENUM ('PEQUENO', 'MEDIO', 'GRANDE');
+
+-- CreateEnum
+CREATE TYPE "PersonalidadePet" AS ENUM ('CALMO', 'BRINCALHAO', 'INDEPENDENTE');
+
 -- CreateTable
 CREATE TABLE "Pet" (
     "pet_id" SERIAL NOT NULL,
@@ -9,6 +15,8 @@ CREATE TABLE "Pet" (
     "data_nascimento" DATE,
     "descricao" TEXT,
     "status" "StatusPet" NOT NULL DEFAULT 'DISPONIVEL',
+    "tamanho" "TamanhoPet",
+    "personalidade" "PersonalidadePet",
 
     CONSTRAINT "Pet_pkey" PRIMARY KEY ("pet_id")
 );

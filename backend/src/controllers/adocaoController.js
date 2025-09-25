@@ -55,18 +55,55 @@ export const updateAdocao = async (req, res) => {
   try {
     const { id } = req.params;
     const { pet_id, adotante_id, data_adocao } = req.body;
-    
-    const dadosParaAtualizar = {};
-    if (pet_id) dadosParaAtualizar.pet_id = parseInt(pet_id);
-    if (adotante_id) dadosParaAtualizar.adotante_id = parseInt(adotante_id);
-    if (data_adocao) dadosParaAtualizar.data_adocao = new Date(data_adocao);
 
-    const adocaoAtualizada = await prisma.adocao.update({
-      where: { id: parseInt(id) },
-      data: dadosParaAtualizar,
+    // Usamos uma transação para garantir a consistência dos dados
+    const adocaoAtualizada = await prisma.$transaction(async (prisma) => {
+      const adocaoOriginal = await prisma.adocao.findUnique({
+        where: { adocao_id: parseInt(id) },
+      });
+
+      if (!adocaoOriginal) {
+        throw new Error('Adoção não encontrada.');
+      }
+
+      const petIdAntigo = adocaoOriginal.pet_id;
+      const petIdNovo = pet_id ? parseInt(pet_id) : null;
+
+      
+      if (petIdNovo && petIdNovo !== petIdAntigo) {
+        
+        await prisma.pet.update({
+          where: { pet_id: petIdAntigo },
+          data: { status: 'DISPONIVEL' },
+        });
+
+        await prisma.pet.update({
+          where: { pet_id: petIdNovo },
+          data: { status: 'ADOTADO' },
+        });
+      }
+
+      const dadosParaAtualizar = {};
+      if (petIdNovo) dadosParaAtualizar.pet_id = petIdNovo;
+      if (adotante_id) dadosParaAtualizar.adotante_id = parseInt(adotante_id);
+      if (data_adocao) dadosParaAtualizar.data_adocao = new Date(data_adocao);
+
+      
+      const adocao = await prisma.adocao.update({
+        where: { adocao_id: parseInt(id) },
+        data: dadosParaAtualizar,
+      });
+
+      return adocao;
     });
+
     res.status(200).json(adocaoAtualizada);
   } catch (error) {
+    if (error.message === 'Adoção não encontrada.') {
+      return res.status(404).json({ error: error.message });
+    }
+    // Adiciona um log para depuração no terminal
+    console.error(error);
     res.status(500).json({ error: 'Não foi possível atualizar a adoção.' });
   }
 };
@@ -86,6 +123,7 @@ export const deleteAdocao = async (req, res) => {
       if (!adocao) {
         throw new Error('Adoção não encontrada.');
       }
+
 
       // Atualiza o status do pet de volta para "DISPONIVEL"
       await prisma.pet.update({

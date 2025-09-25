@@ -5,6 +5,16 @@ const prisma = new PrismaClient();
 export const createPet = async (req, res) => {
   try {
     const { nome, especie, data_nascimento, descricao } = req.body;
+    // Padroniza os campos opcionais se eles forem enviados
+    if (status) {
+      dadosCriacao.status = status.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+    if (tamanho) {
+      dadosCriacao.tamanho = tamanho.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+    if (personalidade) {
+      dadosCriacao.personalidade = personalidade.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
     const novoPet = await prisma.pet.create({
       data: {
         nome,
@@ -32,13 +42,38 @@ export const getAllAvailablePets = async (req, res) => {
     res.status(500).json({ error: 'Não foi possível listar os pets.' });
   }
 };
-// READ (Listar TODOS os pets)
+
+// READ (Listar todos os pets com filtro avançado)
 export const getAllPets = async (req, res) => {
   try {
-    const pets = await prisma.pet.findMany();
+    // Pega os possíveis filtros da query da URL (ex: /pets?especie=Gato&tamanho=PEQUENO)
+    const { especie, status, tamanho, personalidade } = req.query;
+
+    // Objeto que vai guardar as condições do filtro
+    const where = {};
+
+    if (especie) {
+      where.especie = especie;
+    }
+    if (status) {
+      where.status = status;
+    }
+    if (tamanho) {
+      where.tamanho = tamanho;
+    }
+    if (personalidade) {
+      where.personalidade = personalidade;
+    }
+
+    // Busca os pets no banco de dados aplicando os filtros construídos
+    const pets = await prisma.pet.findMany({
+      where: where,
+    });
+    
     res.status(200).json(pets);
   } catch (error) {
-    res.status(500).json({ error: 'Não foi possível listar todos os pets.' });
+    console.error(error); 
+    res.status(500).json({ error: 'Não foi possível listar os pets.' });
   }
 };
 
@@ -60,7 +95,7 @@ export const getAllAdoptedPets = async (req, res) => {
 export const updatePet = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, especie, data_nascimento, descricao, status } = req.body;
+    const { nome, especie, data_nascimento, descricao, status, tamanho, personalidade } = req.body;
 
     // Objeto que guardará apenas os dados que foram enviados na requisição
     const dadosParaAtualizar = {};
@@ -78,14 +113,19 @@ export const updatePet = async (req, res) => {
       dadosParaAtualizar.descricao = descricao;
     }
     if (status) {
-      // Validação para garantir que o status seja um dos valores permitidos pelo Enum
-      if (status === 'DISPONIVEL' || status === 'ADOTADO') {
-        dadosParaAtualizar.status = status;
+      const statusTratado = status.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (statusTratado === 'DISPONIVEL' || statusTratado === 'ADOTADO') {
+        dadosParaAtualizar.status = statusTratado;
       } else {
         return res.status(400).json({ error: 'O status deve ser DISPONIVEL ou ADOTADO.' });
       }
     }
-
+    if (tamanho) {
+      dadosParaAtualizar.tamanho = tamanho.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+    if (personalidade) {
+      dadosParaAtualizar.personalidade = personalidade.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
     const petAtualizado = await prisma.pet.update({
       where: { pet_id: parseInt(id) }, 
       data: dadosParaAtualizar, 

@@ -10,10 +10,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enum para o status do Pet, uma boa prática para campos com valores definidos
+// Enum para o status do Pet
 enum StatusPet {
   DISPONIVEL
   ADOTADO
+}
+
+// Enums para filtro avançado
+enum TamanhoPet {
+  PEQUENO
+  MEDIO
+  GRANDE
+}
+
+enum PersonalidadePet {
+  CALMO
+  BRINCALHAO
+  INDEPENDENTE
 }
 
 // Modelo para os Pets
@@ -25,6 +38,8 @@ model Pet {
   descricao       String?
   status          StatusPet  @default(DISPONIVEL)
   adocao          Adocao?
+  tamanho         TamanhoPet? 
+  personalidade   PersonalidadePet? 
 }
 
 // Modelo para os Adotantes

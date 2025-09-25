@@ -4,7 +4,6 @@ const prisma = new PrismaClient();
 // CREATE
 export const createAdotante = async (req, res) => {
   try {
-    // Adicionamos os novos campos de endereço
     const { nome, email, telefone, rua, numero, bairro, cidade, uf } = req.body;
     const novoAdotante = await prisma.adotante.create({
       data: {
@@ -39,7 +38,7 @@ export const getAdotantesSemAdocao = async (req, res) => {
   try {
     const adotantes = await prisma.adotante.findMany({
       where: {
-        // Filtra por adotantes que não têm nenhuma relação em 'adocoes'
+        // Filtra por adotantes que não têm nenhuma relação em adocoes
         adocoes: {
           none: {},
         },
@@ -92,7 +91,7 @@ export const deleteAdotante = async (req, res) => {
       where: { adotante_id: parseInt(id) },
     });
 
-    res.status(204).send(); // Resposta de sucesso sem conteúdo
+    res.status(204).send(); 
   } catch (error) {
     // Trata o caso em que o adotante com o ID fornecido não é encontrado
     if (error.code === 'P2025') {
