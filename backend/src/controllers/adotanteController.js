@@ -57,12 +57,12 @@ export const getAdotantesSemAdocao = async (req, res) => {
 export const updateAdotante = async (req, res) => {
   try {
     const { id } = req.params;
-    // 1. Extrai todos os possíveis campos do corpo da requisição
+    // Extrai todos os possíveis campos do corpo da requisição
     const { nome, email, telefone, rua, numero, bairro, cidade, uf } = req.body;
 
     const dadosParaAtualizar = {};
 
-    // 2. Verifica campo por campo e adiciona ao objeto de atualização
+    // Verifica campo por campo e adiciona ao objeto de atualização
     if (nome) dadosParaAtualizar.nome = nome;
     if (email) dadosParaAtualizar.email = email;
     if (rua) dadosParaAtualizar.rua = rua;
@@ -70,9 +70,9 @@ export const updateAdotante = async (req, res) => {
     if (bairro) dadosParaAtualizar.bairro = bairro;
     if (cidade) dadosParaAtualizar.cidade = cidade;
     if (uf) dadosParaAtualizar.uf = uf;
-    if (telefone) {
+    if (telefone) 
       dadosParaAtualizar.telefone = telefone.replace(/\D/g, '');
-    }
+    
     
 
     const adotanteAtualizado = await prisma.adotante.update({

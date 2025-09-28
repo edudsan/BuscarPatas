@@ -34,12 +34,14 @@ model Pet {
   pet_id              Int        @id @default(autoincrement())
   nome            String
   especie         String
-  data_nascimento DateTime?  @db.Date // Opcional, pois pode ser aproximada
+  data_nascimento DateTime?  @db.Date
   descricao       String?
   status          StatusPet  @default(DISPONIVEL)
   adocao          Adocao?
-  tamanho         TamanhoPet? 
-  personalidade   PersonalidadePet? 
+  tamanho         TamanhoPet?
+  personalidade   PersonalidadePet?
+  imagem_url1     String?
+  imagem_url2     String?
 }
 
 // Modelo para os Adotantes

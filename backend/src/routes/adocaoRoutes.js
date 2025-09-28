@@ -6,7 +6,7 @@ const router = Router();
 
 router.post('/', createAdocao);
 router.get('/', getAllAdocoes);
-router.put('/:id', updateAdocao);     
+router.patch('/:id', updateAdocao);     
 router.delete('/:id', deleteAdocao); 
 
 export default router;
