@@ -104,18 +104,10 @@ export const updatePet = async (req, res) => {
     // Objeto que guardará apenas os dados que foram enviados na requisição
     const dadosParaAtualizar = {};
 
-    if (nome) {
-      dadosParaAtualizar.nome = nome;
-    }
-    if (especie) {
-      dadosParaAtualizar.especie = especie;
-    }
-    if (data_nascimento) {
-      dadosParaAtualizar.data_nascimento = new Date(data_nascimento);
-    }
-    if (descricao) {
-      dadosParaAtualizar.descricao = descricao;
-    }
+    if (nome) dadosParaAtualizar.nome = nome;
+    if (especie) dadosParaAtualizar.especie = especie;
+    if (data_nascimento) dadosParaAtualizar.data_nascimento = new Date(data_nascimento);
+    if (descricao) dadosParaAtualizar.descricao = descricao;
     if (status) {
       const statusTratado = status.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       if (statusTratado === 'DISPONIVEL' || statusTratado === 'ADOTADO') {
@@ -124,12 +116,8 @@ export const updatePet = async (req, res) => {
         return res.status(400).json({ error: 'O status deve ser DISPONIVEL ou ADOTADO.' });
       }
     }
-    if (tamanho) {
-      dadosParaAtualizar.tamanho = tamanho.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    }
-    if (personalidade) {
-      dadosParaAtualizar.personalidade = personalidade.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    }
+    if (tamanho) dadosParaAtualizar.tamanho = tamanho.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (personalidade) dadosParaAtualizar.personalidade = personalidade.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const petAtualizado = await prisma.pet.update({
       where: { pet_id: parseInt(id) }, 
       data: dadosParaAtualizar, 

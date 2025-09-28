@@ -9,7 +9,8 @@ router.get('/', getAllPets);
 router.get('/disponiveis', getAllAvailablePets);
 router.get('/adotados', getAllAdoptedPets); 
 
-router.put('/:id', updatePet);
+router.patch('/:id', updatePet);
+
 router.delete('/:id', deletePet);
 
 export default router;

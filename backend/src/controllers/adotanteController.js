@@ -5,11 +5,14 @@ const prisma = new PrismaClient();
 export const createAdotante = async (req, res) => {
   try {
     const { nome, email, telefone, rua, numero, bairro, cidade, uf } = req.body;
+
+    const telefoneSanitizado = telefone ? telefone.replace(/\D/g, '') : undefined;
+    
     const novoAdotante = await prisma.adotante.create({
       data: {
         nome,
         email,
-        telefone,
+        telefone: telefoneSanitizado,
         rua,
         numero,
         bairro,
@@ -54,10 +57,26 @@ export const getAdotantesSemAdocao = async (req, res) => {
 export const updateAdotante = async (req, res) => {
   try {
     const { id } = req.params;
-    const dadosParaAtualizar = req.body; // Pega todos os campos enviados
+    // 1. Extrai todos os possíveis campos do corpo da requisição
+    const { nome, email, telefone, rua, numero, bairro, cidade, uf } = req.body;
+
+    const dadosParaAtualizar = {};
+
+    // 2. Verifica campo por campo e adiciona ao objeto de atualização
+    if (nome) dadosParaAtualizar.nome = nome;
+    if (email) dadosParaAtualizar.email = email;
+    if (rua) dadosParaAtualizar.rua = rua;
+    if (numero) dadosParaAtualizar.numero = numero;
+    if (bairro) dadosParaAtualizar.bairro = bairro;
+    if (cidade) dadosParaAtualizar.cidade = cidade;
+    if (uf) dadosParaAtualizar.uf = uf;
+    if (telefone) {
+      dadosParaAtualizar.telefone = telefone.replace(/\D/g, '');
+    }
+    
 
     const adotanteAtualizado = await prisma.adotante.update({
-       where: { adotante_id: parseInt(id) },
+      where: { adotante_id: parseInt(id) }, 
       data: dadosParaAtualizar,
     });
     res.status(200).json(adotanteAtualizado);

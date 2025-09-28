@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { 
-  createAdotante, getAllAdotantes, getAdotantesSemAdocao,updateAdotante, deleteAdotante} from '../controllers/adotanteController.js';
+  createAdotante, 
+  getAllAdotantes, 
+  getAdotantesSemAdocao,
+  updateAdotante, 
+  deleteAdotante
+} from '../controllers/adotanteController.js';
 
 const router = Router();
 
@@ -9,7 +14,7 @@ router.get('/', getAllAdotantes);
 
 router.post('/', createAdotante);
 
-router.put('/:id', updateAdotante);
+router.patch('/:id', updateAdotante);
 
 router.delete('/:id', deleteAdotante);
 
