@@ -1,42 +1,64 @@
-import { CtaBanner } from '../components/CtaBanner/CtaBanner'
-import { FAQSection } from '../components/FaqSection/FaqSection'
+import { useState, useEffect } from 'react';
+import { Container } from 'react-bootstrap';
+import { CtaBanner } from '../components/CtaBanner/CtaBanner';
+import { FAQSection } from '../components/FaqSection/FaqSection';
+import { PetFilters } from '../components/PetFilters/PetFilters';
+import { PetList } from '../components/PetList/PetList';
 
 export function Home() {
+  const [pets, setPets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({});
+
+  useEffect(() => {
+    async function fetchPets() {
+      setLoading(true);
+      
+      // String de query com os filtros ativos
+      const queryParams = new URLSearchParams(filters).toString();
+      const url = `http://localhost:3000/pets?${queryParams}`;
+      
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        setPets(data);
+      } catch (error) {
+        console.error("Falha ao buscar pets:", error);
+        // Em caso de erro, define a lista de pets como vazia
+        setPets([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPets();
+  }, [filters]); 
+
+  // Função que será chamada pelo componente PetFilters quando o usuário aplicar um filtro
+  const handleFilterChange = (newFilters) => {
+    // Remove filtros vazios (ex: { tamanho: "" }) antes de atualizar o estado
+    const activeFilters = Object.fromEntries(
+      Object.entries(newFilters).filter(([, value]) => value !== '')
+    );
+    setFilters(activeFilters);
+  };
+
   return (
     <main>
-      <h1 className="fs-5 px-3 py-2">Bem-vindo ao Buscar Patas!</h1>
       <CtaBanner />
-      <section id="busca">
-        <h2>Conheça os pets que ainda precisam de um lar</h2>
-        <h3>Seção de Busca</h3>
-        <p>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Cupiditate
-          reiciendis deleniti maxime ab nihil ipsa. A, quam adipisci harum,
-          reiciendis accusamus optio dolores omnis eius, minus sunt asperiores
-          hic tenetur. Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-          Possimus recusandae, exercitationem quos fugiat provident sint,
-          aliquid aut tenetur, eligendi nostrum cupiditate ab eaque hic optio
-          doloribus perferendis deleniti praesentium placeat. Lorem ipsum dolor
-          sit amet consectetur adipisicing elit. Quos est fuga consequuntur.
-          Modi distinctio nam illum iure doloribus veritatis placeat voluptatum
-          fuga tenetur voluptate fugit blanditiis similique magnam, odit ab!
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti
-          eveniet voluptate ut numquam fuga sint iusto consectetur doloribus
-          maxime, nostrum minus iure nesciunt vitae beatae corrupti quia porro
-          doloremque eum? Lorem ipsum dolor sit amet consectetur, adipisicing
-          elit. Et laudantium provident delectus exercitationem nesciunt nam
-          placeat accusantium sequi aspernatur sint molestias omnis, officiis
-          voluptas suscipit voluptatem repudiandae ducimus cupiditate maxime.
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis ipsum
-          eaque officiis exercitationem veritatis officia consectetur ea sed
-          deserunt dignissimos? Voluptatibus, maxime nulla? Quis doloribus
-          adipisci similique dicta, enim molestias.
-        </p>
-      </section>
 
-      <section>
-        <FAQSection />
-      </section>
+      {/* Esta é a seção de busca que será renderizada */}
+      <Container as="section" id="busca" className="py-5 my-4">
+        <h2 className="text-center mb-4 display-5 fw-light">Encontre seu novo amigo</h2>
+        
+        {/* Componente de Filtros */}
+        <PetFilters onFilterChange={handleFilterChange} />
+        
+        {/* Componente que lista os Pets */}
+        <PetList pets={pets} loading={loading} />
+      </Container>
+
+      <FAQSection />
     </main>
-  )
+  );
 }
