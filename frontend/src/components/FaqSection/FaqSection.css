@@ -1,0 +1,15 @@
+
+.faq-paw-icon {
+    color: var(--cor-azul) !important; 
+}
+
+.faq-title-icon {
+    color: var(--cor-azul) !important;
+}
+
+
+.accordion-button:not(.collapsed) {
+    color: var(--cor-azul) !important;
+    background-color: var(--cor-azul-claro) !important; 
+    box-shadow: none;
+}

@@ -1,0 +1,20 @@
+.btn-principal {
+    background-color: var(--cor-laranja) !important;
+    border-color: var(--cor-laranja) !important;
+    color: #000 !important;
+    font-weight: bold;
+    transition: scale .2s ease-in-out !important;
+}
+
+.btn-principal:hover {
+    scale: 1.1;
+}
+
+
+:root {
+    --cor-azul: #2F6C9B;
+    --cor-azul-claro: #72AFC3;
+    --cor-verde: #86C89A;
+    --cor-laranja: #F58C5C; 
+}
+

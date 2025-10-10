@@ -7,26 +7,6 @@
     width: 100px;
 }
 
-.btn-register {
-    background-color: #F58C5C !important;
-    border-color: #F58C5C !important;
-    color: #000 !important;
-    font-weight: bold;
-    transition: scale 2s ease-in-out;
-}
-
-.btn-register:hover,
-.btn-login:hover {
-    scale: 1.1;
-}
-
-.btn-login {
-    background-color: #F58C5C !important;
-    border-color: #F58C5C !important;
-    color: #000 !important;
-    font-weight: bold;
-    transition: scale 2s ease-in-out;
-}
 
 .nav-custom-link {
     color: #86C89A !important; 
@@ -42,4 +22,6 @@
     scroll-margin-top: 150px; 
 }
 
-
+#faq {
+    scroll-margin-top: 150px; 
+}
