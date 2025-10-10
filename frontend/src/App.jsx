@@ -1,3 +1,14 @@
+import { AppRoutes } from './routes/AppRoutes'
+import { Header } from './components/Header/Header'
+import { ScrollToTop } from './components/ScrollToTop/ScrollToTop'
+
 export function App() {
-  return <h1>Buscar Patas</h1>
+  return (
+    <>
+      <ScrollToTop />
+      <Header />
+
+      <AppRoutes />
+    </>
+  )
 }

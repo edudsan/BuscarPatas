@@ -1,0 +1,45 @@
+.custom-header {
+    background-color: #000000 !important;
+    border-bottom: 1px solid #222;
+}
+
+.header-logo {
+    width: 100px;
+}
+
+.btn-register {
+    background-color: #F58C5C !important;
+    border-color: #F58C5C !important;
+    color: #000 !important;
+    font-weight: bold;
+    transition: scale 2s ease-in-out;
+}
+
+.btn-register:hover,
+.btn-login:hover {
+    scale: 1.1;
+}
+
+.btn-login {
+    background-color: #F58C5C !important;
+    border-color: #F58C5C !important;
+    color: #000 !important;
+    font-weight: bold;
+    transition: scale 2s ease-in-out;
+}
+
+.nav-custom-link {
+    color: #86C89A !important; 
+    font-size: 1.1rem; 
+    font-weight: 500; 
+}
+
+.nav-custom-link:hover {
+    border-bottom: 2px solid #F58C5C !important;
+}
+
+#busca {
+    scroll-margin-top: 150px; 
+}
+
+
