@@ -36,7 +36,7 @@ export function Home() {
 
   // Função que será chamada pelo componente PetFilters quando o usuário aplicar um filtro
   const handleFilterChange = (newFilters) => {
-    // Remove filtros vazios (ex: { tamanho: "" }) antes de atualizar o estado
+    
     const activeFilters = Object.fromEntries(
       Object.entries(newFilters).filter(([, value]) => value !== '')
     );
@@ -47,14 +47,14 @@ export function Home() {
     <main>
       <CtaBanner />
 
-      {/* Esta é a seção de busca que será renderizada */}
+      
       <Container as="section" id="busca" className="py-5 my-4">
         <h2 className="text-center mb-4 display-5 fw-light">Encontre seu novo amigo</h2>
         
-        {/* Componente de Filtros */}
+        
         <PetFilters onFilterChange={handleFilterChange} />
         
-        {/* Componente que lista os Pets */}
+        
         <PetList pets={pets} loading={loading} />
       </Container>
 
