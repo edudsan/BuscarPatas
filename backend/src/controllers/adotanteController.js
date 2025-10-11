@@ -1,18 +1,20 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
+import bcrypt from 'bcryptjs';
 
 // CREATE
 export const createAdotante = async (req, res) => {
   try {
-    const { nome, email, telefone, rua, numero, bairro, cidade, uf } = req.body;
-
-    const telefoneSanitizado = telefone ? telefone.replace(/\D/g, '') : undefined;
+    const { nome, email, senha, telefone, rua, numero, bairro, cidade, uf } = req.body;
+    const senhaHash = await bcrypt.hash(senha, 10);
+    const telefonePadrao = telefone ? telefone.replace(/\D/g, '') : undefined;
     
     const novoAdotante = await prisma.adotante.create({
       data: {
         nome,
         email,
-        telefone: telefoneSanitizado,
+        senha: senhaHash,
+        telefone: telefonePadrao,
         rua,
         numero,
         bairro,
@@ -20,8 +22,11 @@ export const createAdotante = async (req, res) => {
         uf,
       },
     });
+    delete novoAdotante.senha;
     res.status(201).json(novoAdotante);
   } catch (error) {
+    console.error(error); 
+
     res.status(500).json({ error: 'Não foi possível cadastrar o adotante.' });
   }
 };

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Button, Container, Row, Col, Alert, ProgressBar } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Alert, ProgressBar, InputGroup  } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 // Função para verificar a força da senha
 const checkPasswordStrength = (password) => {
@@ -56,6 +58,8 @@ export function Cadastro() {
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, label: '', color: '' });
   const [confirmError, setConfirmError] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -159,13 +163,21 @@ export function Cadastro() {
 
             <Form.Group className="mb-3">
               <Form.Label>Senha</Form.Label>
-              <Form.Control 
-                type="password" 
-                name="senha" 
-                value={formData.senha} 
-                onChange={handleChange} 
-                required 
-              />
+              <InputGroup>
+                <Form.Control 
+                  type={showPassword ? 'text' : 'password'} // Alterna o tipo do campo
+                  name="senha" 
+                  value={formData.senha} 
+                  onChange={handleChange} 
+                  required 
+                />
+                <InputGroup.Text 
+                  onClick={() => setShowPassword(!showPassword)} 
+                  style={{ cursor: 'pointer' }}
+                >
+                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                </InputGroup.Text>
+              </InputGroup>
               {formData.senha && (
                 <ProgressBar 
                   now={passwordStrength.score} 
@@ -179,17 +191,25 @@ export function Cadastro() {
 
             <Form.Group className="mb-3">
               <Form.Label>Confirmar Senha</Form.Label>
-              <Form.Control 
-                type="password" 
-                name="confirmarSenha" 
-                value={formData.confirmarSenha} 
-                onChange={handleChange} 
-                required
-                isInvalid={!!confirmError}
-              />
-              <Form.Control.Feedback type="invalid">
-                {confirmError}
-              </Form.Control.Feedback>
+              <InputGroup>
+                <Form.Control 
+                  type={showConfirmPassword ? 'text' : 'password'} // Alterna o tipo do campo
+                  name="confirmarSenha" 
+                  value={formData.confirmarSenha} 
+                  onChange={handleChange} 
+                  required
+                  isInvalid={!!confirmError}
+                />
+                <InputGroup.Text 
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
+                  style={{ cursor: 'pointer' }}
+                >
+                  <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                </InputGroup.Text>
+                <Form.Control.Feedback type="invalid">
+                  {confirmError}
+                </Form.Control.Feedback>
+              </InputGroup>
             </Form.Group>
             
             <Form.Group className="mb-3">

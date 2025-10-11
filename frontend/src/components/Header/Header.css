@@ -25,3 +25,19 @@
 #faq {
     scroll-margin-top: 150px; 
 }
+
+@media (max-width: 991.98px) {
+
+  .navbar-collapse .btn-principal {
+    width: 50%;
+    text-align: center; 
+  }
+
+  .navbar-collapse .btn-principal + .btn-principal {
+    margin-top: 0.75rem; 
+  }
+
+  .navbar-collapse .me-3 {
+    margin-right: 0 !important;
+  }
+}

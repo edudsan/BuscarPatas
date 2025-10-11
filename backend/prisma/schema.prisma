@@ -29,6 +29,12 @@ enum PersonalidadePet {
   INDEPENDENTE
 }
 
+// Enum para definir os papéis do usuário
+enum Role {
+  USER
+  ADMIN
+}
+
 // Modelo para os Pets
 model Pet {
   pet_id              Int        @id @default(autoincrement())
@@ -51,7 +57,7 @@ model Adotante {
   email    String   @unique
   telefone String
   
-  // Endereço foi dividido em campos compostos
+  // Endereço está em campos compostos
   rua      String
   numero   String? // Opcional, pois pode não ter número
   bairro   String
@@ -59,6 +65,9 @@ model Adotante {
   uf       String   @db.VarChar(2) // Limita a 2 caracteres, ex: "DF"
 
   adocoes  Adocao[]
+
+  senha    String
+  role     Role     @default(USER) // USER como padrão
 }
 
 // Modelo para as Adoções

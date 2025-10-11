@@ -1,16 +1,20 @@
 import { Router } from 'express';
 import { createPet, getAllAvailablePets, updatePet, deletePet, getAllPets, getAllAdoptedPets} from '../controllers/petController.js';
+import { protect, isAdmin } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
-router.post('/', createPet);
+//  ROTAS PROTEGIDAS PARA ADMINS 
+router.post('/', protect, isAdmin, createPet);
+router.patch('/:id', protect, isAdmin, updatePet);
+router.delete('/:id', protect, isAdmin, deletePet);
+
+
+//  ROTAS PÚBLICAS 
 
 router.get('/', getAllPets); 
 router.get('/disponiveis', getAllAvailablePets);
 router.get('/adotados', getAllAdoptedPets); 
 
-router.patch('/:id', updatePet);
-
-router.delete('/:id', deletePet);
 
 export default router;
