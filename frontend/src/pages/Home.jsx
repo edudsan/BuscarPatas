@@ -4,6 +4,7 @@ import { CtaBanner } from '../components/CtaBanner/CtaBanner'
 import { FAQSection } from '../components/FaqSection/FaqSection'
 import { PetFilters } from '../components/PetFilters/PetFilters'
 import { PetList } from '../components/PetList/PetList'
+import { Footer } from '../components/Footer/Footer'
 
 export function Home() {
   const [pets, setPets] = useState([])
@@ -70,6 +71,7 @@ export function Home() {
         reversed={true}
       />
       <FAQSection />
+      <Footer />
     </main>
   )
 }

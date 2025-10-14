@@ -12,6 +12,7 @@ import {
 } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { Footer } from '../components/Footer/Footer'
 
 // Função para verificar a força da senha
 const checkPasswordStrength = (password) => {
@@ -148,184 +149,187 @@ export function Cadastro() {
   }
 
   return (
-    <Container className="my-5">
-      <Row className="justify-content-center">
-        <Col md={8} lg={6}>
-          <h2 className="text-center mb-4">Crie sua Conta</h2>
-          <Form noValidate onSubmit={handleSubmit}>
-            {apiError && <Alert variant="danger">{apiError}</Alert>}
+    <>
+      <Container className="my-5">
+        <Row className="justify-content-center">
+          <Col md={8} lg={6}>
+            <h2 className="text-center mb-4">Crie sua Conta</h2>
+            <Form noValidate onSubmit={handleSubmit}>
+              {apiError && <Alert variant="danger">{apiError}</Alert>}
 
-            <Form.Group className="mb-3">
-              <Form.Label>Nome Completo</Form.Label>
-              <Form.Control
-                type="text"
-                name="nome"
-                value={formData.nome}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>E-mail</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                isInvalid={!!emailError}
-              />
-              <Form.Control.Feedback type="invalid">
-                {emailError || 'Por favor, insira um e-mail válido.'}
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Senha</Form.Label>
-              <InputGroup>
+              <Form.Group className="mb-3">
+                <Form.Label>Nome Completo</Form.Label>
                 <Form.Control
-                  type={showPassword ? 'text' : 'password'} // Alterna o tipo do campo
-                  name="senha"
-                  value={formData.senha}
+                  type="text"
+                  name="nome"
+                  value={formData.nome}
                   onChange={handleChange}
                   required
                 />
-                <InputGroup.Text
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                </InputGroup.Text>
-              </InputGroup>
-              {formData.senha && (
-                <ProgressBar
-                  now={passwordStrength.score}
-                  variant={passwordStrength.color}
-                  label={passwordStrength.label}
-                  className="mt-2"
-                  style={{ height: '10px' }}
-                />
-              )}
-            </Form.Group>
+              </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Confirmar Senha</Form.Label>
-              <InputGroup>
+              <Form.Group className="mb-3">
+                <Form.Label>E-mail</Form.Label>
                 <Form.Control
-                  type={showConfirmPassword ? 'text' : 'password'} // Alterna o tipo do campo
-                  name="confirmarSenha"
-                  value={formData.confirmarSenha}
+                  type="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
                   required
-                  isInvalid={!!confirmError}
+                  isInvalid={!!emailError}
                 />
-                <InputGroup.Text
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <FontAwesomeIcon
-                    icon={showConfirmPassword ? faEyeSlash : faEye}
-                  />
-                </InputGroup.Text>
                 <Form.Control.Feedback type="invalid">
-                  {confirmError}
+                  {emailError || 'Por favor, insira um e-mail válido.'}
                 </Form.Control.Feedback>
-              </InputGroup>
-            </Form.Group>
+              </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Telefone</Form.Label>
-              <Form.Control
-                type="text"
-                name="telefone"
-                value={formData.telefone}
-                onChange={handleChange}
-                placeholder="(XX) XXXXX-XXXX"
-                required
-              />
-            </Form.Group>
-
-            <hr />
-
-            <h4 className="h5 mt-4 mb-3">Endereço</h4>
-            <Row>
-              <Col md={8}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Rua</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label>Senha</Form.Label>
+                <InputGroup>
                   <Form.Control
-                    type="text"
-                    name="rua"
-                    value={formData.rua}
+                    type={showPassword ? 'text' : 'password'} // Alterna o tipo do campo
+                    name="senha"
+                    value={formData.senha}
                     onChange={handleChange}
                     required
                   />
-                </Form.Group>
-              </Col>
-              <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Número</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="numero"
-                    value={formData.numero}
-                    onChange={handleChange}
+                  <InputGroup.Text
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                  </InputGroup.Text>
+                </InputGroup>
+                {formData.senha && (
+                  <ProgressBar
+                    now={passwordStrength.score}
+                    variant={passwordStrength.color}
+                    label={passwordStrength.label}
+                    className="mt-2"
+                    style={{ height: '10px' }}
                   />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={5}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Bairro</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="bairro"
-                    value={formData.bairro}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={5}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Cidade</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="cidade"
-                    value={formData.cidade}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={2}>
-                <Form.Group className="mb-3">
-                  <Form.Label>UF</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="uf"
-                    value={formData.uf}
-                    onChange={handleChange}
-                    maxLength="2"
-                    required
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
+                )}
+              </Form.Group>
 
-            <div className="d-grid mt-4">
-              <Button
-                type="submit"
-                className="btn-principal"
-                disabled={!!confirmError || !!emailError}
-              >
-                Cadastrar
-              </Button>
-            </div>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
+              <Form.Group className="mb-3">
+                <Form.Label>Confirmar Senha</Form.Label>
+                <InputGroup>
+                  <Form.Control
+                    type={showConfirmPassword ? 'text' : 'password'} // Alterna o tipo do campo
+                    name="confirmarSenha"
+                    value={formData.confirmarSenha}
+                    onChange={handleChange}
+                    required
+                    isInvalid={!!confirmError}
+                  />
+                  <InputGroup.Text
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <FontAwesomeIcon
+                      icon={showConfirmPassword ? faEyeSlash : faEye}
+                    />
+                  </InputGroup.Text>
+                  <Form.Control.Feedback type="invalid">
+                    {confirmError}
+                  </Form.Control.Feedback>
+                </InputGroup>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Telefone</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="telefone"
+                  value={formData.telefone}
+                  onChange={handleChange}
+                  placeholder="(XX) XXXXX-XXXX"
+                  required
+                />
+              </Form.Group>
+
+              <hr />
+
+              <h4 className="h5 mt-4 mb-3">Endereço</h4>
+              <Row>
+                <Col md={8}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Rua</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="rua"
+                      value={formData.rua}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Número</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="numero"
+                      value={formData.numero}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={5}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Bairro</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="bairro"
+                      value={formData.bairro}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={5}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Cidade</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="cidade"
+                      value={formData.cidade}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={2}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>UF</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="uf"
+                      value={formData.uf}
+                      onChange={handleChange}
+                      maxLength="2"
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <div className="d-grid mt-4">
+                <Button
+                  type="submit"
+                  className="btn-principal"
+                  disabled={!!confirmError || !!emailError}
+                >
+                  Cadastrar
+                </Button>
+              </div>
+            </Form>
+          </Col>
+        </Row>
+      </Container>
+      <Footer />
+    </>
   )
 }

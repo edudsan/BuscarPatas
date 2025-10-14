@@ -1,5 +1,6 @@
 import '../../styles/global.css'
 import './CtaBanner.css'
+import { HashLink } from 'react-router-hash-link'
 
 export function CtaBanner({
   imageUrl,
@@ -27,9 +28,9 @@ export function CtaBanner({
           <div className="col-md-6 text-center text-md-start">
             <h1 className="display-5 fw-bold">{title}</h1>
 
-            <a className="btn btn-principal btn-lg mt-3" href={buttonHref}>
+            <HashLink className="btn btn-principal btn-lg mt-3" to={buttonHref}>
               {buttonText}
-            </a>
+            </HashLink>
           </div>
         </div>
       </div>

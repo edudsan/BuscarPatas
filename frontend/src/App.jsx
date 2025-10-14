@@ -7,7 +7,6 @@ export function App() {
     <>
       <ScrollToTop />
       <Header />
-
       <AppRoutes />
     </>
   )
