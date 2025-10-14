@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import { Home } from '../pages/home'
 import { Sobre } from '../pages/sobre'
 import { Cadastro } from '../pages/Cadastro'
-// import { Login } from '../pages/Login/Login'
+import { Login } from '../pages/Login'
 
 export function AppRoutes() {
   return (
@@ -11,7 +11,7 @@ export function AppRoutes() {
 
       <Route path="/sobre" element={<Sobre />} />
       <Route path="/cadastro" element={<Cadastro />} />
-      {/* <Route path="/login" element={<Login />} /> */}
+      <Route path="/login" element={<Login />} />
     </Routes>
   )
 }
