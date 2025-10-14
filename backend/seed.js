@@ -16,7 +16,7 @@ async function main() {
   const senhaPadrao = await bcrypt.hash('senha123', 10);
 
   // Cria os Adotantes
-  const adotantes = await prisma.adotante.createMany({
+  await prisma.adotante.createMany({
     data: [
       { nome: "Mariana Costa", email: "mariana.costa@example.com", senha: senhaPadrao, telefone: "11988776655", rua: "Avenida Paulista", numero: "2000", bairro: "Bela Vista", cidade: "São Paulo", uf: "SP" },
       { nome: "Ricardo Almeida", email: "ricardo.a@example.com", senha: senhaPadrao, telefone: "71911223344", rua: "Rua das Laranjeiras", numero: "50", bairro: "Pelourinho", cidade: "Salvador", uf: "BA" },
@@ -25,10 +25,10 @@ async function main() {
       { nome: "Juliana Santos", email: "juliana.s@example.com", senha: senhaPadrao, telefone: "92992345678", rua: "Rua Tapajós", numero: "45", bairro: "Centro", cidade: "Manaus", uf: "AM" }
     ]
   });
-  console.log(`${adotantes.count} adotantes criados.`);
+  console.log('Adotantes criados.');
 
   // Cria os Pets
-  const pets = await prisma.pet.createMany({
+  await prisma.pet.createMany({
     data: [
       { nome: "Fred", especie: "Cachorro", data_nascimento: new Date("2023-08-10"), descricao: "Vira-lata caramelo muito esperto e carinhoso. Adora crianças.", tamanho: "MEDIO", personalidade: "BRINCALHAO" },
       { nome: "Luna", especie: "Gato", data_nascimento: new Date("2022-04-01"), descricao: "Gata siamesa muito tranquila e um pouco tímida no começo. Gosta de ambientes calmos.", tamanho: "PEQUENO", personalidade: "CALMO" },
@@ -37,22 +37,28 @@ async function main() {
       { nome: "Nino", especie: "Gato", data_nascimento: new Date("2024-05-15"), descricao: "Filhote de gato preto muito curioso e independente. Adora explorar a casa.", tamanho: "PEQUENO", personalidade: "INDEPENDENTE" }
     ]
   });
-  console.log(`${pets.count} pets criados.`);
+  console.log('Pets criados.');
 
   // Realiza as Adoções (usando os IDs que sabemos que serão gerados: 1, 2, 3...)
-  await prisma.$transaction(async (prisma) => {
+  const mariana = await prisma.adotante.findUnique({ where: { email: "mariana.costa@example.com" } });
+  const lucas = await prisma.adotante.findUnique({ where: { email: "lucas.pereira@example.com" } });
+  const fred = await prisma.pet.findFirst({ where: { nome: "Fred" } });
+  const luna = await prisma.pet.findFirst({ where: { nome: "Luna" } });
+
     // Adoção 1: Mariana Costa (id 1) adota Fred (id 1)
-    await prisma.adocao.create({ data: { adotante_id: 1, pet_id: 1 } });
-    await prisma.pet.update({ where: { pet_id: 1 }, data: { status: 'ADOTADO' } });
-    console.log('Adoção 1 realizada.');
-
+  if (mariana && fred) {
+    await prisma.adocao.create({ data: { adotante_id: mariana.adotante_id, pet_id: fred.pet_id } });
+    await prisma.pet.update({ where: { pet_id: fred.pet_id }, data: { status: 'ADOTADO' } });
+    console.log('Adoção 1 (Mariana e Fred) realizada.');
+  }
     // Adoção 2: Lucas Pereira (id 4) adota Luna (id 2)
-    await prisma.adocao.create({ data: { adotante_id: 4, pet_id: 2 } });
-    await prisma.pet.update({ where: { pet_id: 2 }, data: { status: 'ADOTADO' } });
-    console.log('Adoção 2 realizada.');
-  });
+  if (lucas && luna) {
+    await prisma.adocao.create({ data: { adotante_id: lucas.adotante_id, pet_id: luna.pet_id } });
+    await prisma.pet.update({ where: { pet_id: luna.pet_id }, data: { status: 'ADOTADO' } });
+    console.log('Adoção 2 (Lucas e Luna) realizada.');
+  }
 
-  console.log('Seeding finalizado com sucesso!');
+  console.log('Seeding finalizado com sucesso! 🐾');
 }
 
 main()
