@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import { NavHashLink } from 'react-router-hash-link'
 
 export function NavLinks() {
+  const getNavLinkClass = ({ isActive }) => {
+    return isActive ? 'nav-custom-link fs-4 active' : 'nav-custom-link fs-4';
+  };
   return (
     <>
       <Nav.Link

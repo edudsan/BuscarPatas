@@ -3,26 +3,29 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || 'seu_segredo_super_secreto'; // Mova para o .env em produção
+const JWT_SECRET = process.env.JWT_SECRET || 'seu_segredo_super_secreto'; 
 
 // Função para registrar um novo usuário (adotante)
 export const register = async (req, res) => {
-  const { nome, email, senha, telefone, rua, bairro, cidade, uf } = req.body;
+  const { nome, email, senha, telefone, numero, rua, bairro, cidade, uf } = req.body;
 
   try {
     // Criptografa a senha antes de salvar
     const senhaHash = await bcrypt.hash(senha, 10);
+    const telefonePadrao = telefone ? telefone.replace(/\D/g, '') : undefined;
+    const ufPadronizado = uf ? uf.toUpperCase() : undefined;
 
     const novoAdotante = await prisma.adotante.create({
       data: {
         nome,
         email,
         senha: senhaHash,
-        telefone,
+        telefone: telefonePadrao,
+        numero,
         rua,
         bairro,
         cidade,
-        uf,
+        uf: ufPadronizado,
       },
     });
 
@@ -63,7 +66,7 @@ export const login = async (req, res) => {
 
     // 3. Gera o token JWT
     const token = jwt.sign(
-      { id: adotante.id, role: adotante.role },
+      { id: adotante.adotante_id, role: adotante.role },
       JWT_SECRET,
       { expiresIn: '8h' } // Token expira em 8 horas
     );

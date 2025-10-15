@@ -3,7 +3,8 @@ import authRoutes from './routes/authRoutes.js';
 import petRoutes from './routes/petRoutes.js';
 import adotanteRoutes from './routes/adotanteRoutes.js';
 import adocaoRoutes from './routes/adocaoRoutes.js';
-import cors from 'cors'; 
+import cors from 'cors';
+import uploadRoutes from './routes/uploadRoutes.js';
 
 const app = express();
 
@@ -18,5 +19,7 @@ app.use('/auth', authRoutes);
 app.use('/pets', petRoutes);
 app.use('/adotantes', adotanteRoutes);
 app.use('/adocoes', adocaoRoutes);
+
+app.use('/upload', uploadRoutes);
 
 export default app;

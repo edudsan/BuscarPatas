@@ -8,7 +8,8 @@ export const createAdotante = async (req, res) => {
     const { nome, email, senha, telefone, rua, numero, bairro, cidade, uf } = req.body;
     const senhaHash = await bcrypt.hash(senha, 10);
     const telefonePadrao = telefone ? telefone.replace(/\D/g, '') : undefined;
-    
+    const ufPadronizado = uf ? uf.toUpperCase() : undefined;
+
     const novoAdotante = await prisma.adotante.create({
       data: {
         nome,
@@ -19,7 +20,7 @@ export const createAdotante = async (req, res) => {
         numero,
         bairro,
         cidade,
-        uf,
+        uf: ufPadronizado,
       },
     });
     delete novoAdotante.senha;
@@ -74,9 +75,9 @@ export const updateAdotante = async (req, res) => {
     if (numero) dadosParaAtualizar.numero = numero;
     if (bairro) dadosParaAtualizar.bairro = bairro;
     if (cidade) dadosParaAtualizar.cidade = cidade;
-    if (uf) dadosParaAtualizar.uf = uf;
-    if (telefone) 
-      dadosParaAtualizar.telefone = telefone.replace(/\D/g, '');
+    if (uf) dadosParaAtualizar.uf = uf.toUpperCase();
+    if (telefone) dadosParaAtualizar.telefone = telefone.replace(/\D/g, ''); 
+      
     
     
 

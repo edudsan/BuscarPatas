@@ -13,6 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { Footer } from '../components/Footer/Footer'
+import Swal from 'sweetalert2';
 
 // Função para verificar a força da senha
 const checkPasswordStrength = (password) => {
@@ -139,10 +140,21 @@ export function Cadastro() {
         throw new Error(errorData.error || 'Falha ao cadastrar.')
       }
 
-      alert(
-        'Cadastro realizado com sucesso! Você será redirecionado para o login.',
-      )
-      navigate('/login')
+      Swal.fire({
+        title: 'Cadastro Realizado!',
+        text: 'Você será redirecionado para a página de login.',
+        icon: 'success',
+        timer: 5000,  
+        timerProgressBar: true, 
+        showConfirmButton: true, 
+        confirmButtonText: 'Ir para o Login', 
+        willClose: () => {
+          navigate('/login'); 
+        }
+      }).then(() => {
+        
+        navigate('/login');
+      });
     } catch (err) {
       setApiError(err.message)
     }

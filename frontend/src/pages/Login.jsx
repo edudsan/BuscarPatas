@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Alert, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
+
 
 export function Login() {
 
@@ -42,12 +44,21 @@ export function Login() {
       }
 
       // Salvar o token de autenticação, ainda está em teste
-      const data = await response.json();
-      // localStorage.setItem('authToken', data.token);
-
-      alert('Login realizado com sucesso!');
-      navigate('/');
-
+      const { token } = await response.json();
+      localStorage.setItem('authToken', token);
+      
+      Swal.fire({
+        title: 'Login Bem-Sucedido!',
+        text: 'Você será redirecionado para a página inicial.',
+        icon: 'success',
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+      }).then(() => {
+        // Redireciona para a home quando o alerta fechar pelo timer ou pelo botão
+        navigate('/');
+      });
     } catch (err) {
       setApiError(err.message);
     }

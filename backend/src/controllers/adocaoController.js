@@ -142,6 +142,7 @@ export const deleteAdocao = async (req, res) => {
     if (error.message === 'Adoção não encontrada.') {
       return res.status(404).json({ error: error.message });
     }
+    console.error(error);
     res.status(500).json({ error: 'Não foi possível cancelar a adoção.' });
   }
 };

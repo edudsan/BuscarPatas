@@ -1,6 +1,6 @@
 import { Card, Button, Badge } from 'react-bootstrap'
 import './PetCard.css'
-export function PetCard({ pet }) {
+export function PetCard({ pet, onDetailClick }) {
   const imageUrl =
     pet.imagem_url1 || 'https://via.placeholder.com/300x200?text=Sem+Foto'
 
@@ -20,7 +20,7 @@ export function PetCard({ pet }) {
           )}
           {pet.personalidade && <Badge bg="success">{pet.personalidade}</Badge>}
         </div>
-        <Button variant="primary" className="btn-principal mt-auto">
+        <Button variant="primary" className="btn-principal mt-auto" onClick={() => onDetailClick(pet)}        >
           Ver Detalhes
         </Button>
       </Card.Body>

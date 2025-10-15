@@ -7,10 +7,12 @@ export const createPet = async (req, res) => {
     const { nome, especie, data_nascimento, descricao, status, tamanho, personalidade } = req.body;
 
     const dadosCriacao = {
-      nome,
-      especie,
+      nome: nome ? nome.toLowerCase() : undefined,
+      especie: especie ? especie.toLowerCase() : undefined,
+      descricao: descricao ? descricao.toLowerCase() : undefined,
       data_nascimento: data_nascimento ? new Date(data_nascimento) : null,
-      descricao,
+      imagem_url1,
+      imagem_url2
     };
 
     if (status) dadosCriacao.status = status.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -45,8 +47,9 @@ export const getAllAvailablePets = async (req, res) => {
 export const getAllPets = async (req, res) => {
   try {
     // Pega os possíveis filtros da query da URL (ex: /pets?especie=Gato&tamanho=PEQUENO)
-    const { especie, status, tamanho, personalidade } = req.query;
-
+    const { especie, status, tamanho, personalidade, page = 1, limit = 10  } = req.query;
+    const pageAsNumber = parseInt(page);
+    const limitAsNumber = parseInt(limit);
     // Objeto que vai guardar as condições do filtro
     const where = {};
 
@@ -66,9 +69,24 @@ export const getAllPets = async (req, res) => {
     // Busca os pets no banco de dados aplicando os filtros construídos
     const pets = await prisma.pet.findMany({
       where: where,
+      skip: (pageAsNumber  - 1) * limitAsNumber,
+      take: limitAsNumber,
     });
     
-    res.status(200).json(pets);
+    const totalPets = await prisma.pet.count({
+      where: where,
+    });
+
+    res.status(200).json({
+      data: pets,
+      pagination: {
+        total: totalPets,
+        page: pageAsNumber ,
+        limit: limitAsNumber,
+        totalPages: Math.ceil(totalPets / limitAsNumber),
+      },
+    });
+
   } catch (error) {
     console.error(error); 
     res.status(500).json({ error: 'Não foi possível listar os pets.' });
