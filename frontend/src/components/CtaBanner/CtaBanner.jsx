@@ -1,27 +1,36 @@
 import '../../styles/global.css'
 import './CtaBanner.css'
+import { HashLink } from 'react-router-hash-link'
 
-export function CtaBanner() {
+export function CtaBanner({
+  imageUrl,
+  imageAlt,
+  title,
+  buttonText,
+  buttonHref = '#busca',
+  reversed,
+}) {
+  const rowClasses = `row justify-content-center align-items-center g-5 ${
+    reversed ? 'flex-md-row-reverse' : ''
+  }`
   return (
     <div className="bg-banner py-5 mb-5">
       <div className="container">
-        <div className="row justify-content-center align-items-center g-5">
+        <div className={rowClasses}>
           <div className="col-md-6 text-center mb-4 mb-md-0">
             <img
-              src="/src/assets/gato-e-cachorro.jpg"
-              alt="Cachorro e Gato"
+              src={imageUrl}
+              alt={imageAlt}
               className="img-fluid rounded img-banner"
             />
           </div>
 
           <div className="col-md-6 text-center text-md-start">
-            <h1 className="display-5 fw-bold">
-              O seu novo melhor amigo está te esperando!
-            </h1>
+            <h1 className="display-5 fw-bold">{title}</h1>
 
-            <button className="btn btn-principal btn-lg mt-3">
-              Adote agora
-            </button>
+            <HashLink className="btn btn-principal btn-lg mt-3" to={buttonHref}>
+              {buttonText}
+            </HashLink>
           </div>
         </div>
       </div>
