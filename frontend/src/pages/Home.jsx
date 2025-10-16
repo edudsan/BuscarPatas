@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Container } from 'react-bootstrap'
 import { CtaBanner } from '../components/CtaBanner/CtaBanner'
 import { FAQSection } from '../components/FaqSection/FaqSection'
@@ -19,6 +19,7 @@ export function Home() {
   })
   const [showModal, setShowModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState(null);
+  const buscaSectionRef = useRef(null);
 
   useEffect(() => {
     async function fetchPets() {
@@ -47,14 +48,16 @@ export function Home() {
 
     // Função que será chamada pelo componente PetFilters quando o usuário aplicar um filtro
     const handleFilterChange = (newFilters) => {
-      setFilters({ ...filters, ...newFilters, page: 1 });
+      setFilters(prevFilters => ({ ...prevFilters, ...newFilters, page: 1 }));
     };
     const handlePageChange = (newPage) => {
-      setFilters({ ...filters, page: newPage });
+      setFilters(prevFilters => ({ ...prevFilters, page: newPage }));
+      buscaSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleLimitChange = (newLimit) => {
-      setFilters({ ...filters, limit: newLimit, page: 1 }); 
+      setFilters(prevFilters => ({ ...prevFilters, limit: newLimit, page: 1 }));
+      buscaSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleShowModal = (pet) => {
@@ -75,7 +78,7 @@ export function Home() {
         buttonText="Adote agora"
       />
 
-      <Container as="section" id="busca" className="py-5 my-4">
+      <Container as="section" id="busca" className="py-5 my-4" ref={buscaSectionRef}>
         <h2 className="text-center mb-4 display-5 fw-light">
           Encontre seu novo amigo
         </h2>
