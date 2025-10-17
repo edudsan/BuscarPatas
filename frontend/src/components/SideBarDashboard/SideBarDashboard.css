@@ -1,3 +1,7 @@
+/* components/SideBarDashboard/SideBarDashboard.css */
+
+/* Defina sua variável CSS aqui se ela não estiver global */
+/* :root { --cor-verde: #4CAF50; --cor-laranja: #FF9800; } */
 
 .sidebar-container {
     min-height: 100vh;
@@ -17,6 +21,7 @@
     transition: background-color 0.2s;
     color: #495057;
 }
+
 
 .sidebar-item-active {
     background-color: var(--cor-laranja);
