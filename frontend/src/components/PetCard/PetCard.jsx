@@ -20,7 +20,11 @@ export function PetCard({ pet, onDetailClick }) {
           )}
           {pet.personalidade && <Badge bg="success">{pet.personalidade}</Badge>}
         </div>
-        <Button variant="primary" className="btn-principal mt-auto" onClick={() => onDetailClick(pet)}        >
+        <Button
+          variant="primary"
+          className="btn-principal mt-auto"
+          onClick={() => onDetailClick(pet)}
+        >
           Ver Detalhes
         </Button>
       </Card.Body>

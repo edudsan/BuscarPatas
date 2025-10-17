@@ -1,19 +1,21 @@
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import { Form, Button, Row, Col } from 'react-bootstrap'
 
 export function PetFilters({ onFilterChange }) {
-  
   const handleFilter = (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
+    event.preventDefault()
+    const formData = new FormData(event.target)
     const filters = {
       tamanho: formData.get('tamanho'),
       personalidade: formData.get('personalidade'),
-    };
-    onFilterChange(filters);
-  };
+    }
+    onFilterChange(filters)
+  }
 
   return (
-    <Form onSubmit={handleFilter} className="mb-5 p-4 rounded shadow-sm bg-light">
+    <Form
+      onSubmit={handleFilter}
+      className="mb-5 p-4 rounded shadow-sm bg-light"
+    >
       <Row className="align-items-end g-3">
         <Col md={5}>
           <Form.Group controlId="tamanhoFiltro">
@@ -38,9 +40,11 @@ export function PetFilters({ onFilterChange }) {
           </Form.Group>
         </Col>
         <Col md={2} className="d-grid">
-          <Button type="submit" className="btn-principal">Filtrar</Button>
+          <Button type="submit" className="btn-principal">
+            Filtrar
+          </Button>
         </Col>
       </Row>
     </Form>
-  );
+  )
 }
