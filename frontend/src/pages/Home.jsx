@@ -5,21 +5,20 @@ import { FAQSection } from '../components/FaqSection/FaqSection'
 import { PetFilters } from '../components/PetFilters/PetFilters'
 import { PetList } from '../components/PetList/PetList'
 import { Footer } from '../components/Footer/Footer'
-import { PaginationControls } from '../components/PaginationControls/PaginationControls';
-import { PetDetailModal } from '../components/PetDetailModal/PetDetailModal';
-
+import { PaginationControls } from '../components/PaginationControls/PaginationControls'
+import { PetDetailModal } from '../components/PetDetailModal/PetDetailModal'
 
 export function Home() {
   const [pets, setPets] = useState([])
-  const [pagination, setPagination] = useState(null);
+  const [pagination, setPagination] = useState(null)
   const [loading, setLoading] = useState(false)
   const [filters, setFilters] = useState({
     page: 1,
-    limit: 10,
+    limit: 8,
   })
-  const [showModal, setShowModal] = useState(false);
-  const [selectedPet, setSelectedPet] = useState(null);
-  const buscaSectionRef = useRef(null);
+  const [showModal, setShowModal] = useState(false)
+  const [selectedPet, setSelectedPet] = useState(null)
+  const buscaSectionRef = useRef(null)
 
   useEffect(() => {
     async function fetchPets() {
@@ -33,7 +32,7 @@ export function Home() {
         const response = await fetch(url)
         const data = await response.json()
         setPets(data.data)
-        setPagination(data.pagination);
+        setPagination(data.pagination)
       } catch (error) {
         console.error('Falha ao buscar pets:', error)
         // Em caso de erro, define a lista de pets como vazia
@@ -46,28 +45,28 @@ export function Home() {
     fetchPets()
   }, [filters])
 
-    // Função que será chamada pelo componente PetFilters quando o usuário aplicar um filtro
-    const handleFilterChange = (newFilters) => {
-      setFilters(prevFilters => ({ ...prevFilters, ...newFilters, page: 1 }));
-    };
-    const handlePageChange = (newPage) => {
-      setFilters(prevFilters => ({ ...prevFilters, page: newPage }));
-      buscaSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+  // Função que será chamada pelo componente PetFilters quando o usuário aplicar um filtro
+  const handleFilterChange = (newFilters) => {
+    setFilters((prevFilters) => ({ ...prevFilters, ...newFilters, page: 1 }))
+  }
+  const handlePageChange = (newPage) => {
+    setFilters((prevFilters) => ({ ...prevFilters, page: newPage }))
+    buscaSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
-    const handleLimitChange = (newLimit) => {
-      setFilters(prevFilters => ({ ...prevFilters, limit: newLimit, page: 1 }));
-      buscaSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+  const handleLimitChange = (newLimit) => {
+    setFilters((prevFilters) => ({ ...prevFilters, limit: newLimit, page: 1 }))
+    buscaSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
-    const handleShowModal = (pet) => {
-    setSelectedPet(pet);
-    setShowModal(true);
-  };
+  const handleShowModal = (pet) => {
+    setSelectedPet(pet)
+    setShowModal(true)
+  }
   const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedPet(null);
-  };
+    setShowModal(false)
+    setSelectedPet(null)
+  }
 
   return (
     <main>
@@ -78,7 +77,12 @@ export function Home() {
         buttonText="Adote agora"
       />
 
-      <Container as="section" id="busca" className="py-5 my-4" ref={buscaSectionRef}>
+      <Container
+        as="section"
+        id="busca"
+        className="py-5 my-4"
+        ref={buscaSectionRef}
+      >
         <h2 className="text-center mb-4 display-5 fw-light">
           Encontre seu novo amigo
         </h2>
@@ -86,10 +90,11 @@ export function Home() {
         <PetFilters onFilterChange={handleFilterChange} />
 
         <PetList pets={pets} loading={loading} onPetClick={handleShowModal} />
-        <PaginationControls 
+        <PaginationControls
           pagination={pagination}
           onPageChange={handlePageChange}
-          onLimitChange={handleLimitChange}/>
+          onLimitChange={handleLimitChange}
+        />
       </Container>
 
       <CtaBanner
@@ -101,11 +106,11 @@ export function Home() {
         reversed={true}
       />
       <FAQSection />
-      <PetDetailModal 
-          show={showModal} 
-          onHide={handleCloseModal} 
-          pet={selectedPet} 
-        />
+      <PetDetailModal
+        show={showModal}
+        onHide={handleCloseModal}
+        pet={selectedPet}
+      />
       <Footer />
     </main>
   )

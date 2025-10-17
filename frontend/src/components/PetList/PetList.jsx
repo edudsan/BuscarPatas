@@ -1,9 +1,9 @@
-import { Row, Col } from 'react-bootstrap';
-import { PetCard } from '../PetCard/PetCard'; 
+import { Row, Col } from 'react-bootstrap'
+import { PetCard } from '../PetCard/PetCard'
 
 export function PetList({ pets, loading, onPetClick }) {
   if (loading) {
-    return <p>Carregando pets...</p>;
+    return <p>Carregando pets...</p>
   }
 
   if (pets.length === 0) {
@@ -12,11 +12,11 @@ export function PetList({ pets, loading, onPetClick }) {
 
   return (
     <Row xs={1} md={2} lg={4} className="g-4">
-      {pets.map(pet => (
+      {pets.map((pet) => (
         <Col key={pet.pet_id}>
-          <PetCard pet={pet} onDetailClick={onPetClick}/>
+          <PetCard pet={pet} onDetailClick={onPetClick} />
         </Col>
       ))}
     </Row>
-  );
+  )
 }

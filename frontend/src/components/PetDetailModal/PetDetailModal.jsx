@@ -1,31 +1,31 @@
-import { Modal, Button, Row, Col, Carousel, Badge } from 'react-bootstrap';
+import { Modal, Button, Row, Col, Carousel, Badge } from 'react-bootstrap'
 
 // Função para calcular a idade a partir da data de nascimento
 const calcularIdade = (dataNascimento) => {
-  if (!dataNascimento) return 'Idade não informada';
-  
-  const hoje = new Date();
-  const nascimento = new Date(dataNascimento);
-  let anos = hoje.getFullYear() - nascimento.getFullYear();
-  let meses = hoje.getMonth() - nascimento.getMonth();
+  if (!dataNascimento) return 'Idade não informada'
+
+  const hoje = new Date()
+  const nascimento = new Date(dataNascimento)
+  let anos = hoje.getFullYear() - nascimento.getFullYear()
+  let meses = hoje.getMonth() - nascimento.getMonth()
 
   if (meses < 0 || (meses === 0 && hoje.getDate() < nascimento.getDate())) {
-    anos--;
-    meses += 12;
+    anos--
+    meses += 12
   }
-  
-  if (anos === 0 && meses === 0) return 'Menos de 1 mês';
-  const idadeAnos = anos > 0 ? `${anos} ${anos > 1 ? 'anos' : 'ano'}` : '';
-  const idadeMeses = meses > 0 ? `${meses} ${meses > 1 ? 'meses' : 'mês'}` : '';
-  
-  return [idadeAnos, idadeMeses].filter(Boolean).join(' e ');
-};
+
+  if (anos === 0 && meses === 0) return 'Menos de 1 mês'
+  const idadeAnos = anos > 0 ? `${anos} ${anos > 1 ? 'anos' : 'ano'}` : ''
+  const idadeMeses = meses > 0 ? `${meses} ${meses > 1 ? 'meses' : 'mês'}` : ''
+
+  return [idadeAnos, idadeMeses].filter(Boolean).join(' e ')
+}
 
 export function PetDetailModal({ show, onHide, pet }) {
-  if (!pet) return null; // Não renderiza nada se não houver pet selecionado
+  if (!pet) return null // Não renderiza nada se não houver pet selecionado
 
-  const idade = calcularIdade(pet.data_nascimento);
-  const imagens = [pet.imagem_url1, pet.imagem_url2].filter(Boolean); // Filtra URLs nulas ou vazias
+  const idade = calcularIdade(pet.data_nascimento)
+  const imagens = [pet.imagem_url1, pet.imagem_url2].filter(Boolean) // Filtra URLs nulas ou vazias
 
   return (
     <Modal show={show} onHide={onHide} size="lg" centered>
@@ -59,12 +59,26 @@ export function PetDetailModal({ show, onHide, pet }) {
           </Col>
           <Col md={6}>
             <h4 className="mt-3 mt-md-0">Detalhes</h4>
-            <p><strong>Espécie:</strong> {pet.especie}</p>
-            <p><strong>Idade Aproximada:</strong> {idade}</p>
-            <p><strong>Descrição:</strong> {pet.descricao}</p>
+            <p>
+              <strong>Espécie:</strong> {pet.especie}
+            </p>
+            <p>
+              <strong>Idade Aproximada:</strong> {idade}
+            </p>
+            <p>
+              <strong>Descrição:</strong> {pet.descricao}
+            </p>
             <div>
-              {pet.tamanho && <Badge bg="primary" className="me-2 p-2">{pet.tamanho}</Badge>}
-              {pet.personalidade && <Badge bg="success" className="p-2">{pet.personalidade}</Badge>}
+              {pet.tamanho && (
+                <Badge bg="primary" className="me-2 p-2">
+                  {pet.tamanho}
+                </Badge>
+              )}
+              {pet.personalidade && (
+                <Badge bg="success" className="p-2">
+                  {pet.personalidade}
+                </Badge>
+              )}
             </div>
           </Col>
         </Row>
@@ -78,5 +92,5 @@ export function PetDetailModal({ show, onHide, pet }) {
         </Button>
       </Modal.Footer>
     </Modal>
-  );
+  )
 }
