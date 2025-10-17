@@ -1,13 +1,11 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './SideBarDashboard.css'
 
-export function SideBarDashboard({ activePanel, setActivePanel }) {
-  const menuItems = [
-    { key: 'pets', label: 'PETS' },
-    { key: 'adotantes', label: 'ADOTANTES' },
-    { key: 'adocoes', label: 'ADOÇÕES' },
-  ]
-
+export function SideBarDashboard({
+  activePanel,
+  setActivePanel,
+  menuItems = [],
+}) {
   return (
     <div className="p-3 d-flex flex-column sidebar-container">
       <h5 className="mb-4 sidebar-title">Bem vindo!</h5>

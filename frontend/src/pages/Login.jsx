@@ -63,7 +63,7 @@ export function Login() {
 
       const data = await response.json()
       alert('Login realizado com sucesso!')
-      navigate('/dashboard')
+      navigate('/dashboardUser')
     } catch (err) {
       setApiError(err.message)
     }
