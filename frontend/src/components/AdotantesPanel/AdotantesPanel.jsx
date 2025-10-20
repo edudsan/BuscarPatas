@@ -1,146 +1,168 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Container, Row, Col, Spinner, Alert } from 'react-bootstrap';
-import Swal from 'sweetalert2';
-import { useAuth } from '../../contexts/AuthContext';
-import { AdotanteCard } from '../AdotanteCard/AdotanteCard';
-import { AdotanteEditModal } from '../AdotanteEditModal/AdotanteEditModal';
-import './AdotantesPanel.css';
+import { useState, useEffect, useCallback } from 'react'
+import { Container, Row, Col, Spinner, Alert } from 'react-bootstrap'
+import Swal from 'sweetalert2'
+import { useAuth } from '../../contexts/AuthContext'
+import { AdotanteCard } from '../AdotanteCard/AdotanteCard'
+import { AdotanteEditModal } from '../AdotanteEditModal/AdotanteEditModal'
+import './AdotantesPanel.css'
 
 export function AdotantesPanel() {
-  const [adotantes, setAdotantes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { token } = useAuth();
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedAdotante, setSelectedAdotante] = useState(null);
+  const [adotantes, setAdotantes] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const { token } = useAuth()
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedAdotante, setSelectedAdotante] = useState(null)
 
   // Envolvemos a função fetchAdotantes com useCallback
   const fetchAdotantes = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
     try {
       const response = await fetch('http://localhost:3000/adotantes', {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+        headers: { Authorization: `Bearer ${token}` },
+      })
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Falha ao buscar adotantes.');
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Falha ao buscar adotantes.')
       }
-      const data = await response.json();
-      setAdotantes(data);
+      const data = await response.json()
+      setAdotantes(data)
     } catch (err) {
-      setError(err.message);
+      setError(err.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [token]); // A função só será recriada se o token mudar
+  }, [token]) // A função só será recriada se o token mudar
 
   useEffect(() => {
     if (token) {
-      fetchAdotantes();
+      fetchAdotantes()
     }
-  }, [token, fetchAdotantes]); 
+  }, [token, fetchAdotantes])
 
   const handleEditAdotante = (adotante) => {
-    setSelectedAdotante(adotante);
-    setShowEditModal(true);
-  };
-  
-  
+    setSelectedAdotante(adotante)
+    setShowEditModal(true)
+  }
+
   const handleUpdateSuccess = (updatedUser) => {
-    setAdotantes(currentAdotantes => 
-      currentAdotantes.map(user => 
-        user.adotante_id === updatedUser.adotante_id ? updatedUser : user
-      )
-    );
-  };
+    setAdotantes((currentAdotantes) =>
+      currentAdotantes.map((user) =>
+        user.adotante_id === updatedUser.adotante_id ? updatedUser : user,
+      ),
+    )
+  }
 
   const handleDeleteAdotante = (adotanteId, adotanteNome) => {
     Swal.fire({
       title: `Deletar ${adotanteNome}?`,
-      text: "Esta ação é irreversível.",
+      text: 'Esta ação é irreversível.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Sim, deletar!',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`http://localhost:3000/adotantes/${adotanteId}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` },
-          });
+          const response = await fetch(
+            `http://localhost:3000/adotantes/${adotanteId}`,
+            {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          )
 
           if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Falha ao deletar adotante.');
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Falha ao deletar adotante.')
           }
 
           // Remove o usuário da lista localmente para atualizar a UI instantaneamente
-          setAdotantes(currentAdotantes =>
-            currentAdotantes.filter(user => user.adotante_id !== adotanteId)
-          );
-          Swal.fire('Deletado!', `${adotanteNome} foi removido.`, 'success');
-
+          setAdotantes((currentAdotantes) =>
+            currentAdotantes.filter((user) => user.adotante_id !== adotanteId),
+          )
+          Swal.fire('Deletado!', `${adotanteNome} foi removido.`, 'success')
         } catch (err) {
-          Swal.fire('Erro!', err.message, 'error');
+          Swal.fire('Erro!', err.message, 'error')
         }
       }
-    });
-  };
+    })
+  }
 
   const handleRoleChange = async (adotanteId, newRole) => {
     try {
-      const response = await fetch(`http://localhost:3000/adotantes/${adotanteId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+      const response = await fetch(
+        `http://localhost:3000/adotantes/${adotanteId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ role: newRole }),
         },
-        body: JSON.stringify({ role: newRole }),
-      });
+      )
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Falha ao mudar a permissão.`);
+        const errorData = await response.json()
+        throw new Error(errorData.error || `Falha ao mudar a permissão.`)
       }
 
-      const updatedUser = await response.json();
-      
+      const updatedUser = await response.json()
+
       // Atualiza o usuário específico na lista localmente
-      setAdotantes(currentAdotantes =>
-        currentAdotantes.map(user =>
-          user.adotante_id === adotanteId ? updatedUser : user
-        )
-      );
+      setAdotantes((currentAdotantes) =>
+        currentAdotantes.map((user) =>
+          user.adotante_id === adotanteId ? updatedUser : user,
+        ),
+      )
       // Não precisa de Swal.fire aqui, a mudança visual no toggle já é um feedback
-
     } catch (err) {
-      Swal.fire('Erro!', err.message, 'error');
+      Swal.fire('Erro!', err.message, 'error')
     }
-  };
+  }
 
-  if (loading) return <Container className="text-center my-5"><Spinner animation="border" /></Container>;
-  if (error) return <Container className="my-5"><Alert variant="danger">{error}</Alert></Container>;
+  if (loading)
+    return (
+      <Container className="text-center my-5">
+        <Spinner animation="border" />
+      </Container>
+    )
+  if (error)
+    return (
+      <Container className="my-5">
+        <Alert variant="danger">{error}</Alert>
+      </Container>
+    )
 
   return (
     <Container className="adotantes-panel p-4">
       <h2 className="mb-4">Gerenciar Adotantes</h2>
       {loading ? (
-        <div className="text-center"><Spinner animation="border" /></div>
+        <div className="text-center">
+          <Spinner animation="border" />
+        </div>
       ) : error ? (
         <Alert variant="danger">{error}</Alert>
       ) : (
         <Row>
-          {adotantes.map(adotante => (
-            <Col key={adotante.adotante_id} xs={12} sm={6} lg={4} xl={3} className="mb-4">
-              <AdotanteCard 
-                user={adotante} 
+          {adotantes.map((adotante) => (
+            <Col
+              key={adotante.adotante_id}
+              xs={12}
+              sm={6}
+              lg={4}
+              xl={3}
+              className="mb-4"
+            >
+              <AdotanteCard
+                user={adotante}
                 onEdit={handleEditAdotante}
                 onDelete={handleDeleteAdotante}
-                onRoleChange={handleRoleChange} 
+                onRoleChange={handleRoleChange}
               />
             </Col>
           ))}
@@ -156,5 +178,5 @@ export function AdotantesPanel() {
         />
       )}
     </Container>
-  );
+  )
 }

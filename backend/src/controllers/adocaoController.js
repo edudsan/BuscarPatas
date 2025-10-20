@@ -1,16 +1,40 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-// CREATE 
+// CREATE
 export const createAdocao = async (req, res) => {
-  const { pet_id, adotante_id } = req.body;
+  // 1. O pet_id é o único campo necessário do corpo da requisição
+  const { pet_id } = req.body;
+  
+  // 2. O auth_id é recuperado do token JWT injetado pelo middleware 'protect'
+  const auth_id_do_token = req.user.id; 
+
+  // Validação e conversão do pet_id
+  const petIdNum = parseInt(pet_id);
+  if (isNaN(petIdNum)) {
+    return res.status(400).json({ error: 'ID do Pet inválido.' });
+  }
 
   try {
+    // 3. BUSCAR O ID DO ADOTANTE CORRETO (adotante_id) USANDO O auth_id
+    const adotanteProfile = await prisma.adotante.findUnique({
+        where: { auth_id: auth_id_do_token },
+        select: { adotante_id: true } 
+    });
+
+    if (!adotanteProfile) {
+        return res.status(404).json({ error: 'Perfil de adotante não encontrado para este usuário logado.' });
+    }
+    
+    const adotanteIdNum = adotanteProfile.adotante_id; // O ID CORRETO
+
+    // 4. Inicia a transação para criar a adoção e atualizar o status do Pet
     const novaAdocao = await prisma.$transaction(async (prisma) => {
+      
       const adocao = await prisma.adocao.create({
         data: {
-          pet_id: parseInt(pet_id),
-          adotante_id: parseInt(adotante_id),
+          pet_id: petIdNum,
+          adotante_id: adotanteIdNum, // Usa a variável corretamente definida
         },
         include: {
           pet: true,
@@ -18,8 +42,9 @@ export const createAdocao = async (req, res) => {
         },
       });
 
+      // Atualiza o status do pet para ADOTADO
       await prisma.pet.update({
-        where: { pet_id: parseInt(pet_id) },
+        where: { pet_id: petIdNum },
         data: { status: 'ADOTADO' },
       });
 
@@ -27,16 +52,18 @@ export const createAdocao = async (req, res) => {
     });
 
     res.status(201).json(novaAdocao);
+
   } catch (error) {
     if (error.code === 'P2002') {
       return res.status(409).json({ error: 'Este pet já foi adotado.' });
     }
-    console.error(error);
+    // O erro anterior (ReferenceError) será tratado aqui se ocorrer um erro interno
+    console.error('ERRO AO PROCESSAR ADOCAO:', error); 
     res.status(500).json({ error: 'Não foi possível processar a adoção.' });
   }
 };
 
-// READ 
+// READ (Listar todas as adoções - Geralmente apenas ADMIN)
 export const getAllAdocoes = async (req, res) => {
   try {
     const adocoes = await prisma.adocao.findMany({
@@ -51,7 +78,7 @@ export const getAllAdocoes = async (req, res) => {
   }
 };
 
-// READ 
+// READ (Listar minhas adoções - Apenas o usuário logado)
 export const getMyAdocoes = async (req, res) => {
   try {
     // Encontrar o perfil do adotante usando o auth_id do token (req.user.id)
@@ -60,7 +87,6 @@ export const getMyAdocoes = async (req, res) => {
     });
 
     if (!adotanteProfile) {
-      // Caso o usuário logado não tenha um perfil de adotante
       return res.status(404).json({ error: 'Perfil de adotante não encontrado.' });
     }
 
@@ -68,10 +94,10 @@ export const getMyAdocoes = async (req, res) => {
     const adocoes = await prisma.adocao.findMany({
       where: { adotante_id: adotanteProfile.adotante_id },
       include: {
-        pet: true, // Inclui os detalhes do pet em cada adoção
+        pet: true, 
       },
       orderBy: {
-        data_adocao: 'desc', // Ordena da mais recente para a mais antiga
+        data_adocao: 'desc', 
       }
     });
     res.status(200).json(adocoes);
@@ -81,7 +107,7 @@ export const getMyAdocoes = async (req, res) => {
   }
 };
 
-// UPDATE 
+// UPDATE (Apenas ADMIN)
 export const updateAdocao = async (req, res) => {
   try {
     const { id } = req.params;
@@ -122,7 +148,7 @@ export const updateAdocao = async (req, res) => {
   }
 };
 
-// DELETE 
+// DELETE (Apenas ADMIN)
 export const deleteAdocao = async (req, res) => {
   try {
     const { id } = req.params;

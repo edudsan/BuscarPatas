@@ -1,10 +1,11 @@
-import { Card, Form, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
-import './UserCard.css';
+import { Card, Form, Button } from 'react-bootstrap'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons'
+import './UserCard.css'
 
-export function UserCard({ user, onRoleChange, onDelete, onEdit }) { // Adicionado onEdit
-  const avatarUrl = `https://i.pravatar.cc/150?u=${user.email}`;
+export function UserCard({ user, onRoleChange, onDelete, onEdit }) {
+  // Adicionado onEdit
+  const avatarUrl = `https://i.pravatar.cc/150?u=${user.email}`
 
   return (
     <Card className="user-card shadow-sm h-100">
@@ -24,19 +25,32 @@ export function UserCard({ user, onRoleChange, onDelete, onEdit }) { // Adiciona
             id={`admin-switch-${user.adotante_id}`}
             label="Admin"
             checked={user.role === 'ADMIN'}
-            onChange={() => onRoleChange(user.adotante_id, user.role === 'ADMIN' ? 'USER' : 'ADMIN')}
+            onChange={() =>
+              onRoleChange(
+                user.adotante_id,
+                user.role === 'ADMIN' ? 'USER' : 'ADMIN',
+              )
+            }
             className="admin-switch"
           />
           <div className="user-buttons">
-            <Button variant="link" className="action-btn" onClick={() => onEdit(user)}>
+            <Button
+              variant="link"
+              className="action-btn"
+              onClick={() => onEdit(user)}
+            >
               <FontAwesomeIcon icon={faPenToSquare} />
             </Button>
-            <Button variant="link" className="action-btn text-danger" onClick={() => onDelete(user.adotante_id, user.nome)}>
+            <Button
+              variant="link"
+              className="action-btn text-danger"
+              onClick={() => onDelete(user.adotante_id, user.nome)}
+            >
               <FontAwesomeIcon icon={faTrash} />
             </Button>
           </div>
         </div>
       </Card.Body>
     </Card>
-  );
+  )
 }

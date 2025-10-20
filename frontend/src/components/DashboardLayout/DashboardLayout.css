@@ -27,9 +27,9 @@
   flex-grow: 1;
   padding: 1.5rem;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* overflow-y: auto; */
 }
 
 .sidebar-toggle {

@@ -1,30 +1,30 @@
-import { useState, useEffect } from 'react';
-import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap';
-import { useAuth } from '../../contexts/AuthContext';
+import { useState, useEffect } from 'react'
+import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap'
+import { useAuth } from '../../contexts/AuthContext'
 
 export function MinhasAdocoes() {
-  const [adocoes, setAdocoes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { token } = useAuth();
+  const [adocoes, setAdocoes] = useState([])
+  const [loading, setLoading] = useState(true)
+  const { token } = useAuth()
 
   useEffect(() => {
     const fetchAdocoes = async () => {
       try {
         const response = await fetch('http://localhost:3000/adocoes/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        setAdocoes(data);
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const data = await response.json()
+        setAdocoes(data)
       } catch (error) {
-        console.error(error);
+        console.error(error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchAdocoes();
-  }, [token]);
+    }
+    fetchAdocoes()
+  }, [token])
 
-  if (loading) return <Spinner animation="border" />;
+  if (loading) return <Spinner animation="border" />
   return (
     <div className="p-4">
       <h2 className="mb-4">Minhas Adoções</h2>
@@ -32,13 +32,21 @@ export function MinhasAdocoes() {
         <Alert variant="info">Você ainda não realizou nenhuma adoção.</Alert>
       ) : (
         <Row xs={1} md={2} lg={3} className="g-4">
-          {adocoes.map(adocao => (
+          {adocoes.map((adocao) => (
             <Col key={adocao.adocao_id}>
               <Card>
-                <Card.Img variant="top" src={adocao.pet.imagem_url1 || 'https://via.placeholder.com/150'} />
+                <Card.Img
+                  variant="top"
+                  src={
+                    adocao.pet.imagem_url1 || 'https://via.placeholder.com/150'
+                  }
+                />
                 <Card.Body>
                   <Card.Title>{adocao.pet.nome}</Card.Title>
-                  <Card.Text>Adotado em: {new Date(adocao.data_adocao).toLocaleDateString()}</Card.Text>
+                  <Card.Text>
+                    Adotado em:{' '}
+                    {new Date(adocao.data_adocao).toLocaleDateString()}
+                  </Card.Text>
                 </Card.Body>
               </Card>
             </Col>
@@ -46,5 +54,5 @@ export function MinhasAdocoes() {
         </Row>
       )}
     </div>
-  );
+  )
 }

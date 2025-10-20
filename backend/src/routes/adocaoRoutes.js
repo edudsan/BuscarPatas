@@ -6,7 +6,7 @@ import { getMyAdocoes } from '../controllers/adocaoController.js';
 
 const router = Router();
 
-router.post('/', protect, isAdmin, createAdocao);
+router.post('/', protect, createAdocao);
 router.get('/', protect, isAdmin, getAllAdocoes);
 router.patch('/:id', protect, isAdmin, updateAdocao);
 router.delete('/:id', protect, isAdmin, deleteAdocao);

@@ -25,7 +25,6 @@ export function CardNumero({ titulo, numero, imagem, inverter = false }) {
             src={caminhoImagem}
             alt={titulo}
             className="img-fluid card-numero-img"
-            // style={{ maxHeight: '350px' }}
           />
         </Col>
       </Row>

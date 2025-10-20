@@ -2,12 +2,10 @@ import React, { useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { SideBarDashboard } from '../SideBarDashboard/SideBarDashboard'
 import { Footer } from '../../components/Footer/Footer'
-import '../../components/DashboardContent/DashboardContentAdmin'
 import './DashboardLayout.css'
 import { Button } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
-import './DashboardLayout.css'
 
 export function DashboardLayout({ menuItems = [], contentMap, initialPanel }) {
   const [activePanel, setActivePanel] = useState(initialPanel)
@@ -26,7 +24,9 @@ export function DashboardLayout({ menuItems = [], contentMap, initialPanel }) {
   return (
     <div className="dashboard-layout-container">
       <div className="dashboard-wrapper">
-        <div className={`sidebar-container-wrapper ${sidebarOpen ? 'open' : ''}`}>
+        <div
+          className={`sidebar-container-wrapper ${sidebarOpen ? 'open' : ''}`}
+        >
           <SideBarDashboard
             activePanel={activePanel}
             setActivePanel={handleSelectPanel}

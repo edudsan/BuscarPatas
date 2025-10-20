@@ -1,9 +1,13 @@
-import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './SideBarDashboard.css';
-import Logo from '../../assets/logo.png'; // Importe sua logo
+import { Link } from 'react-router-dom'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import './SideBarDashboard.css'
+import Logo from '../../assets/logo.png' // Importe sua logo
 
-export function SideBarDashboard({ activePanel, setActivePanel, menuItems = [] }) {
+export function SideBarDashboard({
+  activePanel,
+  setActivePanel,
+  menuItems = [],
+}) {
   return (
     <div className="sidebar-content-wrapper">
       {/* --- ADICIONE ESTA SEÇÃO --- */}
@@ -29,5 +33,5 @@ export function SideBarDashboard({ activePanel, setActivePanel, menuItems = [] }
         </div>
       </div>
     </div>
-  );
+  )
 }

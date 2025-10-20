@@ -3,5 +3,5 @@
 }
 
 .bg-banner {
-    background-color: #86C89A !important; 
+    background-color: var(--cor-verde) !important; 
 }

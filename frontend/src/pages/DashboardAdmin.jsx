@@ -4,7 +4,7 @@ import {
   DashboardPets,
   DashboardAdotantes,
   DashboardAdocoes,
-} from '../components/DashboardContent/DashboardContentAdmin'
+} from '../components/DashboardContentAdmin/DashboardContentAdmin'
 
 // Define os itens do menu para o admin
 const adminMenuItems = [

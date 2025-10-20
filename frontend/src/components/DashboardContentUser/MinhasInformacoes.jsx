@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Form, Button, Row, Col, Spinner } from 'react-bootstrap';
-import { useAuth } from '../../contexts/AuthContext';
-import Swal from 'sweetalert2';
+import { useState, useEffect } from 'react'
+import { Form, Button, Row, Col, Spinner } from 'react-bootstrap'
+import { useAuth } from '../../contexts/AuthContext'
+import Swal from 'sweetalert2'
 
 export function MinhasInformacoes() {
   const [formData, setFormData] = useState({
@@ -12,9 +12,9 @@ export function MinhasInformacoes() {
     bairro: '',
     cidade: '',
     uf: '',
-  });
-  const [loading, setLoading] = useState(true);
-  const { token, user, setUser } = useAuth();
+  })
+  const [loading, setLoading] = useState(true)
+  const { token, user, setUser } = useAuth()
 
   useEffect(() => {
     if (user) {
@@ -26,46 +26,55 @@ export function MinhasInformacoes() {
         bairro: user.bairro || '',
         cidade: user.cidade || '',
         uf: user.uf || '',
-      });
-      setLoading(false);
+      })
+      setLoading(false)
     }
-  }, [user]);
+  }, [user])
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     // Converte UF para maiúsculas enquanto digita
-    const finalValue = name === 'uf' ? value.toUpperCase() : value;
-    setFormData({ ...formData, [name]: finalValue });
-  };
+    const finalValue = name === 'uf' ? value.toUpperCase() : value
+    setFormData({ ...formData, [name]: finalValue })
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
     try {
       const response = await fetch('http://localhost:3000/profile/me', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData)
-      });
+        body: JSON.stringify(formData),
+      })
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Falha ao atualizar.');
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Falha ao atualizar.')
       }
-      const updatedUser = await response.json();
-      setUser(prevUser => ({ ...prevUser, ...updatedUser })); // Atualiza o usuário no contexto global
-      Swal.fire('Sucesso!', 'Suas informações foram atualizadas.', 'success');
+      const updatedUser = await response.json()
+      setUser((prevUser) => ({ ...prevUser, ...updatedUser })) // Atualiza o usuário no contexto global
+      Swal.fire('Sucesso!', 'Suas informações foram atualizadas.', 'success')
     } catch (error) {
-      Swal.fire('Erro!', error.message || 'Não foi possível atualizar suas informações.', 'error');
+      Swal.fire(
+        'Erro!',
+        error.message || 'Não foi possível atualizar suas informações.',
+        'error',
+      )
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  if (loading && !user) return <div className="p-4 text-center"><Spinner animation="border" /></div>;
-  
+  if (loading && !user)
+    return (
+      <div className="p-4 text-center">
+        <Spinner animation="border" />
+      </div>
+    )
+
   return (
     <div className="p-4">
       <h2 className="mb-4">Minhas Informações</h2>
@@ -74,17 +83,28 @@ export function MinhasInformacoes() {
           <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Nome</Form.Label>
-              <Form.Control type="text" name="nome" value={formData.nome} onChange={handleChange} />
+              <Form.Control
+                type="text"
+                name="nome"
+                value={formData.nome}
+                onChange={handleChange}
+              />
             </Form.Group>
           </Col>
           <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Telefone</Form.Label>
-              <Form.Control type="text" name="telefone" value={formData.telefone} onChange={handleChange} placeholder="(XX) XXXXX-XXXX" />
+              <Form.Control
+                type="text"
+                name="telefone"
+                value={formData.telefone}
+                onChange={handleChange}
+                placeholder="(XX) XXXXX-XXXX"
+              />
             </Form.Group>
           </Col>
         </Row>
-        
+
         <hr />
         <h4 className="h5 mt-4 mb-3">Endereço</h4>
 
@@ -92,13 +112,23 @@ export function MinhasInformacoes() {
           <Col md={9}>
             <Form.Group className="mb-3">
               <Form.Label>Rua</Form.Label>
-              <Form.Control type="text" name="rua" value={formData.rua} onChange={handleChange} />
+              <Form.Control
+                type="text"
+                name="rua"
+                value={formData.rua}
+                onChange={handleChange}
+              />
             </Form.Group>
           </Col>
           <Col md={3}>
             <Form.Group className="mb-3">
               <Form.Label>Número</Form.Label>
-              <Form.Control type="text" name="numero" value={formData.numero} onChange={handleChange} />
+              <Form.Control
+                type="text"
+                name="numero"
+                value={formData.numero}
+                onChange={handleChange}
+              />
             </Form.Group>
           </Col>
         </Row>
@@ -106,27 +136,47 @@ export function MinhasInformacoes() {
           <Col md={5}>
             <Form.Group className="mb-3">
               <Form.Label>Bairro</Form.Label>
-              <Form.Control type="text" name="bairro" value={formData.bairro} onChange={handleChange} />
+              <Form.Control
+                type="text"
+                name="bairro"
+                value={formData.bairro}
+                onChange={handleChange}
+              />
             </Form.Group>
           </Col>
           <Col md={5}>
             <Form.Group className="mb-3">
               <Form.Label>Cidade</Form.Label>
-              <Form.Control type="text" name="cidade" value={formData.cidade} onChange={handleChange} />
+              <Form.Control
+                type="text"
+                name="cidade"
+                value={formData.cidade}
+                onChange={handleChange}
+              />
             </Form.Group>
           </Col>
           <Col md={2}>
             <Form.Group className="mb-3">
               <Form.Label>UF</Form.Label>
-              <Form.Control type="text" name="uf" value={formData.uf} onChange={handleChange} maxLength="2" />
+              <Form.Control
+                type="text"
+                name="uf"
+                value={formData.uf}
+                onChange={handleChange}
+                maxLength="2"
+              />
             </Form.Group>
           </Col>
         </Row>
 
         <Button type="submit" className="btn-principal mt-3" disabled={loading}>
-          {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Salvar Alterações'}
+          {loading ? (
+            <Spinner as="span" animation="border" size="sm" />
+          ) : (
+            'Salvar Alterações'
+          )}
         </Button>
       </Form>
     </div>
-  );
+  )
 }

@@ -1,15 +1,14 @@
 .nav-link-custom {
-  color: #a0f0ae !important; /* Verde mais vibrante */
+  color: #a0f0ae !important; 
   font-weight: 500;
-  margin: 0 10px; /* Espaçamento entre os links */
+  margin: 0 10px; 
   transition: color 0.3s ease;
 }
 
 .nav-link-custom:hover {
-  color: #ccffee !important; /* Cor mais clara ao passar o mouse */
+  color: #ccffee !important; 
 }
 
-/* Estilo para os botões de login/cadastro */
 .btn-custom {
   border-radius: 20px;
   padding: 8px 20px;
@@ -37,7 +36,6 @@
   border-color: #79d282;
 }
 
-/* Estilo para o dropdown do usuário */
 .user-dropdown .dropdown-toggle {
   border: none;
   background: none;
@@ -57,7 +55,7 @@
 }
 
 .user-dropdown .dropdown-menu {
-  background-color: #343a40; /* Cor de fundo escura para o menu */
+  background-color: #343a40; 
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
@@ -70,19 +68,18 @@
   color: #fff;
 }
 
-/* Ajustes para telas menores */
 @media (max-width: 991.98px) {
   .nav-link-custom, .btn-custom {
-    margin: 5px 0; /* Espaçamento vertical para links e botões colapsados */
+    margin: 5px 0;
   }
   .ms-auto.d-flex.align-items-center.justify-content-center {
     flex-direction: column;
   }
   .user-dropdown {
-    width: 100%; /* Ocupa a largura total no menu colapsado */
+    width: 100%; 
   }
   .user-dropdown .dropdown-toggle {
-    justify-content: center; /* Centraliza o ícone do usuário */
+    justify-content: center !important; 
     width: 100%;
   }
   .user-dropdown .dropdown-menu {

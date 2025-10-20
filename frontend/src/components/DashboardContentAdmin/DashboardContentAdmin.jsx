@@ -1,10 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './DashboardContentAdmin.css'
-import { CardNumero } from '../NumerosCard/NumerosCard'
+import { CardNumero } from '../NumerosCard/NumerosCard.jsx'
 import { useState } from 'react'
 import { Card, Button, Container, Row, Col } from 'react-bootstrap'
-import { PetCreatePanel } from './PetCreatePanel'
-import { PetEditPanel } from './PetEditPanel'
+import { PetCreatePanel } from './PetCreatePanel.jsx'
+import { PetEditPanel } from './PetEditPanel.jsx'
 import { AdotantesPanel } from '../AdotantesPanel/AdotantesPanel.jsx'
 import './DashboardContentAdmin.css'
 
