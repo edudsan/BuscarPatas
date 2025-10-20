@@ -1,25 +1,22 @@
 import express from 'express';
+import cors from 'cors';
 import authRoutes from './routes/authRoutes.js'; 
 import petRoutes from './routes/petRoutes.js';
-import adotanteRoutes from './routes/adotanteRoutes.js';
+import adotanteRoutes from './routes/adotanteRoutes.js'; // <-- Corrigido
 import adocaoRoutes from './routes/adocaoRoutes.js';
-import cors from 'cors';
 import uploadRoutes from './routes/uploadRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
 
 const app = express();
-
-// Middleware para entender JSON
+app.use(cors());
 app.use(express.json());
 
-app.use(cors());
-
+// Rotas
 app.use('/auth', authRoutes);
-
-// Definindo as rotas base da API
-app.use('/pets', petRoutes);
-app.use('/adotantes', adotanteRoutes);
-app.use('/adocoes', adocaoRoutes);
-
 app.use('/upload', uploadRoutes);
+app.use('/profile', profileRoutes);
+app.use('/pets', petRoutes);
+app.use('/adotantes', adotanteRoutes); 
+app.use('/adocoes', adocaoRoutes);
 
 export default app;

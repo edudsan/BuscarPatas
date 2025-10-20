@@ -1,6 +1,3 @@
-/* components/SideBarDashboard/SideBarDashboard.css */
-
-/* Defina sua variável CSS aqui se ela não estiver global */
 /* :root { --cor-verde: #4CAF50; --cor-laranja: #FF9800; } */
 
 .sidebar-container {
@@ -26,4 +23,41 @@
 .sidebar-item-active {
     background-color: var(--cor-laranja);
     color: #000000 !important;
+}
+
+.sidebar-content-wrapper {
+  position: relative;
+  height: 100%;
+  background-color: var(--cor-verde);
+
+}
+
+.sidebar-menu-items {
+  padding: 1.5rem;
+}
+
+@media (max-width: 991.98px) {
+  .sidebar-menu-items {
+    padding-top: calc(72px + 1.5rem); 
+    background-color: var(--cor-verde);
+
+  }
+}
+
+.sidebar-header {
+  background-color: #000000;
+  padding: 10px 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 72px; 
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #222;
+}
+
+.sidebar-logo {
+  width: 100px;
+  height: auto;
 }

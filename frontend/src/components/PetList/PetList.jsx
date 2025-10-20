@@ -1,7 +1,7 @@
 import { Row, Col } from 'react-bootstrap'
 import { PetCard } from '../PetCard/PetCard'
 
-export function PetList({ pets, loading, onPetClick }) {
+export function PetList({ pets = [], loading, onPetClick }) {
   if (loading) {
     return <p>Carregando pets...</p>
   }

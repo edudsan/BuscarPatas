@@ -3,7 +3,7 @@ import { Pagination, Form } from 'react-bootstrap';
 // Função para gerar os números de página a serem exibidos
 const generatePageNumbers = (currentPage, totalPages) => {
   const pages = [];
-  const maxPagesToShow = 1; // Máximo de botões de página visíveis
+  const maxPagesToShow = 3; // Máximo de botões de página visíveis
   const half = Math.floor(maxPagesToShow / 2);
 
   if (totalPages <= maxPagesToShow + 2) {

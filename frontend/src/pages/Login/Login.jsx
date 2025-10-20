@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import {
   Form,
   Button,
@@ -11,6 +12,10 @@ import {
 } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { jwtDecode } from 'jwt-decode'
+import Swal from 'sweetalert2'
+import { useAuth } from '../../contexts/AuthContext'
+import './Login.css';
 
 export function Login() {
   const [formData, setFormData] = useState({
@@ -23,6 +28,7 @@ export function Login() {
   const [emailError, setEmailError] = useState('') // Estado para o erro do email
 
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   // Função `handleChange` para validar email
   const handleChange = (event) => {
@@ -61,18 +67,44 @@ export function Login() {
         throw new Error(errorData.error || 'E-mail ou senha inválidos.')
       }
 
-      const data = await response.json()
-      alert('Login realizado com sucesso!')
-      navigate('/dashboardUser')
+      const { token } = await response.json()
+      login(token)  // Usa a função de login do contexto de autenticação
+
+      const decodedUser = jwtDecode(token);
+
+      Swal.fire({
+        title: 'Login Bem-Sucedido!',
+        text: 'Você será redirecionado para o seu painel.',
+        icon: 'success',
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: true,
+      }).then(() => {
+        // Redireciona para o dashboard correto
+        if (decodedUser.role === 'ADMIN') {
+          navigate('/dashboardAdmin');
+        } else {
+          navigate('/dashboardUser');
+        }
+      });
     } catch (err) {
       setApiError(err.message)
     }
   }
 
+  const handleGoogleLogin = () => {
+    // AVISO: A lógica real de login com Google é complexa e exige
+    // configuração no backend e no Console de Desenvolvedores do Google.
+    // Este é apenas um placeholder visual.
+    console.log("Botão de login com Google clicado!");
+    Swal.fire('Em breve!', 'O login com Google ainda não foi implementado.', 'info');
+  };
+
   return (
     <Container className="my-5">
       <Row className="justify-content-center">
         <Col md={8} lg={5}>
+        <div className='form-card'>
           <h2 className="text-center mb-4">Acessar sua Conta</h2>
           <Form noValidate onSubmit={handleSubmit}>
             {apiError && <Alert variant="danger">{apiError}</Alert>}
@@ -122,7 +154,26 @@ export function Login() {
                 Entrar
               </Button>
             </div>
+            <div className="mt-3 text-center">
+              <span>Não possui cadastro? </span>
+              <Link to="/cadastro">Cadastre-se aqui!</Link>
+            </div>
+
+            {/* 5. ADICIONADO: Divisor e botão de Login com Google */}
+            <div className="divider-text my-4"><span>OU</span></div>
+
+            <div className="d-grid">
+              <Button
+                variant="light"
+                className="btn-google"
+                onClick={handleGoogleLogin}
+              >
+                <FontAwesomeIcon icon={faGoogle} className="me-2" />
+                Entrar com Google
+              </Button>
+            </div>
           </Form>
+          </div>
         </Col>
       </Row>
     </Container>

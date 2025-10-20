@@ -12,32 +12,71 @@
     color: #86C89A !important; 
     font-size: 1.1rem; 
     font-weight: 500; 
+    padding: 0.5rem 1rem; /* Adiciona padding para melhor espaçamento */
 }
 
 .nav-custom-link:hover {
-    border-bottom: 2px solid #F58C5C !important;
+    color: #F58C5C !important;
 }
 
-#busca {
-    scroll-margin-top: 150px; 
-}
-
-#faq {
-    scroll-margin-top: 150px; 
-}
 
 @media (max-width: 991.98px) {
-
-  .navbar-collapse .btn-principal {
-    width: 50%;
+  #basic-navbar-nav {
+    align-items: center; 
+    
     text-align: center; 
   }
 
-  .navbar-collapse .btn-principal + .btn-principal {
-    margin-top: 0.75rem; 
+  .navbar-collapse > .nav:last-child {
+      margin-top: 1rem;
   }
+  .user-avatar-toggle {
+  
+  margin-left: 9rem;
+}
+}
 
-  .navbar-collapse .me-3 {
-    margin-right: 0 !important;
-  }
+.user-avatar-toggle {
+  cursor: pointer;
+  margin-top: 1.5rem;
+}
+
+.user-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: var(--cor-laranja);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  position: relative;
+}
+
+.admin-badge {
+  position: absolute;
+  bottom: -2px;      /* Move para o canto inferior */
+  right: -2px;       /* Move para o canto direito */
+  border: 2px solid #000;
+  border-radius: 50%; /* Deixa o fundo do badge redondo */
+  padding: 0.25em;    /* Espaçamento interno para não espremer o ícone */
+  line-height: 1;    /* Garante alinhamento vertical */
+  font-size: 0.7rem; /* Diminui o tamanho do ícone */
+}
+
+.navbar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Fundo preto semitransparente */
+  z-index: 1010; /* Fica abaixo do menu (que tem z-index maior), mas acima do resto da página */
+}
+
+/* Garante que o menu (Navbar.Collapse) fique acima do overlay */
+.navbar-collapse.show, .navbar-collapse.collapsing {
+  z-index: 1020;
 }

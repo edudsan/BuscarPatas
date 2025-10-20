@@ -1,0 +1,56 @@
+.dashboard-wrapper {
+  display: flex;
+  position: relative;
+  background-color: #f8f9fa;
+}
+
+.sidebar-container-wrapper {
+  width: 250px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--cor-verde);
+  background-color: var(--cor-verde);
+  height: 100vh;
+}
+
+.content-container-wrapper {
+  flex-grow: 1;
+  padding: 1.5rem;
+  /* Isso faz com que o botão hambúrguer se posicione em relação a esta área */
+  position: relative; 
+}
+
+.sidebar-toggle {
+  position: absolute; /* Posição absoluta EM RELAÇÃO ao content-container-wrapper */
+  top: 1.5rem;   /* Mesma distância do padding */
+  left: 1.5rem;  /* Mesma distância do padding */
+  z-index: 100;
+}
+
+@media (max-width: 991.98px) {
+  .sidebar-container-wrapper {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 1030;
+    margin-left: -250px;
+    transition: margin-left 0.3s ease-in-out;
+  }
+
+  .sidebar-container-wrapper.open {
+    margin-left: 0;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1029;
+  }
+
+  /* Adiciona espaço no topo do conteúdo para o botão não sobrepor o título */
+  .content-container-wrapper {
+    padding-top: 5rem;
+  }
+}

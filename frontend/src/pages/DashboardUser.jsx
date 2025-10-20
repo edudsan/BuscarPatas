@@ -1,28 +1,24 @@
-import React from 'react'
-import { DashboardLayout } from '../components/DashboardLayout/DashboardLayout'
-import 'bootstrap/dist/css/bootstrap.min.css'
-
-import {
-  DashboardMinhasAdocoes,
-  DashboardBuscarPets,
-} from '../components/DashboardContentUser/DashboardContentUser'
+import { DashboardLayout } from '../components/DashboardLayout/DashboardLayout';
+import { MinhasAdocoes } from '../components/DashboardContentUser/MinhasAdocoes';
+import { MinhasInformacoes } from '../components/DashboardContentUser/MinhasInformacoes';
 
 const userMenuItems = [
-  { key: 'buscar-pets', label: 'BUSCAR PETS' },
   { key: 'minhas-adocoes', label: 'MINHAS ADOÇÕES' },
-]
+  { key: 'minhas-informacoes', label: 'MINHAS INFORMAÇÕES' },
+  { key: 'buscar-pets', label: 'BUSCAR PETS' },
+];
 
 const userContentMap = {
-  'buscar-pets': DashboardBuscarPets,
-  'minhas-adocoes': DashboardMinhasAdocoes,
-}
+  'minhas-adocoes': MinhasAdocoes,
+  'minhas-informacoes': MinhasInformacoes,
+};
 
 export function DashboardUser() {
   return (
     <DashboardLayout
       menuItems={userMenuItems}
       contentMap={userContentMap}
-      initialPanel="buscar-pets"
+      initialPanel="minhas-adocoes"
     />
-  )
+  );
 }
