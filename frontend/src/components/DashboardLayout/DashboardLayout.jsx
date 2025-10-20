@@ -24,33 +24,38 @@ export function DashboardLayout({ menuItems = [], contentMap, initialPanel }) {
   }
 
   return (
-    <>
-      <div className={`sidebar-container-wrapper ${sidebarOpen ? 'open' : ''}`}>
-        <SideBarDashboard
-          activePanel={activePanel}
-          setActivePanel={handleSelectPanel}
-          menuItems={menuItems}
-        />
+    <div className="dashboard-layout-container">
+      <div className="dashboard-wrapper">
+        <div className={`sidebar-container-wrapper ${sidebarOpen ? 'open' : ''}`}>
+          <SideBarDashboard
+            activePanel={activePanel}
+            setActivePanel={handleSelectPanel}
+            menuItems={menuItems}
+          />
+        </div>
+        {sidebarOpen && (
+          <div
+            className="overlay d-lg-none"
+            onClick={() => setSidebarOpen(false)}
+          ></div>
+        )}
+
+        <main className="content-container-wrapper">
+          <Button
+            className="sidebar-toggle d-lg-none"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            <FontAwesomeIcon icon={faBars} />
+          </Button>
+
+          <h1 className="titulo-painel text-center py-3 display-6">
+            Painel administrativo - Buscar Patas
+          </h1>
+          {renderPanelContent()}
+        </main>
       </div>
-      {sidebarOpen && (
-        <div
-          className="overlay d-lg-none"
-          onClick={() => setSidebarOpen(false)}
-        ></div>
-      )}
-
-      <Button>
-        <FontAwesomeIcon icon={faBars} />
-      </Button>
-
-      <main className="content-container-wrapper">
-        <h1 className="titulo-painel text-center py-3 display-6">
-          Painel administrativo - Buscar Patas
-        </h1>
-        {renderPanelContent()}
-      </main>
 
       <Footer />
-    </>
+    </div>
   )
 }
