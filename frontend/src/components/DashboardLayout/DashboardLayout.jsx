@@ -1,10 +1,9 @@
-// components/DashboardLayout/DashboardLayout.jsx
-
 import React, { useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { SideBarDashboard } from '../SideBarDashboard/SideBarDashboard'
 import { Footer } from '../../components/Footer/Footer'
 import '../../components/DashboardContent/DashboardContentAdmin'
+import './DashboardLayout.css'
 
 export function DashboardLayout({ menuItems = [], contentMap, initialPanel }) {
   const defaultPanel =
@@ -43,10 +42,14 @@ export function DashboardLayout({ menuItems = [], contentMap, initialPanel }) {
           </div>
 
           <div className="col-12 col-md-9 content-container">
+            <h1 className="titulo-painel text-center py-3 display-6">
+              Painel administrativo - Buscar Patas
+            </h1>
             {renderPanelContent()}
           </div>
         </div>
       </div>
+
       <Footer />
     </>
   )
