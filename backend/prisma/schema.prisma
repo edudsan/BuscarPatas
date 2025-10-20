@@ -1,5 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// schema.prisma
 
 generator client {
   provider = "prisma-client-js"
@@ -10,13 +9,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enum para o status do Pet
+// Enums para padronização de dados
+enum Role {
+  USER
+  ADMIN
+}
+
 enum StatusPet {
   DISPONIVEL
   ADOTADO
 }
 
-// Enums para filtro avançado
 enum TamanhoPet {
   PEQUENO
   MEDIO
@@ -29,54 +32,58 @@ enum PersonalidadePet {
   INDEPENDENTE
 }
 
-// Enum para definir os papéis do usuário
-enum Role {
-  USER
-  ADMIN
+// Modelos do Banco de Dados
+
+// NOVO MODELO PARA AUTENTICAÇÃO
+model Auth {
+  auth_id     Int       @id @default(autoincrement())
+  email       String    @unique
+  senha       String
+  role        Role      @default(USER)
+  
+  // Relação um-para-um com Adotante
+  adotante    Adotante?
 }
 
-// Modelo para os Pets
+// MODELO ADOTANTE AGORA FOCADO NO PERFIL
+model Adotante {
+  adotante_id Int      @id @default(autoincrement())
+  nome        String
+  telefone    String?
+  rua         String?
+  numero      String?
+  bairro      String?
+  cidade      String?
+  uf          String?  @db.VarChar(2)
+
+  // Chave estrangeira para o modelo Auth
+  auth_id     Int      @unique
+  auth        Auth     @relation(fields: [auth_id], references: [auth_id])
+
+  adocoes     Adocao[]
+}
+
 model Pet {
-  pet_id              Int        @id @default(autoincrement())
+  pet_id          Int               @id @default(autoincrement())
   nome            String
   especie         String
-  data_nascimento DateTime?  @db.Date
+  data_nascimento DateTime?         @db.Date
   descricao       String?
-  status          StatusPet  @default(DISPONIVEL)
-  adocao          Adocao?
+  status          StatusPet         @default(DISPONIVEL)
   tamanho         TamanhoPet?
   personalidade   PersonalidadePet?
   imagem_url1     String?
   imagem_url2     String?
+
+  adocao          Adocao?
 }
 
-// Modelo para os Adotantes
-model Adotante {
-  adotante_id       Int      @id @default(autoincrement())
-  nome     String
-  email    String   @unique
-  telefone String
-  
-  // Endereço está em campos compostos
-  rua      String
-  numero   String? // Opcional, pois pode não ter número
-  bairro   String
-  cidade   String
-  uf       String   @db.VarChar(2) // Limita a 2 caracteres, ex: "DF"
-
-  adocoes  Adocao[]
-
-  senha    String
-  role     Role     @default(USER) // USER como padrão
-}
-
-// Modelo para as Adoções
 model Adocao {
-  adocao_id          Int      @id @default(autoincrement())
+  adocao_id   Int      @id @default(autoincrement())
   data_adocao DateTime @default(now()) @db.Date
-  pet_id      Int      @unique // Garante que um pet só pode ser adotado uma vez
+  pet_id      Int      @unique
   adotante_id Int
 
-  pet      Pet      @relation(fields: [pet_id], references: [pet_id])
-  adotante Adotante @relation(fields: [adotante_id], references: [adotante_id])
+  pet         Pet      @relation(fields: [pet_id], references: [pet_id])
+  adotante    Adotante @relation(fields: [adotante_id], references: [adotante_id])
 }

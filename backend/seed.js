@@ -6,26 +6,46 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Iniciando o processo de seeding...');
 
-  // Limpa as tabelas existentes para evitar duplicatas
+  // Limpa as tabelas existentes em ordem para evitar erros de chave estrangeira
   await prisma.adocao.deleteMany({});
   await prisma.pet.deleteMany({});
   await prisma.adotante.deleteMany({});
+  await prisma.auth.deleteMany({});
   console.log('Tabelas limpas.');
 
-  // Criptografa uma senha padrão para todos os adotantes
+  // Criptografa uma senha padrão
   const senhaPadrao = await bcrypt.hash('senha123', 10);
 
-  // Cria os Adotantes
-  await prisma.adotante.createMany({
-    data: [
-      { nome: "Mariana Costa", email: "mariana.costa@example.com", senha: senhaPadrao, telefone: "11988776655", rua: "Avenida Paulista", numero: "2000", bairro: "Bela Vista", cidade: "São Paulo", uf: "SP" },
-      { nome: "Ricardo Almeida", email: "ricardo.a@example.com", senha: senhaPadrao, telefone: "71911223344", rua: "Rua das Laranjeiras", numero: "50", bairro: "Pelourinho", cidade: "Salvador", uf: "BA" },
-      { nome: "Fernanda Oliveira", email: "fernanda.oliveira@example.com", senha: senhaPadrao, telefone: "48999887766", rua: "Avenida Beira Mar Norte", numero: "1200", bairro: "Centro", cidade: "Florianópolis", uf: "SC" },
-      { nome: "Lucas Pereira", email: "lucas.pereira@example.com", senha: senhaPadrao, telefone: "61981234567", rua: "SQS 308 Bloco C", numero: "101", bairro: "Asa Sul", cidade: "Brasília", uf: "DF" },
-      { nome: "Juliana Santos", email: "juliana.s@example.com", senha: senhaPadrao, telefone: "92992345678", rua: "Rua Tapajós", numero: "45", bairro: "Centro", cidade: "Manaus", uf: "AM" }
-    ]
-  });
-  console.log('Adotantes criados.');
+  // Dados dos usuários
+  const usersData = [
+    { email: "mariana.costa@example.com", nome: "Mariana Costa", telefone: "11988776655", rua: "Avenida Paulista", numero: "2000", bairro: "Bela Vista", cidade: "São Paulo", uf: "SP" },
+    { email: "ricardo.a@example.com", nome: "Ricardo Almeida", telefone: "71911223344", rua: "Rua das Laranjeiras", numero: "50", bairro: "Pelourinho", cidade: "Salvador", uf: "BA" },
+    { email: "fernanda.oliveira@example.com", nome: "Fernanda Oliveira", telefone: "48999887766", rua: "Avenida Beira Mar Norte", numero: "1200", bairro: "Centro", cidade: "Florianópolis", uf: "SC" },
+    { email: "lucas.pereira@example.com", nome: "Lucas Pereira", telefone: "61981234567", rua: "SQS 308 Bloco C", numero: "101", bairro: "Asa Sul", cidade: "Brasília", uf: "DF" },
+    { email: "juliana.s@example.com", nome: "Juliana Santos", telefone: "92992345678", rua: "Rua Tapajós", numero: "45", bairro: "Centro", cidade: "Manaus", uf: "AM" }
+  ];
+
+  // Cria os usuários (Auth e Adotante)
+  for (const userData of usersData) {
+    await prisma.auth.create({
+      data: {
+        email: userData.email,
+        senha: senhaPadrao,
+        adotante: {
+          create: {
+            nome: userData.nome,
+            telefone: userData.telefone,
+            rua: userData.rua,
+            numero: userData.numero,
+            bairro: userData.bairro,
+            cidade: userData.cidade,
+            uf: userData.uf,
+          },
+        },
+      },
+    });
+  }
+  console.log('Adotantes e Autenticações criados.');
 
   // Dados para 50 Pets
   const petData = [
@@ -87,8 +107,17 @@ async function main() {
   console.log(`${petData.length} pets criados.`);
 
   // Realiza as Adoções
-  const mariana = await prisma.adotante.findUnique({ where: { email: "mariana.costa@example.com" } });
-  const lucas = await prisma.adotante.findUnique({ where: { email: "lucas.pereira@example.com" } });
+  const authMariana = await prisma.auth.findUnique({
+    where: { email: "mariana.costa@example.com" },
+    include: { adotante: true }, 
+  });
+  const mariana = authMariana?.adotante; 
+
+  const authLucas = await prisma.auth.findUnique({
+    where: { email: "lucas.pereira@example.com" },
+    include: { adotante: true },
+  });
+  const lucas = authLucas?.adotante;
   
   const fred = await prisma.pet.findFirst({ where: { nome: "Fred" } });
   const luna = await prisma.pet.findFirst({ where: { nome: "Luna" } });

@@ -1,0 +1,60 @@
+.adotante-card {
+  border-radius: 15px;
+  border: 1px solid #e9ecef;
+  text-align: center;
+}
+
+.adotante-card .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 1rem;
+}
+
+.user-avatar-card {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+}
+
+.user-details-card {
+  word-break: break-word; /* Garante que o texto quebre*/ 
+}
+
+.user-name-card {
+  font-weight: 600;
+  color: var(--cor-azul);
+}
+
+.user-email-card, .user-phone-card {
+  font-size: 0.9rem;
+}
+
+.user-actions-card {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.admin-switch-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.admin-switch-card .form-check-input {
+  margin-left: 0.5em;
+}
+
+.admin-switch-card .form-check-input:checked {
+  background-color: var(--cor-verde);
+  border-color: var(--cor-verde);
+}
+
+.action-btn-card {
+  font-size: 1.1rem;
+  padding: 0.25rem 0.5rem;
+}

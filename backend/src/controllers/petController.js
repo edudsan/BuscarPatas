@@ -1,30 +1,78 @@
 import { PrismaClient } from '@prisma/client';
+import { v2 as cloudinary } from 'cloudinary';
+import { Readable } from 'stream';
+
 const prisma = new PrismaClient();
+
+// Configura o Cloudinary (pode ser movido para um arquivo de configuração separado no futuro)
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true
+});
+
+// Função auxiliar para fazer upload do buffer para o Cloudinary
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const readableStream = new Readable();
+    readableStream.push(buffer);
+    readableStream.push(null);
+
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: 'buscar_patas', resource_type: 'image' },
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+    readableStream.pipe(uploadStream);
+  });
+};
+
 
 // CREATE
 export const createPet = async (req, res) => {
   try {
     const { nome, especie, data_nascimento, descricao, status, tamanho, personalidade } = req.body;
+    let imageUrl = null;
 
+    // Verifica se um arquivo foi enviado pelo middleware
+    if (req.file) {
+      try {
+        const result = await uploadToCloudinary(req.file.buffer);
+        imageUrl = result.secure_url; // Pega a URL segura da imagem
+      } catch (uploadError) {
+        console.error('Erro no upload para o Cloudinary:', uploadError);
+        return res.status(500).json({ error: 'Falha ao fazer o upload da imagem.' });
+      }
+    }
+
+    // 2. Monta o objeto de dados para o Prisma
     const dadosCriacao = {
       nome: nome ? nome.toLowerCase() : undefined,
       especie: especie ? especie.toLowerCase() : undefined,
       descricao: descricao ? descricao.toLowerCase() : undefined,
       data_nascimento: data_nascimento ? new Date(data_nascimento) : null,
-      imagem_url1,
-      imagem_url2
+      imagem_url1: imageUrl, // Salva a URL no banco de dados
+      // imagem_url2: ... // (se precisar de uma segunda imagem, teria que adaptar o middleware)
     };
 
     if (status) dadosCriacao.status = status.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     if (tamanho) dadosCriacao.tamanho = tamanho.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     if (personalidade) dadosCriacao.personalidade = personalidade.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     
+    // Cria o pet no banco de dados
     const novoPet = await prisma.pet.create({
       data: dadosCriacao,
     });
 
     res.status(201).json(novoPet);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Não foi possível cadastrar o pet.' });
   }
 };
@@ -47,12 +95,18 @@ export const getAllAvailablePets = async (req, res) => {
 export const getAllPets = async (req, res) => {
   try {
     // Pega os possíveis filtros da query da URL (ex: /pets?especie=Gato&tamanho=PEQUENO)
-    const { especie, status, tamanho, personalidade, page = 1, limit = 10  } = req.query;
+    const { nome, especie, status, tamanho, personalidade, page = 1, limit = 10  } = req.query;
     const pageAsNumber = parseInt(page);
     const limitAsNumber = parseInt(limit);
     // Objeto que vai guardar as condições do filtro
     const where = {};
 
+    if (nome) {
+      where.nome = {
+        contains: nome,
+        mode: 'insensitive', // Garante que a busca não diferencia maiúsculas/minúsculas
+      };
+    }
     if (especie) {
       where.especie = especie;
     }
@@ -116,8 +170,8 @@ export const updatePet = async (req, res) => {
     // Objeto que guardará apenas os dados que foram enviados na requisição
     const dadosParaAtualizar = {};
 
-    if (nome) dadosParaAtualizar.nome = nome;
-    if (especie) dadosParaAtualizar.especie = especie;
+    if (nome) dadosParaAtualizar.nome = nome.toLowerCase();
+    if (especie) dadosParaAtualizar.especie = especie.toLowerCase();
     if (data_nascimento) dadosParaAtualizar.data_nascimento = new Date(data_nascimento);
     if (descricao) dadosParaAtualizar.descricao = descricao;
     if (status) {

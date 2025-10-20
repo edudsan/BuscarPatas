@@ -13,7 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { Footer } from '../components/Footer/Footer'
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2'
 
 // Função para verificar a força da senha
 const checkPasswordStrength = (password) => {
@@ -165,6 +165,7 @@ export function Cadastro() {
       <Container className="my-5">
         <Row className="justify-content-center">
           <Col md={8} lg={6}>
+          <div className='form-card'>
             <h2 className="text-center mb-4">Crie sua Conta</h2>
             <Form noValidate onSubmit={handleSubmit}>
               {apiError && <Alert variant="danger">{apiError}</Alert>}
@@ -338,6 +339,7 @@ export function Cadastro() {
                 </Button>
               </div>
             </Form>
+          </div>
           </Col>
         </Row>
       </Container>

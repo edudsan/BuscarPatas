@@ -10,8 +10,8 @@ async function main() {
 
   console.log("Iniciando a criação do usuário admin...");
 
-  // Verifica se o usuário já existe
-  const existingAdmin = await prisma.adotante.findUnique({
+  // 1. CORREÇÃO: Verifica se o admin já existe na tabela 'Auth'
+  const existingAdmin = await prisma.auth.findUnique({
     where: { email: adminEmail },
   });
 
@@ -23,18 +23,22 @@ async function main() {
   // Criptografa a senha
   const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
-  // Cria o usuário com o papel de ADMIN
-  await prisma.adotante.create({
+  // 2. CORREÇÃO: Cria o registro 'Auth' e o 'Adotante' relacionado de uma só vez
+  await prisma.auth.create({
     data: {
       email: adminEmail,
       senha: hashedPassword,
-      nome: adminName,
       role: 'ADMIN',
-      telefone: "00000000000",
-      rua: "Não Aplicável",
-      bairro: "Não Aplicável",
-      cidade: "Não Aplicável",
-      uf: "NA",
+      adotante: { // Cria o perfil do adotante aninhado
+        create: {
+          nome: adminName,
+          telefone: "00000000000",
+          rua: "Não Aplicável",
+          bairro: "Não Aplicável",
+          cidade: "Não Aplicável",
+          uf: "NA",
+        }
+      }
     },
   });
 

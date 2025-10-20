@@ -1,0 +1,92 @@
+.nav-link-custom {
+  color: #a0f0ae !important; /* Verde mais vibrante */
+  font-weight: 500;
+  margin: 0 10px; /* Espaçamento entre os links */
+  transition: color 0.3s ease;
+}
+
+.nav-link-custom:hover {
+  color: #ccffee !important; /* Cor mais clara ao passar o mouse */
+}
+
+/* Estilo para os botões de login/cadastro */
+.btn-custom {
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-weight: bold;
+}
+
+.btn-custom.btn-outline-light {
+  border-color: #a0f0ae;
+  color: #a0f0ae;
+}
+
+.btn-custom.btn-outline-light:hover {
+  background-color: #a0f0ae;
+  color: #212529;
+}
+
+.btn-custom.btn-light {
+  background-color: #a0f0ae;
+  color: #212529;
+  border-color: #a0f0ae;
+}
+
+.btn-custom.btn-light:hover {
+  background-color: #79d282;
+  border-color: #79d282;
+}
+
+/* Estilo para o dropdown do usuário */
+.user-dropdown .dropdown-toggle {
+  border: none;
+  background: none;
+  padding: 0;
+  color: #a0f0ae !important;
+  font-weight: 500;
+}
+
+.user-dropdown .dropdown-toggle:hover {
+  color: #ccffee !important;
+  background: none;
+}
+
+.user-dropdown .dropdown-toggle:focus {
+  box-shadow: none;
+  background: none !important;
+}
+
+.user-dropdown .dropdown-menu {
+  background-color: #343a40; /* Cor de fundo escura para o menu */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.user-dropdown .dropdown-item {
+  color: #e9ecef;
+}
+
+.user-dropdown .dropdown-item:hover {
+  background-color: #495057;
+  color: #fff;
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 991.98px) {
+  .nav-link-custom, .btn-custom {
+    margin: 5px 0; /* Espaçamento vertical para links e botões colapsados */
+  }
+  .ms-auto.d-flex.align-items-center.justify-content-center {
+    flex-direction: column;
+  }
+  .user-dropdown {
+    width: 100%; /* Ocupa a largura total no menu colapsado */
+  }
+  .user-dropdown .dropdown-toggle {
+    justify-content: center; /* Centraliza o ícone do usuário */
+    width: 100%;
+  }
+  .user-dropdown .dropdown-menu {
+    width: 100%;
+    text-align: center;
+  }
+}

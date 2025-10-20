@@ -2,3 +2,15 @@
     background-color: #f8f9fa;
     overflow-y: auto; 
 }
+
+.dashboard-menu-card {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid #e1e6de;
+}
+
+.dashboard-menu-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-color: var(--cor-azul);
+}

@@ -1,0 +1,41 @@
+/* Estilo para o botão de login com Google */
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ced4da !important; /* Borda sutil */
+  font-weight: bold;
+  color: #495057 !important; /* Cor do texto */
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-google:hover {
+  background-color: #f1f3f5 !important;
+  border-color: #adb5bd !important;
+}
+
+/* Estilo para o divisor com texto "OU" */
+.divider-text {
+  position: relative;
+  text-align: center;
+}
+
+.divider-text span {
+  padding: 0 10px;
+  background-color: #f8f9fa; /* Mesma cor de fundo do form-card */
+  position: relative;
+  z-index: 2;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* Esta é a linha que passa por trás do texto */
+.divider-text::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  left: 0;
+  border-top: 1px solid #dee2e6;
+  z-index: 1;
+}
