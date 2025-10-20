@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaw, faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
-import './FAQSection.css'
+import './FaqSection.css'
 
 const faqItems = [
   {
