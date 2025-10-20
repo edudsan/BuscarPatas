@@ -38,7 +38,6 @@ export function PetEditPanel({ onBack }) {
       nome: pet.nome || '',
       especie: pet.especie || '',
       descricao: pet.descricao || '',
-      // --- CORREÇÃO DA TELA EM BRANCO AQUI ---
       // Verifica se a data existe antes de tentar formatá-la
       data_nascimento: pet.data_nascimento ? pet.data_nascimento.split('T')[0] : '',
       tamanho: pet.tamanho || 'PEQUENO',
@@ -106,7 +105,6 @@ export function PetEditPanel({ onBack }) {
       ) : (
         <>
           <h2 className="mb-4">Editando: {capitalizeFirstLetter(petToEdit.nome)}</h2>
-          {/* --- CORREÇÃO DO FORMULÁRIO INCOMPLETO AQUI --- */}
           <Form onSubmit={handleUpdate}>
             <Row>
               <Col md={6}><Form.Group className="mb-3"><Form.Label>Nome</Form.Label><Form.Control type="text" name="nome" value={formData.nome} onChange={handleFormChange} /></Form.Group></Col>

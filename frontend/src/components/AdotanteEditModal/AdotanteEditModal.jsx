@@ -15,7 +15,7 @@ export function AdotanteEditModal({ show, onHide, adotante, onUpdateSuccess }) {
         email: adotante.email || '',
         telefone: adotante.telefone || '',
         role: adotante.role || 'USER',
-        // Adicione outros campos como rua, cidade, etc., se quiser editá-los aqui
+        // Adicione outros campos como rua, cidade, etc., se quiser editar aqui
       });
     }
   }, [adotante]);
@@ -42,8 +42,7 @@ export function AdotanteEditModal({ show, onHide, adotante, onUpdateSuccess }) {
       
       const updatedAdotante = await response.json();
       
-      // --- LÓGICA APLICADA ---
-      // Passa o usuário atualizado de volta para o painel
+      
       onUpdateSuccess(updatedAdotante); 
       
       onHide(); // Fecha o modal
@@ -63,7 +62,6 @@ export function AdotanteEditModal({ show, onHide, adotante, onUpdateSuccess }) {
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
-          {/* ... (campos do formulário como na sua versão) ... */}
           <Row>
             <Col md={6}><Form.Group className="mb-3"><Form.Label>Nome</Form.Label><Form.Control type="text" name="nome" value={formData.nome} onChange={handleChange} required /></Form.Group></Col>
             <Col md={6}><Form.Group className="mb-3"><Form.Label>E-mail</Form.Label><Form.Control type="email" name="email" value={formData.email} onChange={handleChange} required /></Form.Group></Col>

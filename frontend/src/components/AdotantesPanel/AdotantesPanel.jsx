@@ -14,7 +14,7 @@ export function AdotantesPanel() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedAdotante, setSelectedAdotante] = useState(null);
 
-  // 2. Envolvemos a função fetchAdotantes com useCallback
+  // Envolvemos a função fetchAdotantes com useCallback
   const fetchAdotantes = useCallback(async () => {
     setLoading(true);
     setError(null);

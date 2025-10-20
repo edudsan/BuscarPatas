@@ -68,7 +68,7 @@ export const getAdotantesSemAdocao = async (req, res) => {
   }
 };
 
-// UPDATE (Atualização parcial - CORRIGIDO)
+// UPDATE 
 export const updateAdotante = async (req, res) => {
   try {
     const { id } = req.params;
@@ -97,7 +97,7 @@ export const updateAdotante = async (req, res) => {
       });
     }
 
-    // Se a requisição contiver 'role' ou 'email', atualiza a tabela Auth
+    // Se a requisição contiver role ou email, atualiza a tabela Auth
     const dadosAuth = {};
     if (email) dadosAuth.email = email;
     if (role && (role === 'ADMIN' || role === 'USER')) {
@@ -130,7 +130,7 @@ export const updateAdotante = async (req, res) => {
   }
 };
 
-// DELETE (CORRIGIDO)
+// DELETE 
 export const deleteAdotante = async (req, res) => {
   try {
     const { id } = req.params;
@@ -153,7 +153,6 @@ export const deleteAdotante = async (req, res) => {
     }
 
     // Usa uma transação para deletar o Adotante e o Auth associado
-    // A ordem é importante: primeiro o que depende (Adotante), depois o principal (Auth)
     await prisma.$transaction([
       prisma.adotante.delete({ where: { adotante_id } }),
       prisma.auth.delete({ where: { auth_id: adotante.auth_id } })

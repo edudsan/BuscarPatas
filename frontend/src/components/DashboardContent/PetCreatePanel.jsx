@@ -4,7 +4,6 @@ import Swal from 'sweetalert2';
 import { useAuth } from '../../contexts/AuthContext';
 
 export function PetCreatePanel({ onBack }) {
-  // --- CÓDIGO COMPLETO AQUI ---
   const [formData, setFormData] = useState({
     nome: '',
     especie: '',

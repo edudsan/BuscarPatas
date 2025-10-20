@@ -69,7 +69,6 @@ export function MinhasInformacoes() {
   return (
     <div className="p-4">
       <h2 className="mb-4">Minhas Informações</h2>
-      {/* --- FORMULÁRIO COMPLETO AQUI --- */}
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col md={6}>

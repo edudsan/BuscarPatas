@@ -20,7 +20,7 @@
 }
 
 .user-details-card {
-  word-break: break-word; /* Garante que o texto quebre */
+  word-break: break-word; /* Garante que o texto quebre*/ 
 }
 
 .user-name-card {

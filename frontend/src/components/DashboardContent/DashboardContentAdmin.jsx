@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Card, Button, Container, Row, Col } from 'react-bootstrap';
-import { PetCreatePanel } from './PetCreatePanel'; // Vamos criar este componente
-import { PetEditPanel } from './PetEditPanel'; // O componente que acabamos de criar
+import { PetCreatePanel } from './PetCreatePanel'; 
+import { PetEditPanel } from './PetEditPanel'; 
 import { AdotantesPanel } from '../AdotantesPanel/AdotantesPanel.jsx';
 import './DashboardContentAdmin.css';
 
-// --- NOVO COMPONENTE DE MENU ---
 function PetManagementMenu({ setView }) {
   return (
     <Container className="p-4 text-center">
@@ -32,7 +31,6 @@ function PetManagementMenu({ setView }) {
   );
 }
 
-// --- LÓGICA PRINCIPAL DO PAINEL DE PETS ---
 export function DashboardPets() {
   const [petView, setPetView] = useState('menu'); // 'menu', 'create', 'edit'
 
@@ -46,7 +44,6 @@ export function DashboardPets() {
   }
 }
 
-// --- OUTROS PAINÉIS CONTINUAM IGUAIS ---
 export function DashboardAdotantes() {
   return <AdotantesPanel />;
 }

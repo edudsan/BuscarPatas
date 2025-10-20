@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// Função para registrar um novo usuário (MODIFICADA)
+// Função para registrar um novo usuário 
 export const register = async (req, res) => {
   const { nome, email, senha, telefone, numero, rua, bairro, cidade, uf } = req.body;
 
@@ -17,16 +17,16 @@ export const register = async (req, res) => {
 
     // Usamos uma transação para criar o Auth e o Adotante juntos
     const novoUsuario = await prisma.$transaction(async (prisma) => {
-      // 1. Cria o registro de autenticação
+      // Cria o registro de autenticação
       const novoAuth = await prisma.auth.create({
         data: {
           email,
           senha: senhaHash,
-          // role: 'USER' // O padrão já é USER no schema
+          // role: 'USER'  O padrão já é USER no schema
         },
       });
 
-      // 2. Cria o registro do adotante e conecta com o auth criado acima
+      // Cria o registro do adotante e conecta com o auth criado acima
       const novoAdotante = await prisma.adotante.create({
         data: {
           nome,
@@ -57,12 +57,12 @@ export const register = async (req, res) => {
   }
 };
 
-// Função para fazer login (MODIFICADA)
+// Função para fazer login
 export const login = async (req, res) => {
   const { email, senha } = req.body;
 
   try {
-    // 1. Encontra o usuário na tabela Auth pelo e-mail
+    // Encontra o usuário na tabela Auth pelo e-mail
     const auth = await prisma.auth.findUnique({
       where: { email },
     });
@@ -71,14 +71,14 @@ export const login = async (req, res) => {
       return res.status(401).json({ error: 'Credenciais inválidas.' });
     }
 
-    // 2. Compara a senha enviada com a senha criptografada no banco
+    // Compara a senha enviada com a senha criptografada no banco
     const senhaValida = await bcrypt.compare(senha, auth.senha);
 
     if (!senhaValida) {
       return res.status(401).json({ error: 'Credenciais inválidas.' });
     }
 
-    // 3. Gera o token JWT com o ID da tabela Auth
+    // Gera o token JWT com o ID da tabela Auth
     const token = jwt.sign(
       { id: auth.auth_id, role: auth.role }, // Usa o auth_id
       JWT_SECRET,

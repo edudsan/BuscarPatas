@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-// CREATE (Não precisa de alteração, a lógica continua a mesma)
+// CREATE 
 export const createAdocao = async (req, res) => {
   const { pet_id, adotante_id } = req.body;
 
@@ -36,13 +36,13 @@ export const createAdocao = async (req, res) => {
   }
 };
 
-// READ (Listar todas as adoções - não precisa de alteração)
+// READ 
 export const getAllAdocoes = async (req, res) => {
   try {
     const adocoes = await prisma.adocao.findMany({
       include: {
         pet: true,
-        adotante: true, // A relação com Adotante ainda funciona
+        adotante: true, 
       },
     });
     res.status(200).json(adocoes);
@@ -51,10 +51,10 @@ export const getAllAdocoes = async (req, res) => {
   }
 };
 
-// READ (Listar minhas adoções - MODIFICADO)
+// READ 
 export const getMyAdocoes = async (req, res) => {
   try {
-    // 1. Encontrar o perfil do adotante usando o auth_id do token (req.user.id)
+    // Encontrar o perfil do adotante usando o auth_id do token (req.user.id)
     const adotanteProfile = await prisma.adotante.findUnique({
       where: { auth_id: req.user.id },
     });
@@ -64,7 +64,7 @@ export const getMyAdocoes = async (req, res) => {
       return res.status(404).json({ error: 'Perfil de adotante não encontrado.' });
     }
 
-    // 2. Usar o adotante_id encontrado para filtrar as adoções
+    // Usar o adotante_id encontrado para filtrar as adoções
     const adocoes = await prisma.adocao.findMany({
       where: { adotante_id: adotanteProfile.adotante_id },
       include: {
@@ -81,7 +81,7 @@ export const getMyAdocoes = async (req, res) => {
   }
 };
 
-// UPDATE (Não precisa de alteração)
+// UPDATE 
 export const updateAdocao = async (req, res) => {
   try {
     const { id } = req.params;
@@ -122,7 +122,7 @@ export const updateAdocao = async (req, res) => {
   }
 };
 
-// DELETE (Não precisa de alteração)
+// DELETE 
 export const deleteAdocao = async (req, res) => {
   try {
     const { id } = req.params;

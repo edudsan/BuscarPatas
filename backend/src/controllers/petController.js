@@ -40,7 +40,7 @@ export const createPet = async (req, res) => {
     const { nome, especie, data_nascimento, descricao, status, tamanho, personalidade } = req.body;
     let imageUrl = null;
 
-    // 1. Verifica se um arquivo foi enviado pelo middleware
+    // Verifica se um arquivo foi enviado pelo middleware
     if (req.file) {
       try {
         const result = await uploadToCloudinary(req.file.buffer);
@@ -65,7 +65,7 @@ export const createPet = async (req, res) => {
     if (tamanho) dadosCriacao.tamanho = tamanho.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     if (personalidade) dadosCriacao.personalidade = personalidade.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     
-    // 3. Cria o pet no banco de dados
+    // Cria o pet no banco de dados
     const novoPet = await prisma.pet.create({
       data: dadosCriacao,
     });

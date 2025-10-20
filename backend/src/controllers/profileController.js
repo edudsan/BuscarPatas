@@ -1,14 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-// Buscar o Perfil (MODIFICADO)
+// Buscar o Perfil 
 export const getMyProfile = async (req, res) => {
   try {
     // req.user.id agora é o auth_id do token JWT
     const adotante = await prisma.adotante.findUnique({
       where: { auth_id: req.user.id }, 
       include: {
-        auth: { // Inclui os dados de autenticação (como email e role)
+        auth: { // Inclui os dados de autenticação como email e role
           select: {
             email: true,
             role: true,
@@ -32,7 +32,7 @@ export const getMyProfile = async (req, res) => {
   }
 };
 
-// Atualiza o perfil (MODIFICADO)
+// Atualiza o perfil
 export const updateMyProfile = async (req, res) => {
   try {
     const { nome, telefone, rua, numero, bairro, cidade, uf } = req.body;

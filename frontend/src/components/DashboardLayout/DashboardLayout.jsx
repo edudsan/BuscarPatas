@@ -21,7 +21,6 @@ export function DashboardLayout({ menuItems = [], contentMap, initialPanel }) {
 
   return (
     <div className="dashboard-wrapper">
-      {/* O botão fica aqui, mas seu posicionamento será corrigido pelo CSS */}
       <Button
         className="sidebar-toggle d-lg-none"
         onClick={() => setSidebarOpen(!sidebarOpen)}

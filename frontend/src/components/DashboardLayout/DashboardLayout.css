@@ -15,12 +15,11 @@
 .content-container-wrapper {
   flex-grow: 1;
   padding: 1.5rem;
-  /* Isso faz com que o botão hambúrguer se posicione em relação a esta área */
   position: relative; 
 }
 
 .sidebar-toggle {
-  position: absolute; /* Posição absoluta EM RELAÇÃO ao content-container-wrapper */
+  position: absolute; /* Posição absoluta ao content-container-wrapper */
   top: 1.5rem;   /* Mesma distância do padding */
   left: 1.5rem;  /* Mesma distância do padding */
   z-index: 100;
