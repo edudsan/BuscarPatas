@@ -1,0 +1,46 @@
+.adocoes-panel {
+  background-color: #f8f9fa;
+}
+
+.adocao-card {
+  border-radius: 15px;
+  border: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+}
+
+.adocao-card .card-img-top {
+  height: 250px;
+  object-fit: cover;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.adocao-card .card-body {
+  padding: 1.5rem;
+  flex-grow: 1;
+}
+
+.adocao-card .card-title {
+  font-weight: 600;
+  color: var(--cor-azul);
+}
+
+.adocao-card .card-subtitle {
+  font-size: 0.9rem;
+}
+
+.adocao-card .list-group-item {
+  font-size: 0.9rem;
+  word-break: break-word;
+  background-color: transparent; 
+}
+
+.adocao-card .list-group-item strong {
+  color: #333;
+}
+
+.adocao-card .list-group-item:last-child {
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}

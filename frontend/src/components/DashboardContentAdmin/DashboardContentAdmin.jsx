@@ -7,6 +7,7 @@ import { PetEditPanel } from './PetEditPanel.jsx'
 import { AdotantesPanel } from '../AdotantesPanel/AdotantesPanel.jsx'
 import './DashboardContentAdmin.css'
 import { DashboardNumerosPanel } from '../DashboardNumeros/DashboardNumerosPanel.jsx'
+import { AdocoesPanel } from '../AdocoesPanel/AdocoesPanel.jsx' 
 
 export function DashboardNumeros() {
   return <DashboardNumerosPanel />
@@ -42,7 +43,7 @@ function PetManagementMenu({ setView }) {
 }
 
 export function DashboardPets() {
-  const [petView, setPetView] = useState('menu') // 'menu', 'create', 'edit'
+  const [petView, setPetView] = useState('menu')
 
   switch (petView) {
     case 'create':
@@ -59,10 +60,5 @@ export function DashboardAdotantes() {
 }
 
 export function DashboardAdocoes() {
-  return (
-    <div className="p-4">
-      <h2 className="mb-4">Gerenciar Adoções</h2>
-      {/* Futuro painel de adoções */}
-    </div>
-  )
+  return <AdocoesPanel />
 }
