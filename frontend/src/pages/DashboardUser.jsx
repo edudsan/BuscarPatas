@@ -1,6 +1,7 @@
 import { DashboardLayout } from '../components/DashboardLayout/DashboardLayout'
 import { MinhasAdocoes } from '../components/DashboardContentUser/MinhasAdocoes'
 import { MinhasInformacoes } from '../components/DashboardContentUser/MinhasInformacoes'
+import { BuscarPets } from '../components/DashboardContentUser/BuscarPets'
 
 const userMenuItems = [
   { key: 'minhas-adocoes', label: 'MINHAS ADOÇÕES' },
@@ -11,6 +12,7 @@ const userMenuItems = [
 const userContentMap = {
   'minhas-adocoes': MinhasAdocoes,
   'minhas-informacoes': MinhasInformacoes,
+  'buscar-pets': BuscarPets,
 }
 
 export function DashboardUser() {
