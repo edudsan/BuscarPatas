@@ -1,10 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
-import bcrypt from 'bcryptjs';
 
-// REMOVIDO: A função createAdotante não é mais necessária.
-// O cadastro agora é centralizado no authController.register para garantir
-// que a senha e a autenticação sejam criadas corretamente.
 
 // READ (Listar todos - MODIFICADO)
 export const getAllAdotantes = async (req, res) => {
@@ -28,7 +24,6 @@ export const getAllAdotantes = async (req, res) => {
       ...adotante,
       email: adotante.auth.email,
       role: adotante.auth.role,
-      // auth: undefined, // Opcional: remove o objeto aninhado 'auth'
     }));
 
     res.status(200).json(resultado);
@@ -39,7 +34,7 @@ export const getAllAdotantes = async (req, res) => {
   }
 };
 
-// READ (Listar adotantes que ainda não adotaram - MODIFICADO)
+// READ (Listar adotantes que ainda não adotaram)
 export const getAdotantesSemAdocao = async (req, res) => {
   try {
     const adotantes = await prisma.adotante.findMany({

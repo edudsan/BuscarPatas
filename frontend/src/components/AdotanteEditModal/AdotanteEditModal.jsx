@@ -20,7 +20,6 @@ export function AdotanteEditModal({ show, onHide, adotante, onUpdateSuccess }) {
         email: adotante.email || '',
         telefone: adotante.telefone || '',
         role: adotante.role || 'USER',
-        // Adicione outros campos como rua, cidade, etc., se quiser editar aqui
       })
     }
   }, [adotante])
@@ -121,7 +120,6 @@ export function AdotanteEditModal({ show, onHide, adotante, onUpdateSuccess }) {
               </Form.Group>
             </Col>
           </Row>
-          {/* Adicione outros campos aqui se necessário */}
           <div className="text-end mt-3">
             <Button variant="secondary" onClick={onHide} className="me-2">
               Cancelar

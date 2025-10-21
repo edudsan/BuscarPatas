@@ -20,6 +20,12 @@
 }
 
 
+.btn-principal.active {
+    background-color: var(--cor-laranja) !important;
+    color: #000 !important;
+    border-color: var(--cor-laranja) !important;
+}
+
 @media (max-width: 991.98px) {
   #basic-navbar-nav {
     align-items: center; 
@@ -34,6 +40,14 @@
   
   margin-left: 9rem;
 }
+.d-flex.flex-column.flex-lg-row {
+    width: 100%; 
+  }
+  .navbar-collapse .btn-principal {
+    width: 50%; 
+    margin-top: 10px; 
+    font-size: 1rem; 
+  }
 }
 
 .user-avatar-toggle {
@@ -80,3 +94,4 @@
 .navbar-collapse.show, .navbar-collapse.collapsing {
   z-index: 1020;
 }
+

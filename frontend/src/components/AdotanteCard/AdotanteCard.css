@@ -2,13 +2,16 @@
   border-radius: 15px;
   border: 1px solid #e9ecef;
   text-align: center;
+  display: flex; 
+  flex-direction: column; 
 }
 
 .adotante-card .card-body {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-between; 
   padding: 1.5rem 1rem;
+  flex-grow: 1; 
 }
 
 .user-avatar-card {
@@ -20,7 +23,7 @@
 }
 
 .user-details-card {
-  word-break: break-word; /* Garante que o texto quebre*/ 
+  word-break: break-word;
 }
 
 .user-name-card {
@@ -36,17 +39,25 @@
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #f0f0f0;
+  display: flex;             
+  align-items: center;       
+  width: 100%;             
 }
 
 .admin-switch-card {
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin: 0; 
+  margin-right: auto; 
 }
 
 .admin-switch-card .form-check-input {
-  margin-left: 0.5em;
+  cursor: pointer;
+}
+
+.admin-switch-card .form-check-label {
+    cursor: pointer;
+    margin-bottom: 0; 
 }
 
 .admin-switch-card .form-check-input:checked {
@@ -54,7 +65,13 @@
   border-color: var(--cor-verde);
 }
 
+.action-buttons-group {
+    display: flex; 
+    margin: 0; 
+}
+
 .action-btn-card {
   font-size: 1.1rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem; 
+  margin-left: 0.5rem; 
 }

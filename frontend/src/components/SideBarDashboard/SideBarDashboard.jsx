@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './SideBarDashboard.css'
-import Logo from '../../assets/logo.png' // Importe sua logo
+import Logo from '../../assets/logo.png'
 
 export function SideBarDashboard({
   activePanel,
@@ -10,8 +10,6 @@ export function SideBarDashboard({
 }) {
   return (
     <div className="sidebar-content-wrapper">
-      {/* --- ADICIONE ESTA SEÇÃO --- */}
-      {/* Header do Sidebar (só aparece em telas pequenas com 'd-lg-none') */}
       <div className="sidebar-header d-lg-none">
         <Link to="/">
           <img src={Logo} alt="Buscar Patas" className="sidebar-logo" />

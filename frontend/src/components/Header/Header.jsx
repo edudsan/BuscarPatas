@@ -7,7 +7,7 @@ import {
   Dropdown,
   Badge,
 } from 'react-bootstrap'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShieldHalved } from '@fortawesome/free-solid-svg-icons'
 import { useAuth } from '../../contexts/AuthContext'
@@ -19,6 +19,8 @@ export function Header() {
   const { isAuthenticated, user, logout } = useAuth()
   const navigate = useNavigate()
   const [expanded, setExpanded] = useState(false)
+
+  const location = useLocation();
 
   const handleLogout = () => {
     logout()
@@ -83,20 +85,25 @@ export function Header() {
                 </Dropdown>
               ) : (
                 <>
+                <div className="d-flex flex-column flex-lg-row align-items-center"> 
                   <Button
                     as={Link}
                     to="/cadastro"
-                    className="btn-principal me-3 px-3 py-2"
+                    className={`btn-principal me-lg-2 mb-2 mb-lg-0 ${location.pathname === '/cadastro' ? 'active' : ''}`}
+                    onClick={() => setExpanded(false)} 
                   >
                     Cadastre-se
                   </Button>
+                  
                   <Button
                     as={Link}
                     to="/login"
-                    className="btn-principal px-3 py-2"
+                    className={`btn-principal ${location.pathname === '/login' ? 'active' : ''}`}
+                    onClick={() => setExpanded(false)} 
                   >
                     Entrar
                   </Button>
+                  </div>
                 </>
               )}
             </Nav>

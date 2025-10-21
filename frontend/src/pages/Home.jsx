@@ -109,7 +109,6 @@ export function Home() {
       <FAQSection />
       <Footer />
 
-      {/* O MODAL AGORA É RENDERIZADO APENAS UMA VEZ, NO LOCAL CORRETO */}
       {selectedPet && (
         <PetDetailModal
           show={showModal}

@@ -15,7 +15,7 @@ export const register = async (req, res) => {
     const telefonePadrao = telefone ? telefone.replace(/\D/g, '') : undefined;
     const ufPadronizado = uf ? uf.toUpperCase() : undefined;
 
-    // Usamos uma transação para criar o Auth e o Adotante juntos
+    // Usa uma transação para criar o Auth e o Adotante juntos
     const novoUsuario = await prisma.$transaction(async (prisma) => {
       // Cria o registro de autenticação
       const novoAuth = await prisma.auth.create({

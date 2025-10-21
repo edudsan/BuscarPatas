@@ -1,7 +1,7 @@
 .user-card {
   border: none;
   border-radius: 15px;
-  overflow: hidden; /* Garante que nada saia do card */
+  overflow: hidden; /* Garante que nada sai do card */
 }
 
 .user-info-container {

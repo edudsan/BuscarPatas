@@ -4,13 +4,12 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminEmail = "admin@abrigo.com";
+  const adminEmail = "buscarpatas@gmail.com";
   const adminPassword = "senha_123"; 
   const adminName = "Admin do Abrigo";
 
   console.log("Iniciando a criação do usuário admin...");
 
-  // 1. CORREÇÃO: Verifica se o admin já existe na tabela 'Auth'
   const existingAdmin = await prisma.auth.findUnique({
     where: { email: adminEmail },
   });
@@ -20,10 +19,8 @@ async function main() {
     return;
   }
 
-  // Criptografa a senha
   const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
-  // 2. CORREÇÃO: Cria o registro 'Auth' e o 'Adotante' relacionado de uma só vez
   await prisma.auth.create({
     data: {
       email: adminEmail,

@@ -90,7 +90,7 @@ export function Navbar() {
       </BSNavbar.Brand>
       <BSNavbar.Toggle aria-controls="responsive-navbar-nav" />
       <BSNavbar.Collapse id="responsive-navbar-nav">
-        <Nav className="mx-auto text-center"> {/* Centraliza links na navegação colapsada */}
+        <Nav className="mx-auto text-center"> 
           <Nav.Link as={Link} to="/" className="nav-link-custom">Home</Nav.Link>
           <Nav.Link as={Link} to="/sobre" className="nav-link-custom">Sobre</Nav.Link>
           <Nav.Link as={Link} to="/buscar" className="nav-link-custom">Buscar</Nav.Link>

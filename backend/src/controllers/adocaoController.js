@@ -3,10 +3,10 @@ const prisma = new PrismaClient();
 
 // CREATE
 export const createAdocao = async (req, res) => {
-  // 1. O pet_id é o único campo necessário do corpo da requisição
+  // O pet_id é o único campo necessário do corpo da requisição
   const { pet_id } = req.body;
   
-  // 2. O auth_id é recuperado do token JWT injetado pelo middleware 'protect'
+  //O auth_id é recuperado do token JWT injetado pelo middleware 'protect'
   const auth_id_do_token = req.user.id; 
 
   // Validação e conversão do pet_id
@@ -16,7 +16,7 @@ export const createAdocao = async (req, res) => {
   }
 
   try {
-    // 3. BUSCAR O ID DO ADOTANTE CORRETO (adotante_id) USANDO O auth_id
+    // BUSCAR O ID DO ADOTANTE CORRETO (adotante_id) USANDO O auth_id
     const adotanteProfile = await prisma.adotante.findUnique({
         where: { auth_id: auth_id_do_token },
         select: { adotante_id: true } 
@@ -26,9 +26,9 @@ export const createAdocao = async (req, res) => {
         return res.status(404).json({ error: 'Perfil de adotante não encontrado para este usuário logado.' });
     }
     
-    const adotanteIdNum = adotanteProfile.adotante_id; // O ID CORRETO
+    const adotanteIdNum = adotanteProfile.adotante_id; 
 
-    // 4. Inicia a transação para criar a adoção e atualizar o status do Pet
+    // Inicia a transação para criar a adoção e atualizar o status do Pet
     const novaAdocao = await prisma.$transaction(async (prisma) => {
       
       const adocao = await prisma.adocao.create({

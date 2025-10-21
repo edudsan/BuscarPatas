@@ -4,7 +4,6 @@ import { Readable } from 'stream';
 
 const prisma = new PrismaClient();
 
-// Configura o Cloudinary (pode ser movido para um arquivo de configuração separado no futuro)
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
   api_key: process.env.CLOUDINARY_API_KEY, 
@@ -51,7 +50,7 @@ export const createPet = async (req, res) => {
       }
     }
 
-    // 2. Monta o objeto de dados para o Prisma
+    // Monta o objeto de dados para o Prisma
     const dadosCriacao = {
       nome: nome ? nome.toLowerCase() : undefined,
       especie: especie ? especie.toLowerCase() : undefined,

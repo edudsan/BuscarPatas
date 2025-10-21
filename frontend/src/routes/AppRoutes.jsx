@@ -6,6 +6,7 @@ import { Login } from '../pages/Login/Login.jsx'
 import { DashboardAdmin } from '../pages/DashboardAdmin.jsx'
 import { DashboardUser } from '../pages/DashboardUser.jsx'
 import { ProtectedRoute } from './ProtectedRoute.jsx'
+import { AuthCallback } from '../pages/AuthCallback/AuthCallback.jsx'; 
 
 export function AppRoutes() {
   return (
@@ -15,7 +16,7 @@ export function AppRoutes() {
       <Route path="/sobre" element={<Sobre />} />
       <Route path="/cadastro" element={<Cadastro />} />
       <Route path="/login" element={<Login />} />
-
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route
         path="/dashboardAdmin"
         element={

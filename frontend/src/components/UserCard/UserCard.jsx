@@ -4,7 +4,6 @@ import { faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons'
 import './UserCard.css'
 
 export function UserCard({ user, onRoleChange, onDelete, onEdit }) {
-  // Adicionado onEdit
   const avatarUrl = `https://i.pravatar.cc/150?u=${user.email}`
 
   return (

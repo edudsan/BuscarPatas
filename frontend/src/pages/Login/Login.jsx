@@ -93,16 +93,9 @@ export function Login() {
   }
 
   const handleGoogleLogin = () => {
-    // AVISO: A lógica real de login com Google é complexa e exige
-    // configuração no backend e no Console de Desenvolvedores do Google.
-    // Este é apenas um placeholder visual.
-    console.log('Botão de login com Google clicado!')
-    Swal.fire(
-      'Em breve!',
-      'O login com Google ainda não foi implementado.',
-      'info',
-    )
-  }
+    // Redireciona o navegador para a rota do backend que inicia o fluxo do Google
+    window.location.href = 'http://localhost:3000/auth/google';
+  };
 
   return (
     <Container className="my-5">
@@ -163,7 +156,6 @@ export function Login() {
                 <Link to="/cadastro">Cadastre-se aqui!</Link>
               </div>
 
-              {/* 5. ADICIONADO: Divisor e botão de Login com Google */}
               <div className="divider-text my-4">
                 <span>OU</span>
               </div>

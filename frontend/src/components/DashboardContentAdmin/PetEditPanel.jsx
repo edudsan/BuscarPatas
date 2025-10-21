@@ -28,7 +28,6 @@ export function PetEditPanel({ onBack }) {
     setSearchResults([])
     setPetToEdit(null)
     try {
-      // A busca já está correta no backend, agora o frontend a utiliza
       const response = await fetch(
         `http://localhost:3000/pets?nome=${searchTerm.toLowerCase()}`,
         {

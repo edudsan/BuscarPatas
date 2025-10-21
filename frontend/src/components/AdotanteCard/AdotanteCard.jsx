@@ -1,26 +1,26 @@
-import { Card, Form, Button, Stack } from 'react-bootstrap'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons'
-import './AdotanteCard.css'
-import { capitalizeFirstLetter } from '../../utils/formatters'
+import { Card, Form, Button, Stack } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
+import './AdotanteCard.css';
+import { capitalizeFirstLetter } from '../../utils/formatters';
 
 export function AdotanteCard({ user, onRoleChange, onDelete, onEdit }) {
-  const avatarUrl = `https://i.pravatar.cc/150?u=${user.email}`
+  const avatarUrl = `https://i.pravatar.cc/150?u=${user.email}`;
 
   const formatPhoneNumber = (phone) => {
-    if (!phone) return 'Telefone não informado'
-    const cleaned = ('' + phone).replace(/\D/g, '')
-    const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/)
+    if (!phone) return 'Telefone não informado';
+    const cleaned = ('' + phone).replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
     if (match) {
-      return `(${match[1]}) ${match[2]}-${match[3]}`
+      return `(${match[1]}) ${match[2]}-${match[3]}`;
     }
-    return phone
-  }
+    return phone;
+  };
 
   return (
     <Card className="adotante-card shadow-sm h-100">
       <Card.Body>
-        <Stack gap={2} className="text-center align-items-center">
+        <Stack gap={2} className="text-center align-items-center mb-3">
           <img src={avatarUrl} alt={user.nome} className="user-avatar-card" />
           <div className="user-details-card">
             <h5 className="user-name-card mb-0">
@@ -32,7 +32,7 @@ export function AdotanteCard({ user, onRoleChange, onDelete, onEdit }) {
             </p>
           </div>
         </Stack>
-
+        
         <div className="user-actions-card">
           <Form.Check
             type="switch"
@@ -47,11 +47,7 @@ export function AdotanteCard({ user, onRoleChange, onDelete, onEdit }) {
             }
             className="admin-switch-card"
           />
-          <Stack
-            direction="horizontal"
-            gap={2}
-            className="justify-content-center"
-          >
+          <div className="action-buttons-group">
             <Button
               variant="link"
               className="action-btn-card"
@@ -66,9 +62,9 @@ export function AdotanteCard({ user, onRoleChange, onDelete, onEdit }) {
             >
               <FontAwesomeIcon icon={faTrash} />
             </Button>
-          </Stack>
-        </div>
+          </div>
+        </div> 
       </Card.Body>
     </Card>
-  )
+  );
 }
