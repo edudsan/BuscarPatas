@@ -3,10 +3,8 @@ const prisma = new PrismaClient();
 
 // CREATE
 export const createAdocao = async (req, res) => {
-  // O pet_id é o único campo necessário do corpo da requisição
   const { pet_id } = req.body;
   
-  //O auth_id é recuperado do token JWT injetado pelo middleware 'protect'
   const auth_id_do_token = req.user.id; 
 
   // Validação e conversão do pet_id
@@ -34,7 +32,7 @@ export const createAdocao = async (req, res) => {
       const adocao = await prisma.adocao.create({
         data: {
           pet_id: petIdNum,
-          adotante_id: adotanteIdNum, // Usa a variável corretamente definida
+          adotante_id: adotanteIdNum,
         },
         include: {
           pet: true,
@@ -57,23 +55,48 @@ export const createAdocao = async (req, res) => {
     if (error.code === 'P2002') {
       return res.status(409).json({ error: 'Este pet já foi adotado.' });
     }
-    // O erro anterior (ReferenceError) será tratado aqui se ocorrer um erro interno
     console.error('ERRO AO PROCESSAR ADOCAO:', error); 
     res.status(500).json({ error: 'Não foi possível processar a adoção.' });
   }
 };
 
-// READ (Listar todas as adoções - Geralmente apenas ADMIN)
+// READ (Listar todas as adoções - ADMIN)
 export const getAllAdocoes = async (req, res) => {
   try {
+    const { search, sort } = req.query;
+
+    const where = {};
+    if (search) {
+      where.OR = [
+        {
+          pet: {
+            nome: { contains: search, mode: 'insensitive' },
+          },
+        },
+        {
+          adotante: {
+            nome: { contains: search, mode: 'insensitive' },
+          },
+        },
+      ];
+    }
+
+    const orderBy = {
+      data_adocao: sort === 'asc' ? 'asc' : 'desc',
+    };
+
     const adocoes = await prisma.adocao.findMany({
+      where: where,
+      orderBy: orderBy,
       include: {
         pet: true,
-        adotante: true, 
+        adotante: true,
       },
     });
+    
     res.status(200).json(adocoes);
   } catch (error) {
+    console.error('Erro ao listar adoções:', error);
     res.status(500).json({ error: 'Não foi possível listar as adoções.' });
   }
 };
@@ -81,7 +104,6 @@ export const getAllAdocoes = async (req, res) => {
 // READ (Listar minhas adoções - Apenas o usuário logado)
 export const getMyAdocoes = async (req, res) => {
   try {
-    // Encontrar o perfil do adotante usando o auth_id do token (req.user.id)
     const adotanteProfile = await prisma.adotante.findUnique({
       where: { auth_id: req.user.id },
     });
@@ -90,7 +112,6 @@ export const getMyAdocoes = async (req, res) => {
       return res.status(404).json({ error: 'Perfil de adotante não encontrado.' });
     }
 
-    // Usar o adotante_id encontrado para filtrar as adoções
     const adocoes = await prisma.adocao.findMany({
       where: { adotante_id: adotanteProfile.adotante_id },
       include: {

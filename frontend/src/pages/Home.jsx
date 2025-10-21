@@ -43,8 +43,16 @@ export function Home() {
   }, [filters])
 
   const handleFilterChange = (newFilters) => {
-    setFilters((prevFilters) => ({ ...prevFilters, ...newFilters, page: 1 }))
+    setFilters((prevFilters) => {
+      const baseFilters = {
+        limit: prevFilters.limit,
+        page: 1,
+      }
+      
+      return { ...baseFilters, ...newFilters }
+    })
   }
+
   const handlePageChange = (newPage) => {
     setFilters((prevFilters) => ({ ...prevFilters, page: newPage }))
     buscaSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -63,6 +71,7 @@ export function Home() {
   }
   const handleAdocaoConcluida = () => {
     handleCloseModal()
+    // Força a atualização da lista (mantendo os filtros atuais)
     setFilters((currentFilters) => ({ ...currentFilters }))
   }
 
