@@ -40,9 +40,17 @@ export function BuscarPets() {
     fetchPets()
   }, [filters])
 
+  // Função para limpar os filtros antigos
   const handleFilterChange = (newFilters) => {
-    setFilters((prevFilters) => ({ ...prevFilters, ...newFilters, page: 1 }))
+    setFilters((prevFilters) => {
+      const baseFilters = {
+        limit: prevFilters.limit,
+        page: 1, 
+      }
+      return { ...baseFilters, ...newFilters }
+    })
   }
+
   const handlePageChange = (newPage) => {
     setFilters((prevFilters) => ({ ...prevFilters, page: newPage }))
     buscaSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -61,6 +69,7 @@ export function BuscarPets() {
   }
   const handleAdocaoConcluida = () => {
     handleCloseModal()
+    // Força a atualização da lista (mantendo os filtros atuais)
     setFilters((currentFilters) => ({ ...currentFilters })) 
   }
 

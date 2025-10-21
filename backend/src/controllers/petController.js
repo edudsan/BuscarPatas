@@ -106,9 +106,17 @@ export const getAllPets = async (req, res) => {
         mode: 'insensitive', // Garante que a busca não diferencia maiúsculas/minúsculas
       };
     }
+    
+    // *** CORREÇÃO APLICADA AQUI ***
+    // Adiciona o modo 'insensitive' para 'especie'
     if (especie) {
-      where.especie = especie;
+      where.especie = {
+        equals: especie,
+        mode: 'insensitive',
+      };
     }
+    // *** FIM DA CORREÇÃO ***
+
     if (status) {
       where.status = status;
     }
@@ -225,5 +233,28 @@ export const deletePet = async (req, res) => {
       return res.status(404).json({ error: 'Pet não encontrado.' });
     }
     res.status(500).json({ error: 'Não foi possível remover o pet.' });
+  }
+};
+
+
+/// READ (Listar todas as espécies únicas)
+export const getDistinctEspecies = async (req, res) => {
+  try {
+    const pets = await prisma.pet.findMany({
+      distinct: ['especie'],
+      select: {
+        especie: true,
+      },
+      orderBy: {
+        especie: 'asc',
+      },
+    });
+
+    const especies = pets.map((pet) => pet.especie.toUpperCase());
+
+    res.status(200).json(especies);
+  } catch (error) {
+    console.error('Erro ao buscar espécies:', error); 
+    res.status(500).json({ error: 'Não foi possível buscar as espécies.' });
   }
 };
