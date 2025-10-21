@@ -48,9 +48,6 @@ export function DashboardLayout({ menuItems = [], contentMap, initialPanel }) {
             <FontAwesomeIcon icon={faBars} />
           </Button>
 
-          <h1 className="titulo-painel text-center py-3 display-6">
-            Painel administrativo - Buscar Patas
-          </h1>
           {renderPanelContent()}
         </main>
       </div>
