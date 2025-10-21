@@ -10,6 +10,7 @@ import adocaoRoutes from './routes/adocaoRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import passport from './config/passport.js'; 
+import dashboardRoutes from './routes/dashboardRoutes.js';
 
 
 const app = express();
@@ -24,5 +25,6 @@ app.use('/profile', profileRoutes);
 app.use('/pets', petRoutes);
 app.use('/adotantes', adotanteRoutes); 
 app.use('/adocoes', adocaoRoutes);
+app.use('/dashboard', dashboardRoutes);
 
 export default app;

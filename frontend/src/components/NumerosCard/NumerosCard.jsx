@@ -1,14 +1,14 @@
 import { Row, Col, Card } from 'react-bootstrap'
 
-export function CardNumero({ titulo, numero, imagem, inverter = false }) {
+export function NumerosCard({ titulo, numero, imagem, inverter = false }) {
   const caminhoImagem = imagem
 
   const imagemOrderClass = inverter ? 'order-md-last' : 'order-md-first'
   const conteudoOrderClass = inverter ? 'order-md-first' : 'order-md-last'
 
   return (
-    <Card className="shadow-sm h-100 my-4">
-      <Row className="g-0 align-items-center">
+    <Card className="shadow-sm h-100 my-3">
+      <Row className="g-0 align-items-center card-numero-row">
         <Col xs={12} md={6} className={conteudoOrderClass}>
           <Card.Body className="d-flex flex-column justify-content-center p-3 p-md-4 text-center text-md-start">
             <Card.Title className="fs-5 mb-1 text-secondary">
