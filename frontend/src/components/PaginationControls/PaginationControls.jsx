@@ -57,9 +57,9 @@ export function PaginationControls({
           onChange={(e) => onLimitChange(Number(e.target.value))}
           style={{ width: '80px' }}
         >
-          <option value="10">10</option>
-          <option value="20">20</option>
-          <option value="30">30</option>
+          <option value="12">12</option>
+          <option value="24">24</option>
+          <option value="36">36</option>
         </Form.Select>
       </div>
 

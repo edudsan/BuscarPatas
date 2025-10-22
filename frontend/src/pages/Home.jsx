@@ -14,7 +14,7 @@ export function Home() {
   const [loading, setLoading] = useState(false)
   const [filters, setFilters] = useState({
     page: 1,
-    limit: 8,
+    limit: 12,
   })
   const [showModal, setShowModal] = useState(false)
   const [selectedPet, setSelectedPet] = useState(null)
