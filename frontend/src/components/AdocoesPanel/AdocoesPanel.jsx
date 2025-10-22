@@ -4,17 +4,15 @@ import { useAuth } from '../../contexts/AuthContext'
 import './AdocoesPanel.css'
 import Swal from 'sweetalert2'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faPenToSquare, faTrash, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 import { AdocaoEditModal } from './AdocaoEditModal' 
+import { AdocaoCreateModal } from './AdocaoCreateModal'
 
-// Função para formatar a data
 const formatarData = (dataISO) => {
-  return new Date(dataISO).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    timeZone: 'UTC',
-  })
+  if (!dataISO) return 'Data não informada';
+  const dataApenas = dataISO.split('T')[0];
+  const [ano, mes, dia] = dataApenas.split('-');
+  return `${dia}/${mes}/${ano}`;
 }
 
 export function AdocoesPanel() {
@@ -25,7 +23,7 @@ export function AdocoesPanel() {
   const [filters, setFilters] = useState({ search: '', sort: 'desc' })
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedAdocao, setSelectedAdocao] = useState(null)
-
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   const fetchTodasAdocoes = async () => {
     if (!token) return
@@ -73,7 +71,7 @@ export function AdocoesPanel() {
       text: `Você quer cancelar a adoção de "${adocao.pet.nome}" por "${adocao.adotante.nome}"? O pet voltará a ficar "Disponível".`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#dc3545',
+      confirmButtonColor: '#dc3545', 
       cancelButtonText: 'Manter Adoção',
       confirmButtonText: 'Sim, cancelar!',
     }).then(async (result) => {
@@ -95,7 +93,7 @@ export function AdocoesPanel() {
       }
     })
   }
-  
+
   const handleShowEditModal = (adocao) => {
     setSelectedAdocao(adocao)
     setShowEditModal(true)
@@ -108,9 +106,14 @@ export function AdocoesPanel() {
     handleCloseEditModal()
     fetchTodasAdocoes()
   }
+  const handleShowCreateModal = () => setShowCreateModal(true)
+  const handleCloseCreateModal = () => setShowCreateModal(false)
+  const handleCreateSuccess = () => {
+    handleCloseCreateModal()
+    fetchTodasAdocoes()
+  }
 
   // --- RENDERIZAÇÃO ---
-
   if (loading && adocoes.length === 0) { 
     return (
       <div className="p-4 text-center">
@@ -172,63 +175,68 @@ export function AdocoesPanel() {
         </Row>
       </Form>
 
-      {/* Resultados */}
-      {adocoes.length === 0 && !loading ? (
-        <Alert variant="info">
-          Nenhum resultado encontrado para os filtros aplicados.
-        </Alert>
-      ) : (
-        <Row xs={1} md={2} lg={3} className="g-4">
-          {adocoes.map((adocao) => (
-            <Col key={adocao.adocao_id}>
-              <Card className="h-100 shadow-sm adocao-card">
-                
-                <Card.Img
-                  variant="top"
-                  src={
-                    adocao.pet.imagem_url1 || 'https://via.placeholder.com/150'
-                  }
-                />
+      <Row xs={1} md={2} lg={4} className="g-4">
+   
+        <Col>
+          <div className="adocao-card-new" onClick={handleShowCreateModal}>
+            <FontAwesomeIcon icon={faPlusCircle} className="adocao-card-new-icon" />
+            <h3 className="adocao-card-new-title">Registrar Nova Adoção</h3>
+          </div>
+        </Col>
 
-                <Card.Body>
-                  <Card.Title className="fw-bold">
-                    Pet: {adocao.pet.nome}
-                  </Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">
-                    Data: {formatarData(adocao.data_adocao)}
-                  </Card.Subtitle>
-                </Card.Body>
-
-                <ListGroup variant="flush">
-                  <ListGroup.Item>
-                    <strong>Adotante:</strong> {adocao.adotante.nome}
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                    <strong>Telefone:</strong> {adocao.adotante.telefone || 'Não informado'}
-                  </ListGroup.Item>
-                </ListGroup>
-
-                <Card.Footer>
-                  <div className="action-buttons-group">
-                    <FontAwesomeIcon
-                      icon={faPenToSquare}
-                      className="action-btn-card edit"
-                      title="Alterar pet desta adoção"
-                      onClick={() => handleShowEditModal(adocao)}
-                    />
-                    <FontAwesomeIcon
-                      icon={faTrash}
-                      className="action-btn-card delete"
-                      title="Cancelar esta adoção"
-                      onClick={() => handleDelete(adocao)}
-                    />
-                  </div>
-                </Card.Footer>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      )}
+        {adocoes.length === 0 && !loading && (
+          <Col md={12}>
+            <Alert variant="info" className="mt-3">
+              Nenhum resultado encontrado para os filtros aplicados.
+            </Alert>
+          </Col>
+        )}
+      
+        {adocoes.map((adocao) => (
+          <Col key={adocao.adocao_id}>
+            <Card className="h-100 shadow-sm adocao-card">
+              <Card.Img
+                variant="top"
+                src={
+                  adocao.pet.imagem_url1 || 'https://via.placeholder.com/150'
+                }
+              />
+              <Card.Body>
+                <Card.Title className="fw-bold">
+                  Pet: {adocao.pet.nome}
+                </Card.Title>
+              </Card.Body>
+              <ListGroup variant="flush">
+                <ListGroup.Item>
+                  <strong>Adotante:</strong> {adocao.adotante.nome}
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <strong>Telefone:</strong> {adocao.adotante.telefone || 'Não informado'}
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <strong>Data:</strong> {formatarData(adocao.data_adocao)}
+                </ListGroup.Item>
+              </ListGroup>
+              <Card.Footer>
+                <div className="action-buttons-group">
+                  <FontAwesomeIcon
+                    icon={faPenToSquare}
+                    className="action-btn-card edit"
+                    title="Alterar pet desta adoção"
+                    onClick={() => handleShowEditModal(adocao)}
+                  />
+                  <FontAwesomeIcon
+                    icon={faTrash}
+                    className="action-btn-card delete"
+                    title="Cancelar esta adoção"
+                    onClick={() => handleDelete(adocao)}
+                  />
+                </div>
+              </Card.Footer>
+            </Card>
+          </Col>
+        ))}
+      </Row>
 
       {selectedAdocao && (
         <AdocaoEditModal
@@ -238,6 +246,12 @@ export function AdocoesPanel() {
           onUpdateSuccess={handleUpdateSuccess}
         />
       )}
+
+      <AdocaoCreateModal
+        show={showCreateModal}
+        onHide={handleCloseCreateModal}
+        onCreateSuccess={handleCreateSuccess}
+      />
     </div>
   )
 }

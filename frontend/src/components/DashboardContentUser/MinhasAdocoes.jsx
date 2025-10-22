@@ -3,12 +3,13 @@ import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
 
 const formatarData = (dataISO) => {
-  return new Date(dataISO).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    timeZone: 'UTC',
-  })
+  if (!dataISO) return 'Data não informada';
+
+  const dataApenas = dataISO.split('T')[0];
+
+  const [ano, mes, dia] = dataApenas.split('-');
+
+  return `${dia}/${mes}/${ano}`;
 }
 
 export function MinhasAdocoes() {
@@ -54,6 +55,7 @@ export function MinhasAdocoes() {
                   <Card.Title>{adocao.pet.nome}</Card.Title>
                   <Card.Text>
                     Adotado em:{' '}
+                    {/* <<< USA A NOVA FUNÇÃO DE DATA >>> */}
                     {formatarData(adocao.data_adocao)}
                   </Card.Text>
                 </Card.Body>

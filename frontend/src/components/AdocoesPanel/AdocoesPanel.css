@@ -10,28 +10,34 @@
 }
 
 .adocao-card .card-img-top {
-  height: 250px;
+  height: 160px;
   object-fit: cover;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
 }
 
 .adocao-card .card-body {
-  padding: 1.5rem;
-  flex-grow: 1;
+  padding: 1rem 1rem 0.25rem 1rem; 
+  flex-grow: 0; 
 }
 
 .adocao-card .card-title {
   font-weight: 600;
   color: var(--cor-azul);
+  font-size: 1.1rem; 
+  margin-bottom: 0; 
 }
 
 .adocao-card .card-subtitle {
-  font-size: 0.9rem;
+  font-size: 0.85rem; 
 }
 
 .adocao-card .list-group-item {
-  font-size: 0.9rem;
+  font-size: 0.85rem; 
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem; 
+  padding-left: 1rem;
+  padding-right: 1rem;
   word-break: break-word;
   background-color: transparent; 
 }
@@ -45,7 +51,7 @@
   border-top: 1px solid #f0f0f0; 
   border-bottom-left-radius: 15px; 
   border-bottom-right-radius: 15px;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1rem; 
 }
 
 .action-buttons-group {
@@ -57,11 +63,11 @@
 }
 
 .action-btn-card {
-  font-size: 1.1rem;
+  font-size: 1rem; 
   padding: 0.25rem;
-  margin-left: 0.75rem; 
+  margin-left: 0.5rem; 
   cursor: pointer;
-  color: #6c757d;
+  color: #6c757d; 
   transition: all 0.2s; 
 }
 
@@ -70,9 +76,41 @@
 }
 
 .action-btn-card.delete {
-  color: #dc3545; 
+  color: #dc3545;
 }
 
 .action-btn-card.delete:hover {
   filter: brightness(0.9);
+}
+
+.adocao-card-new {
+  border-radius: 15px;
+  border: 2px dashed var(--cor-azul); 
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%; 
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-height: 300px;
+}
+
+.adocao-card-new:hover {
+  background-color: #e9ecef; 
+  border-color: #0056b3; 
+}
+
+.adocao-card-new-icon {
+  font-size: 2.5rem; 
+  color: var(--cor-azul);
+  margin-bottom: 0.75rem; 
+}
+
+.adocao-card-new-title {
+  font-size: 1.1rem; 
+  font-weight: 600;
+  color: var(--cor-azul);
 }

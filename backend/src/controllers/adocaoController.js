@@ -1,13 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-// CREATE
+// CREATE (Usuário logado)
 export const createAdocao = async (req, res) => {
   const { pet_id } = req.body;
-  
   const auth_id_do_token = req.user.id; 
-
   const petIdNum = parseInt(pet_id);
+
   if (isNaN(petIdNum)) {
     return res.status(400).json({ error: 'ID do Pet inválido.' });
   }
@@ -19,29 +18,20 @@ export const createAdocao = async (req, res) => {
     });
 
     if (!adotanteProfile) {
-        return res.status(404).json({ error: 'Perfil de adotante não encontrado para este usuário logado.' });
+        return res.status(404).json({ error: 'Perfil de adotante não encontrado.' });
     }
     
     const adotanteIdNum = adotanteProfile.adotante_id; 
 
     const novaAdocao = await prisma.$transaction(async (prisma) => {
-      
       const adocao = await prisma.adocao.create({
-        data: {
-          pet_id: petIdNum,
-          adotante_id: adotanteIdNum,
-        },
-        include: {
-          pet: true,
-          adotante: true,
-        },
+        data: { pet_id: petIdNum, adotante_id: adotanteIdNum },
+        include: { pet: true, adotante: true },
       });
-
       await prisma.pet.update({
         where: { pet_id: petIdNum },
         data: { status: 'ADOTADO' },
       });
-
       return adocao;
     });
 
@@ -64,21 +54,13 @@ export const getAllAdocoes = async (req, res) => {
     const where = {};
     if (search) {
       where.OR = [
-        {
-          pet: {
-            nome: { contains: search, mode: 'insensitive' },
-          },
-        },
-        {
-          adotante: {
-            nome: { contains: search, mode: 'insensitive' },
-          },
-        },
+        { pet: { nome: { contains: search, mode: 'insensitive' } } },
+        { adotante: { nome: { contains: search, mode: 'insensitive' } } },
       ];
     }
 
     const orderBy = {
-      data_adocao: sort === 'asc' ? 'asc' : 'desc',
+      data_adocao: sort === 'asc' ? 'asc' : 'desc', 
     };
 
     const adocoes = await prisma.adocao.findMany({
@@ -96,7 +78,7 @@ export const getAllAdocoes = async (req, res) => {
   }
 };
 
-// READ (Listar minhas adoções - Apenas o usuário logado)
+// READ (Usuário Comum)
 export const getMyAdocoes = async (req, res) => {
   try {
     const adotanteProfile = await prisma.adotante.findUnique({
@@ -109,12 +91,8 @@ export const getMyAdocoes = async (req, res) => {
 
     const adocoes = await prisma.adocao.findMany({
       where: { adotante_id: adotanteProfile.adotante_id },
-      include: {
-        pet: true, 
-      },
-      orderBy: {
-        data_adocao: 'desc', 
-      }
+      include: { pet: true },
+      orderBy: { data_adocao: 'desc' }
     });
     res.status(200).json(adocoes);
   } catch (error) {
@@ -123,7 +101,7 @@ export const getMyAdocoes = async (req, res) => {
   }
 };
 
-// UPDATE (Apenas ADMIN)
+// UPDATE (ADMIN)
 export const updateAdocao = async (req, res) => {
   try {
     const { id } = req.params;
@@ -137,23 +115,19 @@ export const updateAdocao = async (req, res) => {
 
       const petIdAntigo = adocaoOriginal.pet_id;
       const petIdNovo = pet_id ? parseInt(pet_id) : null;
-
       const dadosParaAtualizar = {};
 
       if (petIdNovo && petIdNovo !== petIdAntigo) {
         await prisma.pet.update({ where: { pet_id: petIdAntigo }, data: { status: 'DISPONIVEL' } });
         await prisma.pet.update({ where: { pet_id: petIdNovo }, data: { status: 'ADOTADO' } });
-        
         dadosParaAtualizar.pet_id = petIdNovo;
-        
         dadosParaAtualizar.data_adocao = new Date(); 
       }
 
       if (adotante_id && adotante_id !== adocaoOriginal.adotante_id) {
         dadosParaAtualizar.adotante_id = parseInt(adotante_id);
-        
         if (!dadosParaAtualizar.data_adocao) {
-          dadosParaAtualizar.data_adocao = new Date();
+          dadosParaAtualizar.data_adocao = new Date(); 
         }
       }
 
@@ -162,7 +136,7 @@ export const updateAdocao = async (req, res) => {
       }
       
       if (Object.keys(dadosParaAtualizar).length === 0) {
-        return adocaoOriginal;
+        return adocaoOriginal; 
       }
 
       return await prisma.adocao.update({
@@ -189,9 +163,7 @@ export const deleteAdocao = async (req, res) => {
     const adocaoDeletada = await prisma.$transaction(async (prisma) => {
       const adocao = await prisma.adocao.findUnique({ where: { adocao_id: parseInt(id) } });
       if (!adocao) throw new Error('Adoção não encontrada.');
-
       await prisma.pet.update({ where: { pet_id: adocao.pet_id }, data: { status: 'DISPONIVEL' } });
-
       return await prisma.adocao.delete({ where: { adocao_id: parseInt(id) } });
     });
 
@@ -202,5 +174,54 @@ export const deleteAdocao = async (req, res) => {
     }
     console.error(error);
     res.status(500).json({ error: 'Não foi possível cancelar a adoção.' });
+  }
+};
+
+// CREATE (Admin)
+export const adminCreateAdocao = async (req, res) => {
+  const { pet_id, adotante_id } = req.body;
+
+  const petIdNum = parseInt(pet_id);
+  const adotanteIdNum = parseInt(adotante_id);
+
+  if (isNaN(petIdNum) || isNaN(adotanteIdNum)) {
+    return res.status(400).json({ error: 'IDs de Pet e Adotante são obrigatórios.' });
+  }
+
+  try {
+    const novaAdocao = await prisma.$transaction(async (prisma) => {
+      
+      // Cria a adoção com os IDs fornecidos
+      const adocao = await prisma.adocao.create({
+        data: {
+          pet_id: petIdNum,
+          adotante_id: adotanteIdNum,
+        },
+        include: {
+          pet: true,
+          adotante: true,
+        },
+      });
+
+      // Atualiza o status do pet para ADOTADO
+      await prisma.pet.update({
+        where: { pet_id: petIdNum },
+        data: { status: 'ADOTADO' },
+      });
+
+      return adocao;
+    });
+
+    res.status(201).json(novaAdocao);
+
+  } catch (error) {
+    if (error.code === 'P2002') { 
+      return res.status(409).json({ error: 'Este pet já foi adotado.' });
+    }
+    if (error.code === 'P2003') { 
+       return res.status(404).json({ error: 'Pet ou Adotante não encontrado.' });
+    }
+    console.error('ERRO AO CRIAR ADOCAO (ADMIN):', error); 
+    res.status(500).json({ error: 'Não foi possível processar a adoção.' });
   }
 };
