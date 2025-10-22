@@ -1,0 +1,94 @@
+.animated-background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -999; 
+    
+    pointer-events: none;
+    
+    background-repeat: no-repeat; 
+    background-position: top left; 
+
+    transition: background-image 0.5s ease, opacity 0.5s ease;
+    animation: background-pan linear infinite;
+}
+
+@keyframes background-pan {
+    0% {
+        background-position: -8% 15%;
+        transform: scale(1);
+    }
+    25% {
+        background-position: -1% 30%; 
+        transform: scale(1.05);
+    }
+    50% {
+        background-position: -4% 60%;
+        transform: scale(1);
+    }
+    100% {
+        background-position: -1% 85%;
+        transform: scale(1);
+    }
+}
+
+
+.animated-background-container.local-element-mode {
+    position: absolute; 
+    pointer-events: none;
+    
+    z-index: 10; 
+    
+    width: 200px; 
+    height: 200px; 
+
+    top: auto; 
+    left: auto;
+    animation: none; 
+}
+
+
+.animated-background-container.local-element-mode.corner-image-mode {
+    bottom: 190px; 
+    right: -20px; 
+    
+    top: auto; 
+    left: auto;
+    
+    background-size: cover; 
+    background-repeat: no-repeat;
+    background-position: center; 
+
+    animation: corner-float 50s linear infinite; 
+}
+
+@keyframes corner-float {
+    0% { 
+        transform: translate(0px, 0px) scale(1); 
+    }
+    33% { 
+        transform: translate(5px, -10px) scale(1.02); 
+    }
+    66% { 
+        transform: translate(-5px, 10px) scale(1.01); 
+    }
+    100% { 
+        transform: translate(0px, 0px) scale(1);
+    }
+}
+
+@media (max-width: 768px) {
+    
+    
+    .animated-background-container {
+        background-image: none !important;
+        animation: none !important; 
+        opacity: 0 !important; 
+    }
+
+    .animated-background-container.local-element-mode {
+        display: none !important; 
+    }
+}

@@ -7,6 +7,7 @@ import { PetList } from '../components/PetList/PetList'
 import { Footer } from '../components/Footer/Footer'
 import { PaginationControls } from '../components/PaginationControls/PaginationControls'
 import { PetDetailModal } from '../components/PetDetailModal/PetDetailModal'
+import AnimatedBackground from '../components/AnimatedBackground/AnimatedBackground'
 
 export function Home() {
   const [pets, setPets] = useState([])
@@ -48,7 +49,7 @@ export function Home() {
         limit: prevFilters.limit,
         page: 1,
       }
-      
+
       return { ...baseFilters, ...newFilters }
     })
   }
@@ -71,12 +72,12 @@ export function Home() {
   }
   const handleAdocaoConcluida = () => {
     handleCloseModal()
-    // Força a atualização da lista (mantendo os filtros atuais)
     setFilters((currentFilters) => ({ ...currentFilters }))
   }
+  const homeBackgroundImageUrl = '../../public/patinhas.png'
 
   return (
-    <main>
+    <main style={{ position: 'relative' }}>
       <CtaBanner
         imageUrl="/src/assets/gato-e-cachorro.jpg"
         imageAlt="Cachorro e Gato"
@@ -116,6 +117,13 @@ export function Home() {
         reversed={true}
       />
       <FAQSection />
+      <AnimatedBackground
+        imageUrl={homeBackgroundImageUrl}
+        opacity={0.5}
+        isLocalElement={true}
+        isCornerImage={true}
+        backgroundSize="200px"
+      />
       <Footer />
 
       {selectedPet && (

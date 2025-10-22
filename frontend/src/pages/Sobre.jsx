@@ -9,8 +9,11 @@ import {
 import { CtaBanner } from '../components/CtaBanner/CtaBanner'
 import { HashLink } from 'react-router-hash-link'
 import { Footer } from '../components/Footer/Footer'
+import AnimatedBackground from '../components/AnimatedBackground/AnimatedBackground'
 
 export function Sobre() {
+  const backgroundImageUrl = 'bg-cat.png'
+
   const mvvItems = [
     {
       icon: faHeart,
@@ -34,8 +37,15 @@ export function Sobre() {
 
   return (
     <>
+      <AnimatedBackground
+        imageUrl={backgroundImageUrl}
+        opacity={0.5}
+        animationDuration="40s"
+        backgroundSize="200px"
+      />
+
       <main>
-        <header className="text-center mb-5 container my-5">
+        <div className="text-center mb-5 container my-5">
           <h1
             className="display-4 fw-bold"
             style={{ color: 'var(--cor-azul)' }}
@@ -46,9 +56,17 @@ export function Sobre() {
           <p className="lead text-secondary mt-3">
             Nossa história, nossa paixão e o compromisso com a vida animal.
           </p>
-        </header>
+        </div>
 
-        <section className="container pb-5">
+        <section
+          className="container pb-5"
+          style={{
+            position: 'relative',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            padding: '20px',
+            borderRadius: '8px',
+          }}
+        >
           <div className="row justify-content-center">
             <div className="col-lg-9">
               <h2 className="fw-bold mb-3">Nossa História</h2>

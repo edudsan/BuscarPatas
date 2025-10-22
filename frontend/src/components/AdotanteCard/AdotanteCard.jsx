@@ -5,7 +5,7 @@ import './AdotanteCard.css'
 import { capitalizeFirstLetter } from '../../utils/formatters'
 
 export function AdotanteCard({ user, onRoleChange, onDelete, onEdit }) {
-  // const avatarUrl = `https://i.pravatar.cc/150?u=${user.email}`
+  const avatarUrl = `https://i.pravatar.cc/150?u=${user.email}`
 
   const formatPhoneNumber = (phone) => {
     if (!phone) return 'Telefone não informado'
@@ -21,7 +21,7 @@ export function AdotanteCard({ user, onRoleChange, onDelete, onEdit }) {
     <Card className="adotante-card shadow-sm h-100">
       <Card.Body>
         <Stack gap={2} className="text-center align-items-center mb-3">
-          {/* <img src={avatarUrl} alt={user.nome} className="user-avatar-card" /> */}
+          <img src={avatarUrl} alt={user.nome} className="user-avatar-card" />
           <div className="user-details-card">
             <h5 className="user-name-card mb-0">
               {capitalizeFirstLetter(user.nome)}

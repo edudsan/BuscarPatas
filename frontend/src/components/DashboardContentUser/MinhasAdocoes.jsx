@@ -3,13 +3,13 @@ import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
 
 const formatarData = (dataISO) => {
-  if (!dataISO) return 'Data não informada';
+  if (!dataISO) return 'Data não informada'
 
-  const dataApenas = dataISO.split('T')[0];
+  const dataApenas = dataISO.split('T')[0]
 
-  const [ano, mes, dia] = dataApenas.split('-');
+  const [ano, mes, dia] = dataApenas.split('-')
 
-  return `${dia}/${mes}/${ano}`;
+  return `${dia}/${mes}/${ano}`
 }
 
 export function MinhasAdocoes() {
@@ -35,6 +35,7 @@ export function MinhasAdocoes() {
   }, [token])
 
   if (loading) return <Spinner animation="border" />
+
   return (
     <div className="p-4">
       <h2 className="mb-4">Minhas Adoções</h2>
@@ -54,8 +55,7 @@ export function MinhasAdocoes() {
                 <Card.Body>
                   <Card.Title>{adocao.pet.nome}</Card.Title>
                   <Card.Text>
-                    Adotado em:{' '}
-                    {/* <<< USA A NOVA FUNÇÃO DE DATA >>> */}
+                    Adotado em: {/* <<< USA A NOVA FUNÇÃO DE DATA >>> */}
                     {formatarData(adocao.data_adocao)}
                   </Card.Text>
                 </Card.Body>

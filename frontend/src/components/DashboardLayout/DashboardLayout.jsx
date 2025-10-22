@@ -6,6 +6,7 @@ import './DashboardLayout.css'
 import { Button } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
+import AnimatedBackground from '../AnimatedBackground/AnimatedBackground'
 
 export function DashboardLayout({ menuItems = [], contentMap, initialPanel }) {
   const [activePanel, setActivePanel] = useState(initialPanel)
@@ -21,8 +22,13 @@ export function DashboardLayout({ menuItems = [], contentMap, initialPanel }) {
     setSidebarOpen(false)
   }
 
+  const homeBackgroundImageUrl = '../../public/patinhas.png'
+
   return (
-    <div className="dashboard-layout-container">
+    <div
+      className="dashboard-layout-container"
+      style={{ position: 'relative' }}
+    >
       <div className="dashboard-wrapper">
         <div
           className={`sidebar-container-wrapper ${sidebarOpen ? 'open' : ''}`}
@@ -51,7 +57,13 @@ export function DashboardLayout({ menuItems = [], contentMap, initialPanel }) {
           {renderPanelContent()}
         </main>
       </div>
-
+      <AnimatedBackground
+        imageUrl={homeBackgroundImageUrl}
+        opacity={0.4}
+        isLocalElement={true}
+        isCornerImage={true}
+        backgroundSize="200px"
+      />
       <Footer />
     </div>
   )
