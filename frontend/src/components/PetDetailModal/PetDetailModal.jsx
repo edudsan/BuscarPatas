@@ -77,7 +77,7 @@ export function PetDetailModal({ show, onHide, pet, onAdocaoConcluida }) {
 
           Swal.fire({
             title: 'Parabéns!',
-            text: `${pet.nome} agora tem um novo lar! A ONG responsável entrará em contato em breve.`,
+            text: `${pet.nome} agora tem um novo lar! A ONG entrará em contato com você em breve.`,
             icon: 'success',
             confirmButtonColor: 'var(--cor-azul)',
           })

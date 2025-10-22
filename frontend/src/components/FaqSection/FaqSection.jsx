@@ -37,7 +37,7 @@ const faqItems = [
     id: 'collapseSix',
     question: 'Posso devolver o pet se não me adaptar?',
     answer:
-      'Entendemos que a adaptação leva tempo, mas a adoção é um ato de compromisso. Caso haja problemas graves e inevitáveis, pedimos que entre em contato imediatamente com a ONG responsável para encontrarmos uma solução e, se necessário, o pet será reencaminhado, **nunca abandonado**.',
+      'Entendemos que a adaptação leva tempo, mas a adoção é um ato de compromisso. Caso haja problemas graves e inevitáveis, pedimos que entre em contato imediatamente com a nossa ONG para encontrarmos uma solução e, se necessário, o pet será reencaminhado, **nunca abandonado**.',
   },
 ]
 

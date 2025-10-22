@@ -20,7 +20,7 @@ async function main() {
   const usersData = [
     { email: "mariana.costa@example.com", nome: "Mariana Costa", telefone: "11988776655", rua: "Avenida Paulista", numero: "2000", bairro: "Bela Vista", cidade: "São Paulo", uf: "SP" },
     { email: "ricardo.a@example.com", nome: "Ricardo Almeida", telefone: "71911223344", rua: "Rua das Laranjeiras", numero: "50", bairro: "Pelourinho", cidade: "Salvador", uf: "BA" },
-    { email: "fernanda.oliveira@example.com", nome: "Fernanda Oliveira", telefone: "48999887766", rua: "Avenida Beira Mar Norte", numero: "1200", bairro: "Centro", cidade: "Florianópolis", uf: "SC" },
+    { email: "fer.oliveira@example.com", nome: "Fernanda Oliveira", telefone: "48999887766", rua: "Avenida Beira Mar Norte", numero: "1200", bairro: "Centro", cidade: "Florianópolis", uf: "SC" },
     { email: "lucas.pereira@example.com", nome: "Lucas Pereira", telefone: "61981234567", rua: "SQS 308 Bloco C", numero: "101", bairro: "Asa Sul", cidade: "Brasília", uf: "DF" },
     { email: "juliana.s@example.com", nome: "Juliana Santos", telefone: "92992345678", rua: "Rua Tapajós", numero: "45", bairro: "Centro", cidade: "Manaus", uf: "AM" },
     { email: "pedro.gomes@example.com", nome: "Pedro Gomes", telefone: "21977665544", rua: "Rua Nascimento Silva", numero: "340", bairro: "Ipanema", cidade: "Rio de Janeiro", uf: "RJ" },

@@ -1,5 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { prisma } from '../config/prisma.js';
 
 // CREATE (Usuário logado)
 export const createAdocao = async (req, res) => {
