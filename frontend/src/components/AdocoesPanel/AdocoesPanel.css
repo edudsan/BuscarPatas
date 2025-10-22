@@ -40,7 +40,39 @@
   color: #333;
 }
 
-.adocao-card .list-group-item:last-child {
-  border-bottom-left-radius: 15px;
+.adocao-card .card-footer {
+  background-color: #fff; 
+  border-top: 1px solid #f0f0f0; 
+  border-bottom-left-radius: 15px; 
   border-bottom-right-radius: 15px;
+  padding: 0.75rem 1.5rem;
+}
+
+.action-buttons-group {
+  display: flex;
+  justify-content: flex-end; 
+  align-items: center;
+  margin: 0;
+  width: 100%;
+}
+
+.action-btn-card {
+  font-size: 1.1rem;
+  padding: 0.25rem;
+  margin-left: 0.75rem; 
+  cursor: pointer;
+  color: #6c757d;
+  transition: all 0.2s; 
+}
+
+.action-btn-card.edit:hover {
+  color: var(--cor-azul); 
+}
+
+.action-btn-card.delete {
+  color: #dc3545; 
+}
+
+.action-btn-card.delete:hover {
+  filter: brightness(0.9);
 }

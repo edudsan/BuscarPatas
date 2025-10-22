@@ -7,14 +7,12 @@ export const createAdocao = async (req, res) => {
   
   const auth_id_do_token = req.user.id; 
 
-  // Validação e conversão do pet_id
   const petIdNum = parseInt(pet_id);
   if (isNaN(petIdNum)) {
     return res.status(400).json({ error: 'ID do Pet inválido.' });
   }
 
   try {
-    // BUSCAR O ID DO ADOTANTE CORRETO (adotante_id) USANDO O auth_id
     const adotanteProfile = await prisma.adotante.findUnique({
         where: { auth_id: auth_id_do_token },
         select: { adotante_id: true } 
@@ -26,7 +24,6 @@ export const createAdocao = async (req, res) => {
     
     const adotanteIdNum = adotanteProfile.adotante_id; 
 
-    // Inicia a transação para criar a adoção e atualizar o status do Pet
     const novaAdocao = await prisma.$transaction(async (prisma) => {
       
       const adocao = await prisma.adocao.create({
@@ -40,7 +37,6 @@ export const createAdocao = async (req, res) => {
         },
       });
 
-      // Atualiza o status do pet para ADOTADO
       await prisma.pet.update({
         where: { pet_id: petIdNum },
         data: { status: 'ADOTADO' },
@@ -90,10 +86,9 @@ export const getAllAdocoes = async (req, res) => {
       orderBy: orderBy,
       include: {
         pet: true,
-        adotante: true,
+        adotante: true, 
       },
     });
-    
     res.status(200).json(adocoes);
   } catch (error) {
     console.error('Erro ao listar adoções:', error);
@@ -143,15 +138,32 @@ export const updateAdocao = async (req, res) => {
       const petIdAntigo = adocaoOriginal.pet_id;
       const petIdNovo = pet_id ? parseInt(pet_id) : null;
 
+      const dadosParaAtualizar = {};
+
       if (petIdNovo && petIdNovo !== petIdAntigo) {
         await prisma.pet.update({ where: { pet_id: petIdAntigo }, data: { status: 'DISPONIVEL' } });
         await prisma.pet.update({ where: { pet_id: petIdNovo }, data: { status: 'ADOTADO' } });
+        
+        dadosParaAtualizar.pet_id = petIdNovo;
+        
+        dadosParaAtualizar.data_adocao = new Date(); 
       }
 
-      const dadosParaAtualizar = {};
-      if (petIdNovo) dadosParaAtualizar.pet_id = petIdNovo;
-      if (adotante_id) dadosParaAtualizar.adotante_id = parseInt(adotante_id);
-      if (data_adocao) dadosParaAtualizar.data_adocao = new Date(data_adocao);
+      if (adotante_id && adotante_id !== adocaoOriginal.adotante_id) {
+        dadosParaAtualizar.adotante_id = parseInt(adotante_id);
+        
+        if (!dadosParaAtualizar.data_adocao) {
+          dadosParaAtualizar.data_adocao = new Date();
+        }
+      }
+
+      if (data_adocao) {
+        dadosParaAtualizar.data_adocao = new Date(data_adocao);
+      }
+      
+      if (Object.keys(dadosParaAtualizar).length === 0) {
+        return adocaoOriginal;
+      }
 
       return await prisma.adocao.update({
         where: { adocao_id: parseInt(id) },

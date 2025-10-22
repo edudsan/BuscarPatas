@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react'
 import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
 
+const formatarData = (dataISO) => {
+  return new Date(dataISO).toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
+}
+
 export function MinhasAdocoes() {
   const [adocoes, setAdocoes] = useState([])
   const [loading, setLoading] = useState(true)
@@ -45,7 +54,7 @@ export function MinhasAdocoes() {
                   <Card.Title>{adocao.pet.nome}</Card.Title>
                   <Card.Text>
                     Adotado em:{' '}
-                    {new Date(adocao.data_adocao).toLocaleDateString()}
+                    {formatarData(adocao.data_adocao)}
                   </Card.Text>
                 </Card.Body>
               </Card>

@@ -2,12 +2,18 @@ import { useState, useEffect } from 'react'
 import { Card, Col, Row, Spinner, Alert, ListGroup, Form, Button } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
 import './AdocoesPanel.css'
+import Swal from 'sweetalert2'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { AdocaoEditModal } from './AdocaoEditModal' 
 
+// Função para formatar a data
 const formatarData = (dataISO) => {
   return new Date(dataISO).toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
+    timeZone: 'UTC',
   })
 }
 
@@ -16,74 +22,116 @@ export function AdocoesPanel() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const { token } = useAuth()
+  const [filters, setFilters] = useState({ search: '', sort: 'desc' })
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedAdocao, setSelectedAdocao] = useState(null)
 
-  const [filters, setFilters] = useState({
-    search: '',
-    sort: 'desc', 
-  })
+
+  const fetchTodasAdocoes = async () => {
+    if (!token) return
+    try {
+      setLoading(true)
+      setError(null)
+      const params = new URLSearchParams(filters)
+      const response = await fetch(
+        `http://localhost:3000/adocoes?${params.toString()}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      )
+      if (!response.ok) {
+        throw new Error('Falha ao buscar adoções. Você tem permissão de admin?')
+      }
+      const data = await response.json()
+      setAdocoes(data)
+    } catch (err) {
+      console.error(err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchTodasAdocoes = async () => {
-      if (!token) return
-
-      try {
-        setLoading(true)
-        setError(null)
-
-        const params = new URLSearchParams(filters)
-        const response = await fetch(
-          `http://localhost:3000/adocoes?${params.toString()}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        )
-
-        if (!response.ok) {
-          throw new Error('Falha ao buscar adoções. Você tem permissão de admin?')
-        }
-
-        const data = await response.json()
-        setAdocoes(data)
-      } catch (err) {
-        console.error(err)
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchTodasAdocoes()
-  }, [token, filters])
+  }, [token, filters]) 
 
   const handleFilterSubmit = (e) => {
     e.preventDefault()
     const formData = new FormData(e.target)
-    
-    const newFilters = {
+    setFilters({
       search: formData.get('search') || '',
       sort: formData.get('sort') || 'desc',
-    }
-    setFilters(newFilters)
+    })
   }
-
   const handleClearFilters = (e) => {
-    const form = e.target.closest('form')
-    if (form) {
-      form.reset()
-    }
+    e.target.closest('form')?.reset()
     setFilters({ search: '', sort: 'desc' })
   }
 
-  if (loading) {
-    
+  const handleDelete = (adocao) => {
+    Swal.fire({
+      title: 'Tem certeza?',
+      text: `Você quer cancelar a adoção de "${adocao.pet.nome}" por "${adocao.adotante.nome}"? O pet voltará a ficar "Disponível".`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonText: 'Manter Adoção',
+      confirmButtonText: 'Sim, cancelar!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`http://localhost:3000/adocoes/${adocao.adocao_id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          if (!response.ok) {
+            const errData = await response.json()
+            throw new Error(errData.error || 'Falha ao cancelar adoção.')
+          }
+          Swal.fire('Cancelada!', 'A adoção foi desfeita.', 'success')
+          setAdocoes(adocoes.filter(a => a.adocao_id !== adocao.adocao_id))
+        } catch (err) {
+          Swal.fire('Erro!', err.message, 'error')
+        }
+      }
+    })
   }
+  
+  const handleShowEditModal = (adocao) => {
+    setSelectedAdocao(adocao)
+    setShowEditModal(true)
+  }
+  const handleCloseEditModal = () => {
+    setShowEditModal(false)
+    setSelectedAdocao(null)
+  }
+  const handleUpdateSuccess = () => {
+    handleCloseEditModal()
+    fetchTodasAdocoes()
+  }
+
+  // --- RENDERIZAÇÃO ---
+
+  if (loading && adocoes.length === 0) { 
+    return (
+      <div className="p-4 text-center">
+        <Spinner animation="border" />
+        <p>Carregando todas as adoções...</p>
+      </div>
+    )
+  }
+
   if (error) {
-    
+    return (
+      <div className="p-4">
+        <Alert variant="danger"><strong>Erro:</strong> {error}</Alert>
+      </div>
+    )
   }
 
   return (
     <div className="p-4 adocoes-panel">
       <h2 className="mb-4">Gerenciar Adoções</h2>
-
+      
       <Form
         onSubmit={handleFilterSubmit}
         className="mb-4 p-3 bg-light rounded shadow-sm"
@@ -124,6 +172,7 @@ export function AdocoesPanel() {
         </Row>
       </Form>
 
+      {/* Resultados */}
       {adocoes.length === 0 && !loading ? (
         <Alert variant="info">
           Nenhum resultado encontrado para os filtros aplicados.
@@ -132,14 +181,15 @@ export function AdocoesPanel() {
         <Row xs={1} md={2} lg={3} className="g-4">
           {adocoes.map((adocao) => (
             <Col key={adocao.adocao_id}>
-              {/* ... (Seu Card de adoção ... ) ... */}
               <Card className="h-100 shadow-sm adocao-card">
+                
                 <Card.Img
                   variant="top"
                   src={
                     adocao.pet.imagem_url1 || 'https://via.placeholder.com/150'
                   }
                 />
+
                 <Card.Body>
                   <Card.Title className="fw-bold">
                     Pet: {adocao.pet.nome}
@@ -148,6 +198,7 @@ export function AdocoesPanel() {
                     Data: {formatarData(adocao.data_adocao)}
                   </Card.Subtitle>
                 </Card.Body>
+
                 <ListGroup variant="flush">
                   <ListGroup.Item>
                     <strong>Adotante:</strong> {adocao.adotante.nome}
@@ -156,10 +207,36 @@ export function AdocoesPanel() {
                     <strong>Telefone:</strong> {adocao.adotante.telefone || 'Não informado'}
                   </ListGroup.Item>
                 </ListGroup>
+
+                <Card.Footer>
+                  <div className="action-buttons-group">
+                    <FontAwesomeIcon
+                      icon={faPenToSquare}
+                      className="action-btn-card edit"
+                      title="Alterar pet desta adoção"
+                      onClick={() => handleShowEditModal(adocao)}
+                    />
+                    <FontAwesomeIcon
+                      icon={faTrash}
+                      className="action-btn-card delete"
+                      title="Cancelar esta adoção"
+                      onClick={() => handleDelete(adocao)}
+                    />
+                  </div>
+                </Card.Footer>
               </Card>
             </Col>
           ))}
         </Row>
+      )}
+
+      {selectedAdocao && (
+        <AdocaoEditModal
+          show={showEditModal}
+          onHide={handleCloseEditModal}
+          adocao={selectedAdocao}
+          onUpdateSuccess={handleUpdateSuccess}
+        />
       )}
     </div>
   )
