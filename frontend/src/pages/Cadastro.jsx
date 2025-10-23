@@ -15,6 +15,9 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { Footer } from '../components/Footer/Footer'
 import Swal from 'sweetalert2'
 
+// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 // Função para verificar a força da senha
 const checkPasswordStrength = (password) => {
   let score = 0
@@ -129,7 +132,8 @@ export function Cadastro() {
       }
       delete payload.confirmarSenha // Remove o campo de confirmação
 
-      const response = await fetch('http://localhost:3000/auth/register', {
+      // CORREÇÃO: Usando API_URL para a rota de registro
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
