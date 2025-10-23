@@ -4,59 +4,32 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Iniciando o processo de seeding...');
+  console.log('Iniciando o processo de seeding (completa limpeza e recriação)...');
 
   // ------------------------------------------------------------------
-  // 1. CRIAÇÃO DO USUÁRIO ADMINISTRADOR
+  // 1. LIMPEZA COMPLETA DOS DADOS
+  // ------------------------------------------------------------------
+  // Excluindo registros para garantir que a ordem dos TRUNCATEs funcione sem erros de FK
+  await prisma.adocao.deleteMany({});
+  await prisma.pet.deleteMany({});
+  
+  // Resetando todas as tabelas e sequências de ID para garantir um ambiente limpo
+  await prisma.$queryRaw`TRUNCATE TABLE "Adocao" RESTART IDENTITY CASCADE;`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Pet" RESTART IDENTITY CASCADE;`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Adotante" RESTART IDENTITY CASCADE;`;
+  // TRUNCATE na tabela Auth (onde o hash da senha é armazenado)
+  await prisma.$queryRaw`TRUNCATE TABLE "Auth" RESTART IDENTITY CASCADE;`;
+  
+  console.log('Tabelas limpas e sequências de ID resetadas.');
+
+  // ------------------------------------------------------------------
+  // 2. CRIAÇÃO DO USUÁRIO ADMINISTRADOR
   // ------------------------------------------------------------------
   const adminEmail = "buscarpatas@gmail.com";
   const adminPassword = "senha_123"; 
   const adminName = "Admin do Abrigo";
-
-  const existingAdmin = await prisma.auth.findUnique({
-    where: { email: adminEmail },
-  });
-
-  if (!existingAdmin) {
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
-    
-    await prisma.auth.create({
-      data: {
-        email: adminEmail,
-        senha: hashedPassword,
-        role: 'ADMIN', 
-        adotante: { 
-          create: {
-            nome: adminName,
-            telefone: "00000000000",
-            rua: "Não Aplicável",
-            numero: "0", // Adicionado o campo 'numero' para evitar erro de schema
-            bairro: "Não Aplicável",
-            cidade: "Não Aplicável",
-            uf: "NA",
-          }
-        }
-      },
-    });
-    console.log(`Usuário Admin criado com sucesso! E-mail: ${adminEmail} (Role: ADMIN)`);
-  } else {
-    console.log("Usuário Admin já existe, pulando a criação.");
-  }
-
-  // ------------------------------------------------------------------
-  // 2. LIMPEZA E CRIAÇÃO DOS DADOS DE TESTE
-  // ------------------------------------------------------------------
-
-  // limpando tudo recriando os adotantes de teste)
-  await prisma.adocao.deleteMany({});
-  await prisma.pet.deleteMany({});
-
-  await prisma.$queryRaw`TRUNCATE TABLE "Adocao" RESTART IDENTITY CASCADE;`;
-  await prisma.$queryRaw`TRUNCATE TABLE "Pet" RESTART IDENTITY CASCADE;`;
-  await prisma.$queryRaw`TRUNCATE TABLE "Adotante" RESTART IDENTITY CASCADE;`;
-  await prisma.$queryRaw`TRUNCATE TABLE "Auth" RESTART IDENTITY CASCADE;`;
-
-  // ************* RECRIANDO O ADMIN APÓS A LIMPEZA COMPLETA *************
+  
+  // Hashing da senha do administrador
   const hashedPasswordAdmin = await bcrypt.hash(adminPassword, 10);
     
   const createdAdminAuth = await prisma.auth.create({
@@ -77,15 +50,16 @@ async function main() {
       }
     },
   });
-  console.log(`Usuário Admin recriado. ID: ${createdAdminAuth.auth_id}`);
+  console.log(`Usuário Admin criado com sucesso! E-mail: ${adminEmail} (ID: ${createdAdminAuth.auth_id})`);
   
-  console.log('Tabelas limpas (com recriação do Admin).');
+  // ------------------------------------------------------------------
+  // 3. CRIAÇÃO DOS DADOS DE TESTE (ADOTANTES E PETS)
+  // ------------------------------------------------------------------
 
-
-  // Criptografa uma senha padrão
+  // Criptografa uma senha padrão para os usuários de teste
   const senhaPadrao = await bcrypt.hash('senha_123', 10);
 
-  // Dados dos usuários
+  // Dados dos usuários de teste
   const usersData = [
     { email: "mariana.costa@example.com", nome: "Mariana Costa", telefone: "11988776655", rua: "Avenida Paulista", numero: "2000", bairro: "Bela Vista", cidade: "São Paulo", uf: "SP" },
     { email: "ricardo.a@example.com", nome: "Ricardo Almeida", telefone: "71911223344", rua: "Rua das Laranjeiras", numero: "50", bairro: "Pelourinho", cidade: "Salvador", uf: "BA" },
@@ -169,10 +143,10 @@ async function main() {
   console.log(`${petData.length} pets criados.`);
 
   // ----------------------------------------------------
-  // RECUPERAÇÃO DE ADOTANTES E PETS PARA ADOÇÕES
+  // 4. CRIAÇÃO DAS ADOÇÕES (Dados de Relacionamento)
   // ----------------------------------------------------
 
-  // Encontrando novamente IDs.
+  // Encontrando IDs.
   const adotantes = await prisma.adotante.findMany();
   const pets = await prisma.pet.findMany();
 
