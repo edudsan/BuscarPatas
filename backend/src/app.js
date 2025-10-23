@@ -18,8 +18,10 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 const app = express();
 
 // ------------------------------------------------------------------
-//  CONFIGURAÇÃO DE CORS SEGURA
+//  CONFIGURAÇÃO DE CORS SEGURA E ROBUSTA
 // ------------------------------------------------------------------
+
+const PRODUCTION_URL_HARDCODE = 'https://buscar-patas-sistema-de-adocao-de-p.vercel.app';
 
 // 1. Processa a variável de ambiente CLIENT_URL
 // Converte a string separada por vírgulas em um array e remove espaços em branco (trim)
@@ -30,21 +32,19 @@ const ENV_ALLOWED_URLS = process.env.CLIENT_URL
 // O nome do seu projeto no Vercel (base para o Regex de previews)
 const VERCEL_PROJECT_NAME = 'buscar-patas-sistema-de-adocao-de-pets';
 
-// REGEX: Permite qualquer link de "preview" do Vercel
-// Ex: https://buscar-patas-sistema-de-adocao-de-pets-XXXXX.vercel.app
-// O pacote 'cors' aceita regex diretamente no array de origens.
+// REGEX: Permite qualquer link de "preview" do Vercel (Resolve o link que está funcionando)
 const VERCEL_PREVIEW_REGEX = new RegExp(`^https://${VERCEL_PROJECT_NAME}-.*\\.vercel\\.app$`);
 
 
 // 2. Cria a lista final de origens (Strings e Regex)
-// Esta lista será passada diretamente para o middleware CORS
 const allowedOrigins = [
-    ...ENV_ALLOWED_URLS, // Deve incluir 'http://localhost:5173' e a URL de produção
-    VERCEL_PREVIEW_REGEX // Inclui o Regex para os previews do Vercel
+    ...ENV_ALLOWED_URLS, 
+    PRODUCTION_URL_HARDCODE, // Garante que o domínio de produção funcione
+    VERCEL_PREVIEW_REGEX 
 ];
 
 
-// Aplica o middleware CORS usando a lista de origens (strings e regex)
+// Aplica o middleware CORS
 app.use(cors({
     origin: allowedOrigins, 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
