@@ -1,5 +1,3 @@
-// src/config/prisma.js
-
 import { PrismaClient } from '@prisma/client';
 
 // 1. Declara uma variável global para a instância do Prisma para ser utilizada em todo o ambiente Node.js.
