@@ -6,12 +6,17 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+
+const callbackURL = process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/auth/google/callback` : "/auth/google/callback";
+console.log("Usando Callback URL:", callbackURL); // Log para depuração
+
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/auth/google/callback", 
+    callbackURL: callbackURL, 
     scope: ['profile', 'email'] 
   },
+
   async (accessToken, refreshToken, profile, done) => {
     try {
       const email = profile.emails[0].value;
