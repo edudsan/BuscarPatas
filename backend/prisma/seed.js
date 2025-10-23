@@ -9,61 +9,49 @@ async function main() {
   // ------------------------------------------------------------------
   // 1. LIMPEZA COMPLETA DOS DADOS
   // ------------------------------------------------------------------
-  // Excluindo registros que dependem de FKs para TRUNCATE
+  // Excluindo registros para garantir que a ordem dos TRUNCATEs funcione sem erros de FK
   await prisma.adocao.deleteMany({});
   await prisma.pet.deleteMany({});
-
+  
   // Resetando todas as tabelas e sequências de ID para garantir um ambiente limpo
   await prisma.$queryRaw`TRUNCATE TABLE "Adocao" RESTART IDENTITY CASCADE;`;
   await prisma.$queryRaw`TRUNCATE TABLE "Pet" RESTART IDENTITY CASCADE;`;
   await prisma.$queryRaw`TRUNCATE TABLE "Adotante" RESTART IDENTITY CASCADE;`;
   // TRUNCATE na tabela Auth (onde o hash da senha é armazenado)
   await prisma.$queryRaw`TRUNCATE TABLE "Auth" RESTART IDENTITY CASCADE;`;
-
+  
   console.log('Tabelas limpas e sequências de ID resetadas.');
 
   // ------------------------------------------------------------------
-  // 2. CRIAÇÃO/UPSERT DO USUÁRIO ADMINISTRADOR
+  // 2. CRIAÇÃO DO USUÁRIO ADMINISTRADOR
   // ------------------------------------------------------------------
   const adminEmail = "buscarpatas@gmail.com";
-  const adminPassword = "senha_123";
+  const adminPassword = "senha_123"; 
   const adminName = "Admin do Abrigo";
-
+  
   // Hashing da senha do administrador
   const hashedPasswordAdmin = await bcrypt.hash(adminPassword, 10);
-
-  // Garante que o usuário Admin (Auth) exista e tenha a role correta
-  const createdAdminAuth = await prisma.auth.upsert({
-    where: { email: adminEmail },
-    update: {
-      senha: hashedPasswordAdmin, // Atualiza a senha se o hash mudar
-      role: 'ADMIN', // Garante a role correta
-    },
-    create: {
+    
+  const createdAdminAuth = await prisma.auth.create({
+    data: {
       email: adminEmail,
       senha: hashedPasswordAdmin,
-      role: 'ADMIN',
+      role: 'ADMIN', 
+      adotante: { 
+        create: {
+          nome: adminName,
+          telefone: "00000000000",
+          rua: "Não Aplicável",
+          numero: "0", 
+          bairro: "Não Aplicável",
+          cidade: "Não Aplicável",
+          uf: "NA",
+        }
+      }
     },
   });
-
-  // Garante que o Adotante para o Admin exista e esteja conectado
-  await prisma.adotante.upsert({
-    where: { auth_id: createdAdminAuth.auth_id },
-    update: { nome: adminName },
-    create: {
-      nome: adminName,
-      telefone: "00000000000",
-      rua: "Não Aplicável",
-      numero: "0",
-      bairro: "Não Aplicável",
-      cidade: "Não Aplicável",
-      uf: "NA",
-      auth_id: createdAdminAuth.auth_id 
-    }
-  });
-
-  console.log(`Usuário Admin criado/atualizado com sucesso! E-mail: ${adminEmail} (ID: ${createdAdminAuth.auth_id})`);
-
+  console.log(`Usuário Admin criado com sucesso! E-mail: ${adminEmail} (ID: ${createdAdminAuth.auth_id})`);
+  
   // ------------------------------------------------------------------
   // 3. CRIAÇÃO DOS DADOS DE TESTE (ADOTANTES E PETS)
   // ------------------------------------------------------------------
@@ -131,7 +119,7 @@ async function main() {
     { nome: "Jack", especie: "Cachorro", data_nascimento: new Date("2024-01-10"), descricao: "Jack é um filhote destemido e aventureiro. Ele é pequeno, mas cheio de coragem e adora explorar.", tamanho: "PEQUENO", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1723065929236-2cabbb1c685f?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=869" },
     { nome: "Cleo", especie: "Cachorro", data_nascimento: new Date("2017-02-15"), descricao: "Cleo é uma cachorra idosa e serena. Ela busca um lar tranquilo e confortável onde possa passar seus dias relaxando.", tamanho: "MEDIO", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1709497083259-2767f307aa55?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1031" },
     { nome: "Duke", especie: "Cachorro", data_nascimento: new Date("2021-06-28"), descricao: "Duke é um cão brincalhão e cheio de vigor. Ele tem uma beleza imponente e adora se aventurar na natureza.", tamanho: "GRANDE", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1723065866755-9ef44454a004?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=465" },
-    { nome: "Lily", especie: "Gato", data_nascimento: new Date("2023-09-05"), descricao: "Lily é uma gatinha muito divertida e curiosa. Ela adora descobrir coisas novas e brincar com tudo que vê.", tamanho: "PEQUENO", personalidade: "BRINCALHAO", imagem_url1: "https://plus.unsplash.com/premium_photo-1673967770669-91b5c2f2d0ce?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=430" },
+    { nome: "Lily", especie: "Gato", data_nascimento: new Date("2023-09-05"), descricao: "Lily é uma gatinha muito divertida e curiosa. Ela está sempre pronta para uma boa sessão de brincadeiras.", tamanho: "PEQUENO", personalidade: "BRINCALHAO", imagem_url1: "https://plus.unsplash.com/premium_photo-1673967770669-91b5c2f2d0ce?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=430" },
     { nome: "Cooper", especie: "Cachorro", data_nascimento: new Date("2022-08-11"), descricao: "Cooper é um cão sociável e amigável. Ele se adapta bem e adora fazer amizade com outros animais.", tamanho: "MEDIO", personalidade: "BRINCALHAO", imagem_url1: "https://plus.unsplash.com/premium_photo-1719537437497-eb3b69c6c7b5?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=388" },
     { nome: "Nala", especie: "Gato", data_nascimento: new Date("2020-03-17"), descricao: "Nala é uma gata observadora e elegante. Ela aprecia seu espaço pessoal e gosta de ter um ponto estratégico para ver o movimento.", tamanho: "MEDIO", personalidade: "INDEPENDENTE", imagem_url1: "https://images.unsplash.com/photo-1597626259989-a11e97b7772d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=580" },
     { nome: "Bear", especie: "Cachorro", data_nascimento: new Date("2018-10-20"), descricao: "Bear é um gigante gentil e amável. Ele é muito calmo e se contenta em passar o tempo deitado e observando o ambiente.", tamanho: "GRANDE", personalidade: "CALMO", imagem_url1: "https://plus.unsplash.com/premium_photo-1668114375002-a7794d5209b4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=869" },
@@ -165,7 +153,7 @@ async function main() {
   // Mapeando adotantes e pets por nome/email
   const adotanteMap = new Map();
   adotantes.forEach(a => adotanteMap.set(a.nome, a));
-
+  
   const mariana = adotanteMap.get("Mariana Costa");
   const lucas = adotanteMap.get("Lucas Pereira");
   const pedro = adotanteMap.get("Pedro Gomes");
@@ -185,15 +173,15 @@ async function main() {
   // Função auxiliar para realizar a adoção
   async function realizarAdocao(adotante, pet) {
     if (adotante && pet) {
-      await prisma.adocao.create({
-        data: {
-          adotante_id: adotante.adotante_id,
-          pet_id: pet.pet_id
-        }
+      await prisma.adocao.create({ 
+        data: { 
+          adotante_id: adotante.adotante_id, 
+          pet_id: pet.pet_id 
+        } 
       });
-      await prisma.pet.update({
-        where: { pet_id: pet.pet_id },
-        data: { status: 'ADOTADO' }
+      await prisma.pet.update({ 
+        where: { pet_id: pet.pet_id }, 
+        data: { status: 'ADOTADO' } 
       });
       console.log(`Adoção realizada: ${adotante.nome} e ${pet.nome}.`);
     } else {
