@@ -1,18 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
+import logoBuscarPatas from '../../assets/logo.png'; 
 
 // DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 const formatarData = (dataISO) => {
-  if (!dataISO) return 'Data não informada'
-
-  const dataApenas = dataISO.split('T')[0]
-
-  const [ano, mes, dia] = dataApenas.split('-')
-
-  return `${dia}/${mes}/${ano}`
+  if (!dataISO) return 'Data não informada';
+  const dataApenas = dataISO.split('T')[0];
+  const [ano, mes, dia] = dataApenas.split('-');
+  return `${dia}/${mes}/${ano}`;
 }
 
 export function MinhasAdocoes() {
@@ -22,15 +20,27 @@ export function MinhasAdocoes() {
 
   useEffect(() => {
     const fetchAdocoes = async () => {
+      if (!token) { setLoading(false); return; }
       try {
+<<<<<<< Updated upstream
         // CORREÇÃO: Usando API_URL para a rota /adocoes/me
         const response = await fetch(`${API_URL}/adocoes/me`, {
+=======
+        setLoading(true);
+        const response = await fetch('http://localhost:3000/adocoes/me', {
+>>>>>>> Stashed changes
           headers: { Authorization: `Bearer ${token}` },
         })
-        const data = await response.json()
-        setAdocoes(data)
+        if (!response.ok) {
+           console.error("Erro ao buscar adoções:", response.statusText);
+           setAdocoes([]);
+        } else {
+           const data = await response.json()
+           setAdocoes(data)
+        }
       } catch (error) {
-        console.error(error)
+        console.error("Erro de rede ou JSON:", error)
+        setAdocoes([]);
       } finally {
         setLoading(false)
       }
@@ -38,7 +48,7 @@ export function MinhasAdocoes() {
     fetchAdocoes()
   }, [token])
 
-  if (loading) return <Spinner animation="border" />
+  if (loading) return <div className="p-4 text-center"><Spinner animation="border" /></div>
 
   return (
     <div className="p-4">
@@ -48,6 +58,7 @@ export function MinhasAdocoes() {
       ) : (
         <Row xs={1} md={2} lg={3} className="g-4">
           {adocoes.map((adocao) => (
+<<<<<<< Updated upstream
             <Col key={adocao.adocao_id}>
               <Card>
                 <Card.Img
@@ -65,6 +76,30 @@ export function MinhasAdocoes() {
                 </Card.Body>
               </Card>
             </Col>
+=======
+             (adocao.pet) && (
+                <Col key={adocao.adocao_id}>
+                  <Card>
+                    <Card.Img
+                      variant="top"
+                      src={ adocao.pet.imagem_url1 || logoBuscarPatas }
+                      alt={ adocao.pet.imagem_url1 ? `Foto de ${adocao.pet.nome}` : "Logo Buscar Patas" }
+                      style={{
+                          height: '180px',
+                          objectFit: adocao.pet.imagem_url1 ? 'cover' : 'contain',
+                          padding: adocao.pet.imagem_url1 ? '0' : '0.5rem'
+                      }}
+                    />
+                    <Card.Body>
+                      <Card.Title>{adocao.pet.nome}</Card.Title>
+                      <Card.Text>
+                        Adotado em: {formatarData(adocao.data_adocao)}
+                      </Card.Text>
+                    </Card.Body>
+                  </Card>
+                </Col>
+            )
+>>>>>>> Stashed changes
           ))}
         </Row>
       )}

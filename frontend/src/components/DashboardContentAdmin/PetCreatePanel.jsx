@@ -1,19 +1,14 @@
 import { useState } from 'react'
-import { Form, Button, Container, Row, Col, Spinner } from 'react-bootstrap'
+import { Form, Button, Row, Col, Spinner } from 'react-bootstrap'
 import Swal from 'sweetalert2'
 import { useAuth } from '../../contexts/AuthContext'
 
-// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
-export function PetCreatePanel({ onBack }) {
+export function PetCreatePanel({ onSuccess, onCancel }) {
   const [formData, setFormData] = useState({
-    nome: '',
-    especie: '',
-    data_nascimento: '',
-    descricao: '',
-    tamanho: 'PEQUENO',
-    personalidade: 'CALMO',
+    nome: '', especie: '', data_nascimento: '', descricao: '',
+    tamanho: 'PEQUENO', personalidade: 'CALMO',
   })
   const [imageFile, setImageFile] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -24,57 +19,46 @@ export function PetCreatePanel({ onBack }) {
   }
 
   const handleFileChange = (e) => {
-    setImageFile(e.target.files[0])
+    if (e.target.files && e.target.files[0]) {
+        setImageFile(e.target.files[0])
+    } else {
+        setImageFile(null);
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!imageFile) {
-      Swal.fire(
-        'Atenção!',
-        'Por favor, selecione uma imagem para o pet.',
-        'warning',
-      )
-      return
-    }
+
     setLoading(true)
 
     const data = new FormData()
-    data.append('nome', formData.nome)
-    data.append('especie', formData.especie)
-    data.append('data_nascimento', formData.data_nascimento)
-    data.append('descricao', formData.descricao)
-    data.append('tamanho', formData.tamanho)
-    data.append('personalidade', formData.personalidade)
-    data.append('image', imageFile)
+
+    Object.keys(formData).forEach(key => {
+      if (formData[key] || key === 'tamanho' || key === 'personalidade' || key === 'data_nascimento') {
+        data.append(key, formData[key]);
+      }
+    });
+    // Adiciona imagem opcionalmente
+    if (imageFile) {
+       data.append('image', imageFile)
+    }
 
     try {
-      // CORREÇÃO: Usando API_URL para a rota POST /pets
+      // Usa API_URL
       const response = await fetch(`${API_URL}/pets`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: data,
       })
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Falha ao cadastrar o pet.')
+        throw new Error(errorData.error || 'Falha ao cadastrar.')
       }
 
-      Swal.fire('Sucesso!', 'Novo pet cadastrado com sucesso!', 'success')
-      e.target.reset() // Limpa o formulário
-      setFormData({
-        // Reseta o estado do formulário
-        nome: '',
-        especie: '',
-        data_nascimento: '',
-        descricao: '',
-        tamanho: 'PEQUENO',
-        personalidade: 'CALMO',
+      Swal.fire('Sucesso!', 'Pet cadastrado!', 'success').then(() => {
+        onSuccess(); // Chama onSuccess
       })
-      setImageFile(null)
     } catch (error) {
       Swal.fire('Erro!', error.message, 'error')
     } finally {
@@ -83,105 +67,90 @@ export function PetCreatePanel({ onBack }) {
   }
 
   return (
-    <Container className="p-4">
-      <div className="form-card">
-        <Button variant="secondary" onClick={onBack} className="mb-4">
-          Voltar
-        </Button>
-        <h2 className="mb-4">Cadastrar Novo Pet</h2>
-        <Form onSubmit={handleSubmit}>
-          <Row>
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Nome do Pet</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="nome"
-                  onChange={handleChange}
-                  required
-                />
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Espécie</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="especie"
-                  onChange={handleChange}
-                  required
-                />
-              </Form.Group>
-            </Col>
-          </Row>
-          <Form.Group className="mb-3">
-            <Form.Label>Descrição</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              name="descricao"
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Row>
-            <Col md={4}>
-              <Form.Group className="mb-3">
-                <Form.Label>Data de Nascimento (Aprox.)</Form.Label>
-                <Form.Control
-                  type="date"
-                  name="data_nascimento"
-                  onChange={handleChange}
-                />
-              </Form.Group>
-            </Col>
-            <Col md={4}>
-              <Form.Group className="mb-3">
-                <Form.Label>Tamanho</Form.Label>
-                <Form.Select
-                  name="tamanho"
-                  value={formData.tamanho}
-                  onChange={handleChange}
-                >
-                  <option value="PEQUENO">Pequeno</option>
-                  <option value="MEDIO">Médio</option>
-                  <option value="GRANDE">Grande</option>
-                </Form.Select>
-              </Form.Group>
-            </Col>
-            <Col md={4}>
-              <Form.Group className="mb-3">
-                <Form.Label>Personalidade</Form.Label>
-                <Form.Select
-                  name="personalidade"
-                  value={formData.personalidade}
-                  onChange={handleChange}
-                >
-                  <option value="CALMO">Calmo</option>
-                  <option value="BRINCALHAO">Brincalhão</option>
-                  <option value="INDEPENDENTE">Independente</option>
-                </Form.Select>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Form.Group className="mb-3">
-            <Form.Label>Imagem Principal</Form.Label>
-            <Form.Control
-              type="file"
-              name="image"
-              onChange={handleFileChange}
-              required
-            />
-          </Form.Group>
-          <Button type="submit" className="btn-principal" disabled={loading}>
-            {loading ? (
-              <Spinner as="span" animation="border" size="sm" />
-            ) : (
-              'Cadastrar Pet'
-            )}
-          </Button>
-        </Form>
-      </div>
-    </Container>
+    <>
+      {/* Formulário de Criação */}
+      <Form onSubmit={handleSubmit}>
+        <Row>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Nome do Pet*</Form.Label>
+              <Form.Control
+                type="text" name="nome" value={formData.nome}
+                onChange={handleChange} required
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Espécie*</Form.Label>
+              <Form.Control
+                type="text" name="especie" value={formData.especie}
+                onChange={handleChange} required
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+        <Form.Group className="mb-3">
+          <Form.Label>Descrição</Form.Label>
+          <Form.Control
+            as="textarea" rows={3} name="descricao" value={formData.descricao}
+            onChange={handleChange}
+          />
+        </Form.Group>
+        <Row>
+          <Col md={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>Data Nasc. (Aprox.)</Form.Label>
+              <Form.Control
+                type="date" name="data_nascimento" value={formData.data_nascimento}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>Tamanho</Form.Label>
+              <Form.Select
+                name="tamanho" value={formData.tamanho}
+                onChange={handleChange}
+              >
+                <option value="PEQUENO">Pequeno</option>
+                <option value="MEDIO">Médio</option>
+                <option value="GRANDE">Grande</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>Personalidade</Form.Label>
+              <Form.Select
+                name="personalidade" value={formData.personalidade}
+                onChange={handleChange}
+              >
+                <option value="CALMO">Calmo</option>
+                <option value="BRINCALHAO">Brincalhão</option>
+                <option value="INDEPENDENTE">Independente</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+        </Row>
+        <Form.Group className="mb-3">
+          <Form.Label>Imagem Principal (Opcional)</Form.Label>
+          <Form.Control
+            type="file" name="image" accept="image/*"
+            onChange={handleFileChange}
+          />
+        </Form.Group>
+         {/* Botões de Ação */}
+        <div className="d-flex justify-content-end mt-3">
+           <Button variant="secondary" onClick={onCancel} className="me-2">
+             Cancelar
+           </Button>
+           <Button type="submit" className="btn-principal" disabled={loading}>
+             {loading ? <Spinner size="sm" /> : 'Cadastrar Pet'}
+           </Button>
+        </div>
+      </Form>
+    </>
   )
 }
