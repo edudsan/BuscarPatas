@@ -6,15 +6,84 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Iniciando o processo de seeding...');
 
-  // Limpa as tabelas existentes em ordem para evitar erros de chave estrangeira
+  // ------------------------------------------------------------------
+  // 1. CRIAÇÃO DO USUÁRIO ADMINISTRADOR
+  // ------------------------------------------------------------------
+  const adminEmail = "buscarpatas@gmail.com";
+  const adminPassword = "senha_123"; 
+  const adminName = "Admin do Abrigo";
+
+  const existingAdmin = await prisma.auth.findUnique({
+    where: { email: adminEmail },
+  });
+
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    
+    await prisma.auth.create({
+      data: {
+        email: adminEmail,
+        senha: hashedPassword,
+        role: 'ADMIN', 
+        adotante: { 
+          create: {
+            nome: adminName,
+            telefone: "00000000000",
+            rua: "Não Aplicável",
+            numero: "0", // Adicionado o campo 'numero' para evitar erro de schema
+            bairro: "Não Aplicável",
+            cidade: "Não Aplicável",
+            uf: "NA",
+          }
+        }
+      },
+    });
+    console.log(`Usuário Admin criado com sucesso! E-mail: ${adminEmail} (Role: ADMIN)`);
+  } else {
+    console.log("Usuário Admin já existe, pulando a criação.");
+  }
+
+  // ------------------------------------------------------------------
+  // 2. LIMPEZA E CRIAÇÃO DOS DADOS DE TESTE
+  // ------------------------------------------------------------------
+
+  // limpando tudo recriando os adotantes de teste)
   await prisma.adocao.deleteMany({});
   await prisma.pet.deleteMany({});
-  await prisma.adotante.deleteMany({});
-  await prisma.auth.deleteMany({});
-  console.log('Tabelas limpas.');
+
+  await prisma.$queryRaw`TRUNCATE TABLE "Adocao" RESTART IDENTITY CASCADE;`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Pet" RESTART IDENTITY CASCADE;`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Adotante" RESTART IDENTITY CASCADE;`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Auth" RESTART IDENTITY CASCADE;`;
+
+  // ************* RECRIANDO O ADMIN APÓS A LIMPEZA COMPLETA *************
+  const hashedPasswordAdmin = await bcrypt.hash(adminPassword, 10);
+    
+  const createdAdminAuth = await prisma.auth.create({
+    data: {
+      email: adminEmail,
+      senha: hashedPasswordAdmin,
+      role: 'ADMIN', 
+      adotante: { 
+        create: {
+          nome: adminName,
+          telefone: "00000000000",
+          rua: "Não Aplicável",
+          numero: "0", 
+          bairro: "Não Aplicável",
+          cidade: "Não Aplicável",
+          uf: "NA",
+        }
+      }
+    },
+  });
+  console.log(`Usuário Admin recriado. ID: ${createdAdminAuth.auth_id}`);
+  
+  console.log('Tabelas limpas (com recriação do Admin).');
+
 
   // Criptografa uma senha padrão
-  const senhaPadrao = await bcrypt.hash('senha123', 10);
+  const senhaPadrao = await bcrypt.hash('senha_123', 10);
 
   // Dados dos usuários
   const usersData = [
@@ -49,9 +118,9 @@ async function main() {
       },
     });
   }
-  console.log('Adotantes e Autenticações criados.');
+  console.log('Adotantes e Autenticações (de teste) criados.');
 
-  // Dados para 50 Pets
+  // Dados para Pets
   const petData = [
     { nome: "Fred", especie: "Cachorro", data_nascimento: new Date("2023-08-10"), descricao: "Fred é um cachorro cheio de energia! Ele adora correr, buscar a bolinha e está sempre pronto para a próxima aventura.", tamanho: "MEDIO", personalidade: "BRINCALHAO", imagem_url1: "https://img.freepik.com/fotos-premium/o-cachorro-branco-dorme-na-mesa-em-frente-ao-laptop-o-conceito-de-trabalhar-em-casa-treinando-um-trabalhador-cansado_330478-1569.jpg?w=740" },
     { nome: "Luna", especie: "Gato", data_nascimento: new Date("2022-04-01"), descricao: "Luna é uma gata serena. Ela aprecia cochilos longos em lugares quentinhos e é uma companheira muito tranquila.", tamanho: "PEQUENO", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=436" },
@@ -99,107 +168,61 @@ async function main() {
   });
   console.log(`${petData.length} pets criados.`);
 
+  // ----------------------------------------------------
+  // RECUPERAÇÃO DE ADOTANTES E PETS PARA ADOÇÕES
+  // ----------------------------------------------------
+
+  // Encontrando novamente IDs.
+  const adotantes = await prisma.adotante.findMany();
+  const pets = await prisma.pet.findMany();
+
+  // Mapeando adotantes e pets por nome/email
+  const adotanteMap = new Map();
+  adotantes.forEach(a => adotanteMap.set(a.nome, a));
+  
+  const mariana = adotanteMap.get("Mariana Costa");
+  const lucas = adotanteMap.get("Lucas Pereira");
+  const pedro = adotanteMap.get("Pedro Gomes");
+  const carla = adotanteMap.get("Carla Rocha");
+  const marcos = adotanteMap.get("Marcos Lima");
+  const patricia = adotanteMap.get("Patrícia Menezes");
+  const juliana = adotanteMap.get("Juliana Santos");
+
+  const fred = pets.find(p => p.nome === "Fred");
+  const luna = pets.find(p => p.nome === "Luna");
+  const zeca = pets.find(p => p.nome === "Zeca");
+  const amora = pets.find(p => p.nome === "Amora");
+  const toby = pets.find(p => p.nome === "Toby");
+  const nino = pets.find(p => p.nome === "Nino");
+  const rocky = pets.find(p => p.nome === "Rocky");
+
+  // Função auxiliar para realizar a adoção
+  async function realizarAdocao(adotante, pet) {
+    if (adotante && pet) {
+      await prisma.adocao.create({ 
+        data: { 
+          adotante_id: adotante.adotante_id, 
+          pet_id: pet.pet_id 
+        } 
+      });
+      await prisma.pet.update({ 
+        where: { pet_id: pet.pet_id }, 
+        data: { status: 'ADOTADO' } 
+      });
+      console.log(`Adoção realizada: ${adotante.nome} e ${pet.nome}.`);
+    } else {
+      console.log(`Adoção não realizada por falta de Adotante ou Pet.`);
+    }
+  }
+
   // Realiza as Adoções existentes
-  const authMariana = await prisma.auth.findUnique({
-    where: { email: "mariana.costa@example.com" },
-    include: { adotante: true },
-  });
-  const mariana = authMariana?.adotante;
-
-  const authLucas = await prisma.auth.findUnique({
-    where: { email: "lucas.pereira@example.com" },
-    include: { adotante: true },
-  });
-  const lucas = authLucas?.adotante;
-
-  const fred = await prisma.pet.findFirst({ where: { nome: "Fred" } });
-  const luna = await prisma.pet.findFirst({ where: { nome: "Luna" } });
-
-  if (mariana && fred) {
-    await prisma.adocao.create({ data: { adotante_id: mariana.adotante_id, pet_id: fred.pet_id } });
-    await prisma.pet.update({ where: { pet_id: fred.pet_id }, data: { status: 'ADOTADO' } });
-    console.log('Adoção 1 (Mariana e Fred) realizada.');
-  }
-
-  if (lucas && luna) {
-    await prisma.adocao.create({ data: { adotante_id: lucas.adotante_id, pet_id: luna.pet_id } });
-    await prisma.pet.update({ where: { pet_id: luna.pet_id }, data: { status: 'ADOTADO' } });
-    console.log('Adoção 2 (Lucas e Luna) realizada.');
-  }
-
-  // ----------------------------------------------------
-  // Novas 5 Adoções
-  // ----------------------------------------------------
-
-  // Adoção 3: Pedro e Zeca
-  const authPedro = await prisma.auth.findUnique({
-    where: { email: "pedro.gomes@example.com" },
-    include: { adotante: true },
-  });
-  const pedro = authPedro?.adotante;
-  const zeca = await prisma.pet.findFirst({ where: { nome: "Zeca" } });
-
-  if (pedro && zeca) {
-    await prisma.adocao.create({ data: { adotante_id: pedro.adotante_id, pet_id: zeca.pet_id } });
-    await prisma.pet.update({ where: { pet_id: zeca.pet_id }, data: { status: 'ADOTADO' } });
-    console.log('Adoção 3 (Pedro e Zeca) realizada.');
-  }
-
-  // Adoção 4: Carla e Amora
-  const authCarla = await prisma.auth.findUnique({
-    where: { email: "carla.rocha@example.com" },
-    include: { adotante: true },
-  });
-  const carla = authCarla?.adotante;
-  const amora = await prisma.pet.findFirst({ where: { nome: "Amora" } });
-
-  if (carla && amora) {
-    await prisma.adocao.create({ data: { adotante_id: carla.adotante_id, pet_id: amora.pet_id } });
-    await prisma.pet.update({ where: { pet_id: amora.pet_id }, data: { status: 'ADOTADO' } });
-    console.log('Adoção 4 (Carla e Amora) realizada.');
-  }
-
-  // Adoção 5: Marcos e Toby
-  const authMarcos = await prisma.auth.findUnique({
-    where: { email: "marcos.lima@example.com" },
-    include: { adotante: true },
-  });
-  const marcos = authMarcos?.adotante;
-  const toby = await prisma.pet.findFirst({ where: { nome: "Toby" } });
-
-  if (marcos && toby) {
-    await prisma.adocao.create({ data: { adotante_id: marcos.adotante_id, pet_id: toby.pet_id } });
-    await prisma.pet.update({ where: { pet_id: toby.pet_id }, data: { status: 'ADOTADO' } });
-    console.log('Adoção 5 (Marcos e Toby) realizada.');
-  }
-
-  // Adoção 6: Patrícia e Nino
-  const authPatricia = await prisma.auth.findUnique({
-    where: { email: "patricia.m@example.com" },
-    include: { adotante: true },
-  });
-  const patricia = authPatricia?.adotante;
-  const nino = await prisma.pet.findFirst({ where: { nome: "Nino" } });
-
-  if (patricia && nino) {
-    await prisma.adocao.create({ data: { adotante_id: patricia.adotante_id, pet_id: nino.pet_id } });
-    await prisma.pet.update({ where: { pet_id: nino.pet_id }, data: { status: 'ADOTADO' } });
-    console.log('Adoção 6 (Patrícia e Nino) realizada.');
-  }
-
-  // Adoção 7: Juliana e Rocky
-  const authJuliana = await prisma.auth.findUnique({
-    where: { email: "juliana.s@example.com" },
-    include: { adotante: true },
-  });
-  const juliana = authJuliana?.adotante;
-  const rocky = await prisma.pet.findFirst({ where: { nome: "Rocky" } });
-
-  if (juliana && rocky) {
-    await prisma.adocao.create({ data: { adotante_id: juliana.adotante_id, pet_id: rocky.pet_id } });
-    await prisma.pet.update({ where: { pet_id: rocky.pet_id }, data: { status: 'ADOTADO' } });
-    console.log('Adoção 7 (Juliana e Rocky) realizada.');
-  }
+  await realizarAdocao(mariana, fred);
+  await realizarAdocao(lucas, luna);
+  await realizarAdocao(pedro, zeca);
+  await realizarAdocao(carla, amora);
+  await realizarAdocao(marcos, toby);
+  await realizarAdocao(patricia, nino);
+  await realizarAdocao(juliana, rocky);
 
   console.log('Seeding finalizado com sucesso! 🐾');
 }
