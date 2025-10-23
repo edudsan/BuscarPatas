@@ -4,6 +4,9 @@ import Swal from 'sweetalert2'
 import { useAuth } from '../../contexts/AuthContext'
 import { capitalizeFirstLetter } from '../../utils/formatters'
 
+// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 const calcularIdade = (dataNascimento) => {
   if (!dataNascimento) return 'Idade não informada'
   const hoje = new Date()
@@ -57,7 +60,8 @@ export function PetDetailModal({ show, onHide, pet, onAdocaoConcluida }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch('http://localhost:3000/adocoes', {
+          // CORREÇÃO: Usando API_URL para a rota /adocoes
+          const response = await fetch(`${API_URL}/adocoes`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
