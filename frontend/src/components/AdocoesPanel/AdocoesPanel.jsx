@@ -1,18 +1,33 @@
 import { useState, useEffect } from 'react'
-import { Card, Col, Row, Spinner, Alert, ListGroup, Form, Button } from 'react-bootstrap'
+import {
+  Card,
+  Col,
+  Row,
+  Spinner,
+  Alert,
+  ListGroup,
+  Form,
+  Button,
+} from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
 import './AdocoesPanel.css'
 import Swal from 'sweetalert2'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPenToSquare, faTrash, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
-import { AdocaoEditModal } from './AdocaoEditModal' 
+import {
+  faPenToSquare,
+  faTrash,
+  faPlusCircle,
+} from '@fortawesome/free-solid-svg-icons'
+import { AdocaoEditModal } from './AdocaoEditModal'
 import { AdocaoCreateModal } from './AdocaoCreateModal'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 const formatarData = (dataISO) => {
-  if (!dataISO) return 'Data não informada';
-  const dataApenas = dataISO.split('T')[0];
-  const [ano, mes, dia] = dataApenas.split('-');
-  return `${dia}/${mes}/${ano}`;
+  if (!dataISO) return 'Data não informada'
+  const dataApenas = dataISO.split('T')[0]
+  const [ano, mes, dia] = dataApenas.split('-')
+  return `${dia}/${mes}/${ano}`
 }
 
 export function AdocoesPanel() {
@@ -31,10 +46,9 @@ export function AdocoesPanel() {
       setLoading(true)
       setError(null)
       const params = new URLSearchParams(filters)
-      const response = await fetch(
-        `http://localhost:3000/adocoes?${params.toString()}`,
-        { headers: { Authorization: `Bearer ${token}` } },
-      )
+      const response = await fetch(`${API_URL}/adocoes?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       if (!response.ok) {
         throw new Error('Falha ao buscar adoções. Você tem permissão de admin?')
       }
@@ -50,7 +64,7 @@ export function AdocoesPanel() {
 
   useEffect(() => {
     fetchTodasAdocoes()
-  }, [token, filters]) 
+  }, [token, filters])
 
   const handleFilterSubmit = (e) => {
     e.preventDefault()
@@ -71,22 +85,25 @@ export function AdocoesPanel() {
       text: `Você quer cancelar a adoção de "${adocao.pet.nome}" por "${adocao.adotante.nome}"? O pet voltará a ficar "Disponível".`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#dc3545', 
+      confirmButtonColor: '#dc3545',
       cancelButtonText: 'Manter Adoção',
       confirmButtonText: 'Sim, cancelar!',
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`http://localhost:3000/adocoes/${adocao.adocao_id}`, {
-            method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` },
-          })
+          const response = await fetch(
+            `${API_URL}/adocoes/${adocao.adocao_id}`,
+            {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          )
           if (!response.ok) {
             const errData = await response.json()
             throw new Error(errData.error || 'Falha ao cancelar adoção.')
           }
           Swal.fire('Cancelada!', 'A adoção foi desfeita.', 'success')
-          setAdocoes(adocoes.filter(a => a.adocao_id !== adocao.adocao_id))
+          setAdocoes(adocoes.filter((a) => a.adocao_id !== adocao.adocao_id))
         } catch (err) {
           Swal.fire('Erro!', err.message, 'error')
         }
@@ -114,7 +131,7 @@ export function AdocoesPanel() {
   }
 
   // --- RENDERIZAÇÃO ---
-  if (loading && adocoes.length === 0) { 
+  if (loading && adocoes.length === 0) {
     return (
       <div className="p-4 text-center">
         <Spinner animation="border" />
@@ -126,7 +143,9 @@ export function AdocoesPanel() {
   if (error) {
     return (
       <div className="p-4">
-        <Alert variant="danger"><strong>Erro:</strong> {error}</Alert>
+        <Alert variant="danger">
+          <strong>Erro:</strong> {error}
+        </Alert>
       </div>
     )
   }
@@ -134,7 +153,6 @@ export function AdocoesPanel() {
   return (
     <div className="p-4 adocoes-panel">
       <h2 className="mb-4">Gerenciar Adoções</h2>
-      
       <Form
         onSubmit={handleFilterSubmit}
         className="mb-4 p-3 bg-light rounded shadow-sm"
@@ -142,7 +160,9 @@ export function AdocoesPanel() {
         <Row className="align-items-end g-3">
           <Col md={6}>
             <Form.Group controlId="searchFiltro">
-              <Form.Label className="fw-bold">Buscar por Pet ou Adotante</Form.Label>
+              <Form.Label className="fw-bold">
+                Buscar por Pet ou Adotante
+              </Form.Label>
               <Form.Control
                 type="text"
                 name="search"
@@ -176,10 +196,12 @@ export function AdocoesPanel() {
       </Form>
 
       <Row xs={1} md={2} lg={4} className="g-4">
-   
         <Col>
           <div className="adocao-card-new" onClick={handleShowCreateModal}>
-            <FontAwesomeIcon icon={faPlusCircle} className="adocao-card-new-icon" />
+            <FontAwesomeIcon
+              icon={faPlusCircle}
+              className="adocao-card-new-icon"
+            />
             <h3 className="adocao-card-new-title">Registrar Nova Adoção</h3>
           </div>
         </Col>
@@ -191,7 +213,7 @@ export function AdocoesPanel() {
             </Alert>
           </Col>
         )}
-      
+
         {adocoes.map((adocao) => (
           <Col key={adocao.adocao_id}>
             <Card className="h-100 shadow-sm adocao-card">
@@ -211,7 +233,8 @@ export function AdocoesPanel() {
                   <strong>Adotante:</strong> {adocao.adotante.nome}
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  <strong>Telefone:</strong> {adocao.adotante.telefone || 'Não informado'}
+                  <strong>Telefone:</strong>{' '}
+                  {adocao.adotante.telefone || 'Não informado'}
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <strong>Data:</strong> {formatarData(adocao.data_adocao)}

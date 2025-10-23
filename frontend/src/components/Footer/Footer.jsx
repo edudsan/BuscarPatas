@@ -16,7 +16,7 @@ export function Footer() {
           <div className="col-12 col-lg-4 text-center text-lg-start mb-4 mb-lg-0">
             <HashLink to="/#top" smooth>
               <img
-                src="../../../src/assets/logo.png"
+                src="/logo.png"
                 alt="Buscar Patas Logo"
                 className="img-fluid footer-logo"
               />

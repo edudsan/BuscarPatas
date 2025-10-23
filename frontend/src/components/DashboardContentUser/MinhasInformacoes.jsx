@@ -3,6 +3,9 @@ import { Form, Button, Row, Col, Spinner } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
 import Swal from 'sweetalert2'
 
+// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export function MinhasInformacoes() {
   const [formData, setFormData] = useState({
     nome: '',
@@ -42,7 +45,8 @@ export function MinhasInformacoes() {
     e.preventDefault()
     setLoading(true)
     try {
-      const response = await fetch('http://localhost:3000/profile/me', {
+      // CORREÇÃO: Usando API_URL para a rota PATCH /profile/me
+      const response = await fetch(`${API_URL}/profile/me`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

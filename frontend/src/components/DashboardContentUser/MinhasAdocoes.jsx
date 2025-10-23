@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
 
+// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 const formatarData = (dataISO) => {
   if (!dataISO) return 'Data não informada'
 
@@ -20,7 +23,8 @@ export function MinhasAdocoes() {
   useEffect(() => {
     const fetchAdocoes = async () => {
       try {
-        const response = await fetch('http://localhost:3000/adocoes/me', {
+        // CORREÇÃO: Usando API_URL para a rota /adocoes/me
+        const response = await fetch(`${API_URL}/adocoes/me`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         const data = await response.json()
@@ -55,7 +59,7 @@ export function MinhasAdocoes() {
                 <Card.Body>
                   <Card.Title>{adocao.pet.nome}</Card.Title>
                   <Card.Text>
-                    Adotado em: {/* <<< USA A NOVA FUNÇÃO DE DATA >>> */}
+                    Adotado em:
                     {formatarData(adocao.data_adocao)}
                   </Card.Text>
                 </Card.Body>

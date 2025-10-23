@@ -3,6 +3,9 @@ import { Modal, Button, Form, Spinner, Alert } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
 import Swal from 'sweetalert2'
 
+// 1. Definição da URL da API (usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export function AdocaoCreateModal({ show, onHide, onCreateSuccess }) {
   const [petsDisponiveis, setPetsDisponiveis] = useState([])
   const [todosAdotantes, setTodosAdotantes] = useState([])
@@ -19,15 +22,18 @@ export function AdocaoCreateModal({ show, onHide, onCreateSuccess }) {
         setLoading(true)
         setError(null)
         // Limpa seleções antigas
-        setSelectedPet('');
-        setSelectedAdotante('');
+        setSelectedPet('')
+        setSelectedAdotante('')
         try {
           // Busca de dados em paralelo
           const [petsRes, adotantesRes] = await Promise.all([
-            fetch('http://localhost:3000/pets/disponiveis', {
+            // 2. CORREÇÃO: Usando API_URL
+            fetch(`${API_URL}/pets/disponiveis`, {
               headers: { Authorization: `Bearer ${token}` },
             }),
-            fetch('http://localhost:3000/adotantes', { // Rota de admin
+            // 3. CORREÇÃO: Usando API_URL
+            fetch(`${API_URL}/adotantes`, {
+              // Rota de admin
               headers: { Authorization: `Bearer ${token}` },
             }),
           ])
@@ -53,13 +59,17 @@ export function AdocaoCreateModal({ show, onHide, onCreateSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!selectedPet || !selectedAdotante) {
-      Swal.fire('Atenção', 'Você precisa selecionar um pet E um adotante.', 'warning')
+      Swal.fire(
+        'Atenção',
+        'Você precisa selecionar um pet E um adotante.',
+        'warning',
+      )
       return
     }
 
     try {
-      // Chama a nova rota POST /adocoes/admin
-      const response = await fetch('http://localhost:3000/adocoes/admin', {
+      // 4. CORREÇÃO: Usando API_URL
+      const response = await fetch(`${API_URL}/adocoes/admin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,6 +88,7 @@ export function AdocaoCreateModal({ show, onHide, onCreateSuccess }) {
 
       Swal.fire('Sucesso!', 'Adoção registrada.', 'success')
       onCreateSuccess() // Chama a função do pai para atualizar a lista
+      onHide() // Fechar o modal
     } catch (err) {
       Swal.fire('Erro!', err.message, 'error')
     }
@@ -107,7 +118,7 @@ export function AdocaoCreateModal({ show, onHide, onCreateSuccess }) {
                   required
                 >
                   <option value="">Selecione um adotante...</option>
-                  {todosAdotantes.map(a => (
+                  {todosAdotantes.map((a) => (
                     <option key={a.adotante_id} value={a.adotante_id}>
                       {a.nome} ({a.auth?.email || 'Sem email'})
                     </option>
@@ -124,7 +135,7 @@ export function AdocaoCreateModal({ show, onHide, onCreateSuccess }) {
                   required
                 >
                   <option value="">Selecione um pet...</option>
-                  {petsDisponiveis.map(p => (
+                  {petsDisponiveis.map((p) => (
                     <option key={p.pet_id} value={p.pet_id}>
                       {p.nome} ({p.especie})
                     </option>
@@ -138,7 +149,12 @@ export function AdocaoCreateModal({ show, onHide, onCreateSuccess }) {
           <Button variant="secondary" onClick={onHide}>
             Cancelar
           </Button>
-          <Button variant="primary" type="submit" className="btn-principal" disabled={loading}>
+          <Button
+            variant="primary"
+            type="submit"
+            className="btn-principal"
+            disabled={loading}
+          >
             Registrar Adoção
           </Button>
         </Modal.Footer>

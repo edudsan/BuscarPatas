@@ -3,6 +3,9 @@ import { Form, Button, Container, Row, Col, Spinner } from 'react-bootstrap'
 import Swal from 'sweetalert2'
 import { useAuth } from '../../contexts/AuthContext'
 
+// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export function PetCreatePanel({ onBack }) {
   const [formData, setFormData] = useState({
     nome: '',
@@ -46,7 +49,8 @@ export function PetCreatePanel({ onBack }) {
     data.append('image', imageFile)
 
     try {
-      const response = await fetch('http://localhost:3000/pets', {
+      // CORREÇÃO: Usando API_URL para a rota POST /pets
+      const response = await fetch(`${API_URL}/pets`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

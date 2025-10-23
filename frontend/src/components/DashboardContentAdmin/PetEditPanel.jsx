@@ -13,6 +13,9 @@ import Swal from 'sweetalert2'
 import { useAuth } from '../../contexts/AuthContext'
 import { capitalizeFirstLetter } from '../../utils/formatters'
 
+// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export function PetEditPanel({ onBack }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResults, setSearchResults] = useState([])
@@ -28,8 +31,9 @@ export function PetEditPanel({ onBack }) {
     setSearchResults([])
     setPetToEdit(null)
     try {
+      // CORREÇÃO 1: Usando API_URL para buscar pets
       const response = await fetch(
-        `http://localhost:3000/pets?nome=${searchTerm.toLowerCase()}`,
+        `${API_URL}/pets?nome=${searchTerm.toLowerCase()}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -63,17 +67,15 @@ export function PetEditPanel({ onBack }) {
     e.preventDefault()
     setLoading(true)
     try {
-      const response = await fetch(
-        `http://localhost:3000/pets/${petToEdit.pet_id}`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
+      // CORREÇÃO 2: Usando API_URL para a rota PATCH
+      const response = await fetch(`${API_URL}/pets/${petToEdit.pet_id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-      )
+        body: JSON.stringify(formData),
+      })
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || 'Falha ao atualizar o pet.')

@@ -6,6 +6,9 @@ import { PaginationControls } from '../PaginationControls/PaginationControls'
 import { PetDetailModal } from '../PetDetailModal/PetDetailModal'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
+// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export function DashboardMinhasAdocoes() {
   return (
     <div className="p-4">
@@ -31,7 +34,8 @@ export function DashboardBuscarPets() {
 
       // String de query com os filtros ativos
       const queryParams = new URLSearchParams(filters).toString()
-      const url = `http://localhost:3000/pets?${queryParams}`
+      // CORREÇÃO: Usando API_URL para a rota de busca
+      const url = `${API_URL}/pets?${queryParams}`
 
       try {
         const response = await fetch(url)
@@ -78,13 +82,14 @@ export function DashboardBuscarPets() {
       <Container fluid>
         <h1 className="text-dark mb-4">Buscar Pets</h1>
         <p className="text-muted mb-4">
-          Encontre seu novo melhor amigo! Use os filtros abaixo para encontrar pets que combinem com seu estilo de vida.
+          Encontre seu novo melhor amigo! Use os filtros abaixo para encontrar
+          pets que combinem com seu estilo de vida.
         </p>
 
         <PetFilters onFilterChange={handleFilterChange} />
 
         <PetList pets={pets} loading={loading} onPetClick={handleShowModal} />
-        
+
         <PaginationControls
           pagination={pagination}
           onPageChange={handlePageChange}

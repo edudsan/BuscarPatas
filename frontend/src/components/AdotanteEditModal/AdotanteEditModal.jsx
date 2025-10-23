@@ -3,6 +3,9 @@ import { Modal, Button, Form, Row, Col, Spinner } from 'react-bootstrap'
 import Swal from 'sweetalert2'
 import { useAuth } from '../../contexts/AuthContext'
 
+// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export function AdotanteEditModal({ show, onHide, adotante, onUpdateSuccess }) {
   const { token } = useAuth()
   const [formData, setFormData] = useState({
@@ -31,8 +34,9 @@ export function AdotanteEditModal({ show, onHide, adotante, onUpdateSuccess }) {
     e.preventDefault()
     setLoading(true)
     try {
+      // CORREÇÃO: Usando API_URL para a rota PATCH
       const response = await fetch(
-        `http://localhost:3000/adotantes/${adotante.adotante_id}`,
+        `${API_URL}/adotantes/${adotante.adotante_id}`,
         {
           method: 'PATCH',
           headers: {

@@ -22,7 +22,7 @@ export function DashboardLayout({ menuItems = [], contentMap, initialPanel }) {
     setSidebarOpen(false)
   }
 
-  const homeBackgroundImageUrl = '../../public/patinhas.png'
+  const homeBackgroundImageUrl = '/patinhas.png'
 
   return (
     <div

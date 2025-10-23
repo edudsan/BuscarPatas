@@ -3,6 +3,9 @@ import { Modal, Button, Form, Spinner, Alert } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
 import Swal from 'sweetalert2'
 
+// 1. Definição da URL da API (usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
   const [petsDisponiveis, setPetsDisponiveis] = useState([])
   const [novoPetId, setNovoPetId] = useState('')
@@ -17,16 +20,19 @@ export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
         setLoading(true)
         setError(null)
         try {
-          // 1. Busca pets disponíveis (rota do seu petController)
-          const response = await fetch('http://localhost:3000/pets/disponiveis', {
-            headers: { Authorization: `Bearer ${token}` },
-          })
+          // 2. CORREÇÃO: Usando API_URL
+          const response = await fetch(
+            `${API_URL}/pets/disponiveis`, // URL corrigida
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          )
           if (!response.ok) throw new Error('Falha ao buscar pets disponíveis.')
-          
+
           const data = await response.json()
           setPetsDisponiveis(data)
-          // 2. Define o pet atual como o selecionado por padrão
-          setNovoPetId(adocao.pet_id) 
+          // Define o pet atual como o selecionado por padrão
+          setNovoPetId(adocao.pet_id)
         } catch (err) {
           setError(err.message)
         } finally {
@@ -46,15 +52,18 @@ export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
     }
 
     try {
-      // Chama a rota PATCH do seu adocaoController
-      const response = await fetch(`http://localhost:3000/adocoes/${adocao.adocao_id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+      // 3. CORREÇÃO: Usando API_URL com o ID da adoção
+      const response = await fetch(
+        `${API_URL}/adocoes/${adocao.adocao_id}`, // URL corrigida
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ pet_id: parseInt(novoPetId) }),
         },
-        body: JSON.stringify({ pet_id: parseInt(novoPetId) }),
-      })
+      )
 
       if (!response.ok) {
         const errData = await response.json()
@@ -63,6 +72,7 @@ export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
 
       Swal.fire('Sucesso!', 'A adoção foi atualizada.', 'success')
       onUpdateSuccess() // Chama a função do pai para atualizar a lista
+      onHide()
     } catch (err) {
       Swal.fire('Erro!', err.message, 'error')
     }
@@ -94,16 +104,15 @@ export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
                   Atual: {adocao?.pet.nome} ({adocao?.pet.especie})
                 </option>
                 <option disabled>--- PETS DISPONÍVEIS ---</option>
-                
+
                 {/* 2. Lista de outros pets disponíveis */}
                 {petsDisponiveis
-                  .filter(pet => pet.pet_id !== adocao?.pet_id) // Não repete o pet atual
-                  .map(pet => (
+                  .filter((pet) => pet.pet_id !== adocao?.pet_id) // Não repete o pet atual
+                  .map((pet) => (
                     <option key={pet.pet_id} value={pet.pet_id}>
                       {pet.nome} ({pet.especie})
                     </option>
-                  ))
-                }
+                  ))}
               </Form.Select>
             )}
           </Form.Group>
@@ -112,7 +121,12 @@ export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
           <Button variant="secondary" onClick={onHide}>
             Cancelar
           </Button>
-          <Button variant="primary" type="submit" className="btn-principal" disabled={loading}>
+          <Button
+            variant="primary"
+            type="submit"
+            className="btn-principal"
+            disabled={loading}
+          >
             Salvar Alteração
           </Button>
         </Modal.Footer>

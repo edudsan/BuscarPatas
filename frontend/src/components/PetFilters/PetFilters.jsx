@@ -1,46 +1,49 @@
 import { Form, Button, Row, Col } from 'react-bootstrap'
 import { useState, useEffect } from 'react'
 
+// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 function capitalize(str) {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  if (!str) return ''
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
 
 export function PetFilters({ onFilterChange }) {
-  const [especies, setEspecies] = useState([]);
+  const [especies, setEspecies] = useState([])
 
   useEffect(() => {
     async function fetchEspecies() {
       try {
-        const response = await fetch('http://localhost:3000/pets/especies'); 
+        // CORREÇÃO: Usando API_URL para carregar as espécies
+        const response = await fetch(`${API_URL}/pets/especies`)
         if (!response.ok) {
-          throw new Error('Falha ao carregar espécies');
+          throw new Error('Falha ao carregar espécies')
         }
-        const data = await response.json(); 
-        setEspecies(data);
+        const data = await response.json()
+        setEspecies(data)
       } catch (error) {
-        console.error(error);
+        console.error(error)
       }
     }
 
-    fetchEspecies();
-  }, []); 
-
+    fetchEspecies()
+  }, [])
 
   const handleFilter = (event) => {
     event.preventDefault()
     const formData = new FormData(event.target)
-    
+
     const filters = {}
     const tamanho = formData.get('tamanho')
     const personalidade = formData.get('personalidade')
     const especie = formData.get('especie')
-    const nome = formData.get('nome') 
+    const nome = formData.get('nome')
 
     if (tamanho) filters.tamanho = tamanho
     if (personalidade) filters.personalidade = personalidade
     if (especie) filters.especie = especie
-    if (nome) filters.nome = nome 
+    if (nome) filters.nome = nome
 
     onFilterChange(filters)
   }
@@ -51,16 +54,11 @@ export function PetFilters({ onFilterChange }) {
       className="mb-5 p-4 rounded shadow-sm bg-light"
     >
       <Row className="align-items-end g-3">
-
         {/* Campo de Nome */}
         <Col md={3}>
           <Form.Group controlId="nomeFiltro">
             <Form.Label className="fw-bold">Nome do Pet</Form.Label>
-            <Form.Control
-              type="text"
-              name="nome"
-              placeholder="Ex: Bob"
-            />
+            <Form.Control type="text" name="nome" placeholder="Ex: Bob" />
           </Form.Group>
         </Col>
 
@@ -91,13 +89,13 @@ export function PetFilters({ onFilterChange }) {
             </Form.Select>
           </Form.Group>
         </Col>
-        
+
         {/* Filtro de Personalidade */}
         <Col md={3}>
           <Form.Group controlId="personalidadeFiltro">
             <Form.Label className="fw-bold">Personalidade</Form.Label>
             <Form.Select name="personalidade">
-              <option value="">Todas</option> 
+              <option value="">Todas</option>
               <option value="CALMO">Calmo</option>
               <option value="BRINCALHAO">Brincalhão</option>
               <option value="INDEPENDENTE">Independente</option>
@@ -112,12 +110,12 @@ export function PetFilters({ onFilterChange }) {
             type="button"
             variant="outline-secondary"
             className="me-2"
-            onClick={(e) => { 
-              const form = e.target.closest('form');
+            onClick={(e) => {
+              const form = e.target.closest('form')
               if (form) {
-                form.reset(); 
+                form.reset()
               }
-              onFilterChange({}); 
+              onFilterChange({})
             }}
           >
             Limpar Filtros

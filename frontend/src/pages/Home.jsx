@@ -24,9 +24,10 @@ export function Home() {
   useEffect(() => {
     async function fetchPets() {
       setLoading(true)
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
       const allFilters = { ...filters, status: 'DISPONIVEL' }
       const queryParams = new URLSearchParams(allFilters).toString()
-      const url = `http://localhost:3000/pets?${queryParams}`
+      const url = `${API_URL}/pets?${queryParams}`
 
       try {
         const response = await fetch(url)
@@ -74,12 +75,12 @@ export function Home() {
     handleCloseModal()
     setFilters((currentFilters) => ({ ...currentFilters }))
   }
-  const homeBackgroundImageUrl = '../../public/patinhas.png'
+  const homeBackgroundImageUrl = '/patinhas.png'
 
   return (
     <main style={{ position: 'relative' }}>
       <CtaBanner
-        imageUrl="/src/assets/gato-e-cachorro.jpg"
+        imageUrl="/gato-e-cachorro.jpg"
         imageAlt="Cachorro e Gato"
         title="O seu novo melhor amigo está te esperando!"
         buttonText="Adote agora"
@@ -109,7 +110,7 @@ export function Home() {
       </Container>
 
       <CtaBanner
-        imageUrl="/src/assets/mao-humana-segurando-pata.jpg"
+        imageUrl="/mao-humana-segurando-pata.jpg"
         imageAlt="Mão segurando patinha"
         title="O buscar Patas já ajudou 1000 pets a encontrarem um lar"
         buttonText="Saiba mais sobre nós"

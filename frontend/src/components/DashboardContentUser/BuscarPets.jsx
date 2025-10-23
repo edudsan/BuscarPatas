@@ -5,6 +5,9 @@ import { PetList } from '../PetList/PetList'
 import { PaginationControls } from '../PaginationControls/PaginationControls'
 import { PetDetailModal } from '../PetDetailModal/PetDetailModal'
 
+// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export function BuscarPets() {
   const [pets, setPets] = useState([])
   const [pagination, setPagination] = useState(null)
@@ -20,10 +23,11 @@ export function BuscarPets() {
   useEffect(() => {
     async function fetchPets() {
       setLoading(true)
-      
-      const allFilters = { ...filters, status: 'DISPONIVEL' } 
+
+      const allFilters = { ...filters, status: 'DISPONIVEL' }
       const queryParams = new URLSearchParams(allFilters).toString()
-      const url = `http://localhost:3000/pets?${queryParams}`
+      // CORREÇÃO: Usando API_URL para a busca de pets
+      const url = `${API_URL}/pets?${queryParams}`
 
       try {
         const response = await fetch(url)
@@ -45,7 +49,7 @@ export function BuscarPets() {
     setFilters((prevFilters) => {
       const baseFilters = {
         limit: prevFilters.limit,
-        page: 1, 
+        page: 1,
       }
       return { ...baseFilters, ...newFilters }
     })
@@ -70,7 +74,7 @@ export function BuscarPets() {
   const handleAdocaoConcluida = () => {
     handleCloseModal()
     // Força a atualização da lista (mantendo os filtros atuais)
-    setFilters((currentFilters) => ({ ...currentFilters })) 
+    setFilters((currentFilters) => ({ ...currentFilters }))
   }
 
   return (

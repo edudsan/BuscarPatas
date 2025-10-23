@@ -41,7 +41,7 @@ export function Header() {
           <Navbar.Brand as={Link} to="/">
             <img
               className="header-logo"
-              src="/src/assets/logo.png"
+              src="/logo.png"
               alt="logo Buscar Patas"
             />
           </Navbar.Brand>

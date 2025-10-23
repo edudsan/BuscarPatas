@@ -6,6 +6,9 @@ import { AdotanteCard } from '../AdotanteCard/AdotanteCard'
 import { AdotanteEditModal } from '../AdotanteEditModal/AdotanteEditModal'
 import './AdotantesPanel.css'
 
+// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export function AdotantesPanel() {
   const [adotantes, setAdotantes] = useState([])
   const [loading, setLoading] = useState(true)
@@ -19,7 +22,8 @@ export function AdotantesPanel() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('http://localhost:3000/adotantes', {
+      // CORREÇÃO 1: Usando API_URL para buscar todos os adotantes
+      const response = await fetch(`${API_URL}/adotantes`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (!response.ok) {
@@ -33,7 +37,7 @@ export function AdotantesPanel() {
     } finally {
       setLoading(false)
     }
-  }, [token]) // A função só será recriada se o token mudar
+  }, [token])
 
   useEffect(() => {
     if (token) {
@@ -67,13 +71,11 @@ export function AdotantesPanel() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(
-            `http://localhost:3000/adotantes/${adotanteId}`,
-            {
-              method: 'DELETE',
-              headers: { Authorization: `Bearer ${token}` },
-            },
-          )
+          // CORREÇÃO 2: Usando API_URL para a rota DELETE
+          const response = await fetch(`${API_URL}/adotantes/${adotanteId}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+          })
 
           if (!response.ok) {
             const errorData = await response.json()
@@ -94,17 +96,15 @@ export function AdotantesPanel() {
 
   const handleRoleChange = async (adotanteId, newRole) => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/adotantes/${adotanteId}`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ role: newRole }),
+      // CORREÇÃO 3: Usando API_URL para a rota PATCH
+      const response = await fetch(`${API_URL}/adotantes/${adotanteId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-      )
+        body: JSON.stringify({ role: newRole }),
+      })
 
       if (!response.ok) {
         const errorData = await response.json()
