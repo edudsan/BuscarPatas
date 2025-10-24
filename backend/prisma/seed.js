@@ -58,8 +58,6 @@ async function main() {
   // ------------------------------------------------------------------
   // 3. CRIAÇÃO DOS DADOS DE TESTE (ADOTANTES E PETS)
   // ...
-  // (O restante do seu código de seeding não foi modificado por estar correto)
-  // ...
   const senhaPadrao = await bcrypt.hash('senha_123', 10);
 
   // Dados dos usuários de teste

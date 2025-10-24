@@ -1,35 +1,32 @@
 import { useState, useEffect } from 'react'
-import {
-  Card,
-  Col,
-  Row,
-  Spinner,
-  Alert,
-  ListGroup,
-  Form,
-  Button,
-} from 'react-bootstrap'
+import { Card, Col, Row, Spinner, Alert, ListGroup, Form, Button } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
 import './AdocoesPanel.css'
 import Swal from 'sweetalert2'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faPenToSquare,
-  faTrash,
-  faPlusCircle,
-} from '@fortawesome/free-solid-svg-icons'
+import { faPenToSquare, faTrash, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 import { AdocaoEditModal } from './AdocaoEditModal'
 import { AdocaoCreateModal } from './AdocaoCreateModal'
 import logoBuscarPatas from '../../assets/logo.png';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const formatarData = (dataISO) => {
-  if (!dataISO) return 'Data não informada'
-  const dataApenas = dataISO.split('T')[0]
-  const [ano, mes, dia] = dataApenas.split('-')
-  return `${dia}/${mes}/${ano}`
+  if (!dataISO || typeof dataISO !== 'string') return 'Data inválida';
+  try {
+    const dataObj = new Date(dataISO);
+    return dataObj.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+  } catch (error) {
+    console.error("Erro ao formatar data:", dataISO, error);
+    return 'Erro na data';
+  }
 }
+
 const formatarTelefone = (value) => {
   if (!value) return 'Não informado';
   const digitos = value.replace(/\D/g, '');
@@ -44,6 +41,7 @@ export function AdocoesPanel() {
   const [error, setError] = useState(null)
   const { token } = useAuth()
   const [filters, setFilters] = useState({ search: '', sort: 'desc' })
+
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedAdocao, setSelectedAdocao] = useState(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -54,17 +52,19 @@ export function AdocoesPanel() {
       setLoading(true)
       setError(null)
       const params = new URLSearchParams(filters)
-      const response = await fetch(`${API_URL}/adocoes?${params.toString()}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await fetch(
+        `${API_URL}/adocoes?${params.toString()}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
       if (!response.ok) {
         throw new Error('Falha ao buscar adoções. Você tem permissão de admin?')
       }
       const data = await response.json()
-      setAdocoes(data)
+      setAdocoes(Array.isArray(data) ? data : [])
     } catch (err) {
       console.error(err)
       setError(err.message)
+      setAdocoes([]);
     } finally {
       setLoading(false)
     }
@@ -99,13 +99,10 @@ export function AdocoesPanel() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(
-            `${API_URL}/adocoes/${adocao.adocao_id}`,
-            {
-              method: 'DELETE',
-              headers: { Authorization: `Bearer ${token}` },
-            },
-          )
+          const response = await fetch(`${API_URL}/adocoes/${adocao.adocao_id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+          })
           if (!response.ok) {
             const errData = await response.json()
             throw new Error(errData.error || 'Falha ao cancelar.')

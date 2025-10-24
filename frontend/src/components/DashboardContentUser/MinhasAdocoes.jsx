@@ -6,10 +6,19 @@ import logoBuscarPatas from '../../assets/logo.png';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const formatarData = (dataISO) => {
-  if (!dataISO) return 'Data não informada';
-  const dataApenas = dataISO.split('T')[0];
-  const [ano, mes, dia] = dataApenas.split('-');
-  return `${dia}/${mes}/${ano}`;
+  if (!dataISO || typeof dataISO !== 'string') return 'Data inválida';
+  try {
+    const dataObj = new Date(dataISO);
+    return dataObj.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+  } catch (error) {
+    console.error("Erro ao formatar data:", dataISO, error);
+    return 'Erro na data';
+  }
 }
 
 export function MinhasAdocoes() {
@@ -30,7 +39,7 @@ export function MinhasAdocoes() {
            setAdocoes([]);
         } else {
            const data = await response.json()
-           setAdocoes(Array.isArray(data) ? data : []) 
+           setAdocoes(Array.isArray(data) ? data : [])
         }
       } catch (error) {
         console.error("Erro de rede ou JSON:", error)
@@ -52,7 +61,7 @@ export function MinhasAdocoes() {
       ) : (
         <Row xs={1} md={2} lg={3} className="g-4">
           {adocoes.map((adocao) => (
-             (adocao && adocao.pet) && ( 
+             (adocao && adocao.pet) && (
                 <Col key={adocao.adocao_id}>
                   <Card>
                     <Card.Img
