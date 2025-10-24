@@ -4,60 +4,57 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Iniciando o processo de seeding (completa limpeza e recriação)...');
+  console.log('Iniciando o processo de seeding (apenas inserindo o que não existe)...');
 
   // ------------------------------------------------------------------
-  // 1. LIMPEZA COMPLETA DOS DADOS
-  // ------------------------------------------------------------------
-  // Excluindo registros para garantir que a ordem dos TRUNCATEs funcione sem erros de FK
-  await prisma.adocao.deleteMany({});
-  await prisma.pet.deleteMany({});
-
-  // Resetando todas as tabelas e sequências de ID para garantir um ambiente limpo
-  await prisma.$queryRaw`TRUNCATE TABLE "Adocao" RESTART IDENTITY CASCADE;`;
-  await prisma.$queryRaw`TRUNCATE TABLE "Pet" RESTART IDENTITY CASCADE;`;
-  await prisma.$queryRaw`TRUNCATE TABLE "Adotante" RESTART IDENTITY CASCADE;`;
-  // TRUNCATE na tabela Auth (onde o hash da senha é armazenado)
-  await prisma.$queryRaw`TRUNCATE TABLE "Auth" RESTART IDENTITY CASCADE;`;
-
-  console.log('Tabelas limpas e sequências de ID resetadas.');
-
-  // ------------------------------------------------------------------
-  // 2. CRIAÇÃO DO USUÁRIO ADMINISTRADOR
+  // 1. GARANTIR A EXISTÊNCIA DO USUÁRIO ADMINISTRADOR
   // ------------------------------------------------------------------
   const adminEmail = "buscarpatas@gmail.com";
   const adminPassword = "senha_123";
   const adminName = "Admin do Abrigo";
 
-  // Hashing da senha do administrador
-  const hashedPasswordAdmin = await bcrypt.hash(adminPassword, 10);
-
-  const createdAdminAuth = await prisma.auth.create({
-    data: {
-      email: adminEmail,
-      senha: hashedPasswordAdmin,
-      role: 'ADMIN',
-      adotante: {
-        create: {
-          nome: adminName,
-          telefone: "00000000000",
-          rua: "Não Aplicável",
-          numero: "0",
-          bairro: "Não Aplicável",
-          cidade: "Não Aplicável",
-          uf: "NA",
-        }
-      }
-    },
+  // 1.1. Tenta encontrar o Admin
+  const existingAdminAuth = await prisma.auth.findUnique({
+    where: { email: adminEmail },
+    // Inclui o Adotante para saber se todo o registro está completo
+    include: { adotante: true }
   });
-  console.log(`Usuário Admin criado com sucesso! E-mail: ${adminEmail} (ID: ${createdAdminAuth.auth_id})`);
 
-  // ADIÇÃO PARA DEBUG: CONFIRMAR O ROLE EXATAMENTE COMO FOI CRIADO
-  console.log(`[DEBUG] Role gravado para o Admin: ${createdAdminAuth.role}`);
+  let createdAdminAuth;
+
+  if (existingAdminAuth) {
+    // Se o Auth já existe, usa ele.
+    createdAdminAuth = existingAdminAuth;
+    console.log(`Usuário Admin já existe. E-mail: ${adminEmail} (ID: ${existingAdminAuth.auth_id})`);
+  } else {
+    // Se não existe, cria.
+    const hashedPasswordAdmin = await bcrypt.hash(adminPassword, 10);
+
+    createdAdminAuth = await prisma.auth.create({
+      data: {
+        email: adminEmail,
+        senha: hashedPasswordAdmin,
+        role: 'ADMIN',
+        adotante: {
+          create: {
+            nome: adminName,
+            telefone: "00000000000",
+            rua: "Não Aplicável",
+            numero: "0",
+            bairro: "Não Aplicável",
+            cidade: "Não Aplicável",
+            uf: "NA",
+          }
+        }
+      },
+    });
+    console.log(`Usuário Admin criado com sucesso! E-mail: ${adminEmail} (ID: ${createdAdminAuth.auth_id})`);
+  }
 
   // ------------------------------------------------------------------
-  // 3. CRIAÇÃO DOS DADOS DE TESTE (ADOTANTES E PETS)
-  // ...
+  // 2. CRIAÇÃO DOS DADOS DE TESTE (ADOTANTES E PETS)
+  // ------------------------------------------------------------------
+
   const senhaPadrao = await bcrypt.hash('senha_123', 10);
 
   // Dados dos usuários de teste
@@ -73,132 +70,219 @@ async function main() {
     { email: "patricia.m@example.com", nome: "Patrícia Menezes", telefone: "51944332211", rua: "Rua 24 de Outubro", numero: "90", bairro: "Moinhos de Vento", cidade: "Porto Alegre", uf: "RS" }
   ];
 
-  // Cria os usuários (Auth e Adotante)
+  let newAdotantesCount = 0;
+  // Cria os usuários (Auth e Adotante) APENAS SE NÃO EXISTIREM
   for (const userData of usersData) {
-    await prisma.auth.create({
-      data: {
-        email: userData.email,
-        senha: senhaPadrao,
-        adotante: {
-          create: {
-            nome: userData.nome,
-            telefone: userData.telefone,
-            rua: userData.rua,
-            numero: userData.numero,
-            bairro: userData.bairro,
-            cidade: userData.cidade,
-            uf: userData.uf,
+    const existingUser = await prisma.auth.findUnique({
+      where: { email: userData.email },
+    });
+
+    if (!existingUser) {
+      await prisma.auth.create({
+        data: {
+          email: userData.email,
+          senha: senhaPadrao,
+          adotante: {
+            create: {
+              nome: userData.nome,
+              telefone: userData.telefone,
+              rua: userData.rua,
+              numero: userData.numero,
+              bairro: userData.bairro,
+              cidade: userData.cidade,
+              uf: userData.uf,
+            },
           },
         },
-      },
-    });
+      });
+      newAdotantesCount++;
+    }
   }
-  console.log('Adotantes e Autenticações (de teste) criados.');
+  console.log(`${newAdotantesCount} novos Adotantes/Autenticações (de teste) criados. Os restantes já existiam.`);
+
 
   // Dados para Pets
   const petData = [
+
     { nome: "Fred", especie: "Cachorro", data_nascimento: new Date("2023-08-10"), descricao: "Fred é um cachorro cheio de energia! Ele adora correr, buscar a bolinha e está sempre pronto para a próxima aventura.", tamanho: "MEDIO", personalidade: "BRINCALHAO", imagem_url1: "https://img.freepik.com/fotos-premium/o-cachorro-branco-dorme-na-mesa-em-frente-ao-laptop-o-conceito-de-trabalhar-em-casa-treinando-um-trabalhador-cansado_330478-1569.jpg?w=740" },
+
     { nome: "Luna", especie: "Gato", data_nascimento: new Date("2022-04-01"), descricao: "Luna é uma gata serena. Ela aprecia cochilos longos em lugares quentinhos e é uma companheira muito tranquila.", tamanho: "PEQUENO", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=436" },
+
     { nome: "Zeca", especie: "Pássaro", data_nascimento: new Date("2020-01-20"), descricao: "Zeca é um pássaro muito animado. Ele adora interagir, cantar e é muito sociável com quem está por perto.", tamanho: "PEQUENO", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1685388463626-68e8011f2058?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+
     { nome: "Penny", especie: "Porquinho da India", data_nascimento: new Date("2022-04-08"), descricao: "Penny é um porquinho da Índia calmo e dócil. Ela é carinhosa e adora passar o tempo mastigando seus petiscos favoritos.", tamanho: "MEDIO", personalidade: "CALMO", imagem_url1: "https://plus.unsplash.com/premium_photo-1664300277972-b9a0db2e1b2e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=872" },
+
     { nome: "Amora", especie: "Cachorro", data_nascimento: new Date("2019-12-25"), descricao: "Amora é uma cadela calma e obediente. Ela adora descansar na grama e é perfeita para um lar que busca tranquilidade.", tamanho: "GRANDE", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1561037404-61cd46aa615b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+
     { nome: "Nino", especie: "Gato", data_nascimento: new Date("2024-05-15"), descricao: "Nino é um gato curioso e independente. Ele gosta de explorar o ambiente sozinho e tem uma natureza aventureira.", tamanho: "PEQUENO", personalidade: "INDEPENDENTE", imagem_url1: "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=436" },
+
     { nome: "Toby", especie: "Cachorro", data_nascimento: new Date("2022-02-14"), descricao: "Toby é um cachorro brincalhão. Ele tem um faro impecável e se diverte muito farejando e correndo em campos abertos.", tamanho: "MEDIO", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1503256207526-0d5d80fa2f47?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=386" },
+
     { nome: "Mia", especie: "Gato", data_nascimento: new Date("2021-09-30"), descricao: "Mia é uma gata muito afetuosa. Ela adora colo, é muito relaxada e busca sempre um ambiente confortável para se aconchegar.", tamanho: "PEQUENO", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+
     { nome: "Rocky", especie: "Cachorro", data_nascimento: new Date("2020-07-22"), descricao: "Rocky é um cachorro leal e com um temperamento equilibrado. Ele é um ótimo companheiro, com uma presença imponente e calma.", tamanho: "GRANDE", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+
     { nome: "Simba", especie: "Gato", data_nascimento: new Date("2023-01-05"), descricao: "Simba é um gato muito ativo. Ele está sempre alerta, adora caçar bolinhas de papel e tem uma personalidade divertida.", tamanho: "PEQUENO", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=436" },
+
     { nome: "Lola", especie: "Cachorro", data_nascimento: new Date("2023-11-11"), descricao: "Lola é uma cachorra esperta e divertida. Ela é fácil de treinar e adora exibir sua elegância enquanto brinca.", tamanho: "PEQUENO", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1625316708582-7c38734be31d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387" },
+
     { nome: "Oliver", especie: "Gato", data_nascimento: new Date("2018-06-18"), descricao: "Oliver é um gato experiente e muito reservado. Ele é ideal para quem busca um pet que se contenta em ter o seu próprio espaço.", tamanho: "MEDIO", personalidade: "INDEPENDENTE", imagem_url1: "https://images.unsplash.com/photo-1506755855567-92ff770e8d00?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387" },
+
     { nome: "Max", especie: "Cachorro", data_nascimento: new Date("2021-03-25"), descricao: "Max é um cão amigável e cheio de alegria. Ele está sempre pronto para passear e fazer novos amigos.", tamanho: "GRANDE", personalidade: "BRINCALHAO", imagem_url1: "https://plus.unsplash.com/premium_photo-1676389281733-aaefab0e7907?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=386" },
+
     { nome: "Bella", especie: "Cachorro", data_nascimento: new Date("2024-02-01"), descricao: "Bella é uma filhote muito calma. Ela adora dormir no colo e é a definição de aconchego para o seu futuro lar.", tamanho: "PEQUENO", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1504826260979-242151ee45b7?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387" },
+
     { nome: "Charlie", especie: "Cachorro", data_nascimento: new Date("2019-08-19"), descricao: "Charlie é um cachorro tranquilo e carinhoso, apesar de um pouco teimoso. Ele é um ótimo companheiro de sofá.", tamanho: "PEQUENO", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1741610609941-93cddf05b88d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=327" },
+
     { nome: "Lucy", especie: "Cachorro", data_nascimento: new Date("2022-10-09"), descricao: "Lucy é uma cachorra ativa e cheia de vida. Ela é uma companheira fiel que adora correr e brincar ao ar livre.", tamanho: "MEDIO", personalidade: "BRINCALHAO", imagem_url1: "https://plus.unsplash.com/premium_photo-1677542200636-87e4f3f5e3eb?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=386" },
+
     { nome: "Leo", especie: "Gato", data_nascimento: new Date("2023-05-20"), descricao: "Leo é um gato tranquilo e majestoso. Ele aprecia ser mimado e passar o tempo relaxando em superfícies macias.", tamanho: "MEDIO", personalidade: "CALMO", imagem_url1: "https://plus.unsplash.com/premium_photo-1707353400249-1d96e1a7e0e6?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+
     { nome: "Daisy", especie: "Calopsita", data_nascimento: new Date("2023-04-12"), descricao: "Daisy é uma calopsita calma e sociável. Ela é uma ótima companheira que adora a tranquilidade do seu lar.", tamanho: "MEDIO", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1517101724602-c257fe568157?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=812" },
+
     { nome: "Milo", especie: "Gato", data_nascimento: new Date("2022-12-01"), descricao: "Milo é um gato reservado, mas que aceita carinho. Ele é curioso e prefere ter seu tempo para observar o ambiente.", tamanho: "PEQUENO", personalidade: "INDEPENDENTE", imagem_url1: "https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+
     { nome: "Zoe", especie: "Cachorro", data_nascimento: new Date("2020-11-03"), descricao: "Zoe é uma cachorra com muita energia. Ela adora exercícios e precisa de bastante espaço para correr e se divertir.", tamanho: "GRANDE", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1630063813131-2b07bf227697?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387" },
+
     { nome: "Jack", especie: "Cachorro", data_nascimento: new Date("2024-01-10"), descricao: "Jack é um filhote destemido e aventureiro. Ele é pequeno, mas cheio de coragem e adora explorar.", tamanho: "PEQUENO", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1723065929236-2cabbb1c685f?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=869" },
+
     { nome: "Cleo", especie: "Cachorro", data_nascimento: new Date("2017-02-15"), descricao: "Cleo é uma cachorra idosa e serena. Ela busca um lar tranquilo e confortável onde possa passar seus dias relaxando.", tamanho: "MEDIO", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1709497083259-2767f307aa55?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1031" },
+
     { nome: "Duke", especie: "Cachorro", data_nascimento: new Date("2021-06-28"), descricao: "Duke é um cão brincalhão e cheio de vigor. Ele tem uma beleza imponente e adora se aventurar na natureza.", tamanho: "GRANDE", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1723065866755-9ef44454a004?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=465" },
+
     { nome: "Lily", especie: "Gato", data_nascimento: new Date("2023-09-05"), descricao: "Lily é uma gatinha muito divertida e curiosa. Ela está sempre pronta para uma boa sessão de brincadeiras.", tamanho: "PEQUENO", personalidade: "BRINCALHAO", imagem_url1: "https://plus.unsplash.com/premium_photo-1673967770669-91b5c2f2d0ce?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=430" },
+
     { nome: "Cooper", especie: "Cachorro", data_nascimento: new Date("2022-08-11"), descricao: "Cooper é um cão sociável e amigável. Ele se adapta bem e adora fazer amizade com outros animais.", tamanho: "MEDIO", personalidade: "BRINCALHAO", imagem_url1: "https://plus.unsplash.com/premium_photo-1719537437497-eb3b69c6c7b5?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=388" },
+
     { nome: "Nala", especie: "Gato", data_nascimento: new Date("2020-03-17"), descricao: "Nala é uma gata observadora e elegante. Ela aprecia seu espaço pessoal e gosta de ter um ponto estratégico para ver o movimento.", tamanho: "MEDIO", personalidade: "INDEPENDENTE", imagem_url1: "https://images.unsplash.com/photo-1597626259989-a11e97b7772d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=580" },
+
     { nome: "Bear", especie: "Cachorro", data_nascimento: new Date("2018-10-20"), descricao: "Bear é um gigante gentil e amável. Ele é muito calmo e se contenta em passar o tempo deitado e observando o ambiente.", tamanho: "GRANDE", personalidade: "CALMO", imagem_url1: "https://plus.unsplash.com/premium_photo-1668114375002-a7794d5209b4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=869" },
+
     { nome: "Chloe", especie: "Gato", data_nascimento: new Date("2022-05-19"), descricao: "Chloe é uma gatinha aventureira e cheia de curiosidade. Ela adora descobrir coisas novas e brincar com tudo que vê.", tamanho: "PEQUENO", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1570450466756-c1c0bc431719?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387" },
+
     { nome: "Riley", especie: "Cachorro", data_nascimento: new Date("2023-03-03"), descricao: "Riley é um cão extremamente inteligente e ativo. Ele precisa de desafios e adora atividades que explorem sua agilidade.", tamanho: "MEDIO", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1669635842183-e43281a76bdf?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=869" },
+
     { nome: "Gizmo", especie: "Coelho", data_nascimento: new Date("2024-04-01"), descricao: "Gizmo é um coelho muito fofo e tranquilo. Ele é um pet dócil que adora cenouras e passar o tempo em segurança.", tamanho: "PEQUENO", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387" },
+
     { nome: "Ruby", especie: "Cachorro", data_nascimento: new Date("2019-05-25"), descricao: "Ruby é uma cachorra deslumbrante e cheia de vida. Ela é atlética e adora brincar e correr em espaços abertos.", tamanho: "GRANDE", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1714135400352-cf17b6919f71?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387" },
+
     { nome: "Oscar", especie: "Gato", data_nascimento: new Date("2021-11-29"), descricao: "Oscar é um gato reservado e gosta de se esconder. Ele aprecia ter um bom esconderijo e uma rotina previsível.", tamanho: "MEDIO", personalidade: "INDEPENDENTE", imagem_url1: "https://images.unsplash.com/photo-1503844281047-cf42eade5ca5?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=876" },
+
     { nome: "Bentley", especie: "Calopsita", data_nascimento: new Date("2023-07-14"), descricao: "Bentley é uma calopsita dócil e cantora. Ele é um companheiro que traz alegria e adora interagir com música.", tamanho: "PEQUENO", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1707096656916-284aa48b50e8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387" },
+
     { nome: "Pipoca", especie: "Hamster", data_nascimento: new Date("2024-06-01"), descricao: "Pipoca é um hamster muito ativo, especialmente à noite. Ele é brincalhão e adora explorar sua rodinha e gaiola.", tamanho: "PEQUENO", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1725522908781-3738eb43e031?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=449" },
+
     { nome: "Kurama", especie: "Jabuti", data_nascimento: new Date("2015-04-05"), descricao: "Kurama é um jabuti com uma natureza muito reservada. Ele gosta de passear no seu próprio ritmo e apreciar o ambiente natural.", tamanho: "MEDIO", personalidade: "INDEPENDENTE", imagem_url1: "https://images.unsplash.com/photo-1585696862208-ca12defa3a78?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387" },
+
     { nome: "Whiskers", especie: "Gato", data_nascimento: new Date("2021-07-20"), descricao: "Whiskers é um gato brincalhão e cheio de energia. Ele adora perseguir brinquedos e está sempre pronto para uma boa caçada.", tamanho: "PEQUENO", personalidade: "BRINCALHAO", imagem_url1: "https://images.unsplash.com/photo-1571566882372-1598d88abd90?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387" },
+
     { nome: "Buddy", especie: "Cachorro", data_nascimento: new Date("2022-01-15"), descricao: "Buddy é um cachorro extremamente calmo e dócil. Ele adora carinho e é o companheiro perfeito para quem busca tranquilidade.", tamanho: "MEDIO", personalidade: "CALMO", imagem_url1: "https://images.unsplash.com/photo-1613915588542-388135ac5f4d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870" },
+
     { nome: "Shadow", especie: "Gato", data_nascimento: new Date("2020-09-10"), descricao: "Shadow é um gato misterioso e muito independente. Ele aprecia sua liberdade e gosta de explorar os cantos da casa por conta própria.", tamanho: "MEDIO", personalidade: "INDEPENDENTE", imagem_url1: "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=580" },
 
   ];
 
-  await prisma.pet.createMany({
-    data: petData,
+
+  // Encontra quais pets na lista de dados AINDA NÃO existem
+  const petNames = petData.map(p => p.nome);
+  const existingPets = await prisma.pet.findMany({
+    where: {
+      nome: {
+        in: petNames,
+      },
+    },
+    select: {
+      nome: true,
+    },
   });
-  console.log(`${petData.length} pets criados.`);
+
+  const existingPetNames = new Set(existingPets.map(p => p.nome));
+
+  const petsToCreate = petData.filter(p => !existingPetNames.has(p.nome));
+
+  if (petsToCreate.length > 0) {
+    await prisma.pet.createMany({
+      data: petsToCreate,
+    });
+  }
+
+  console.log(`${petsToCreate.length} novos pets criados.`);
 
   // ----------------------------------------------------
-  // 4. CRIAÇÃO DAS ADOÇÕES (Dados de Relacionamento)
+  // 3. CRIAÇÃO DAS ADOÇÕES (Dados de Relacionamento)
   // ----------------------------------------------------
 
-  // Encontrando IDs.
+  // Encontrando IDs. 
   const adotantes = await prisma.adotante.findMany();
+  // Pega TODOS os pets, incluindo os recém-criados
   const pets = await prisma.pet.findMany();
 
-  // Mapeando adotantes e pets por nome/email
+  // Mapeando adotantes e pets por nome
   const adotanteMap = new Map();
   adotantes.forEach(a => adotanteMap.set(a.nome, a));
 
-  const mariana = adotanteMap.get("Mariana Costa");
-  const lucas = adotanteMap.get("Lucas Pereira");
-  const pedro = adotanteMap.get("Pedro Gomes");
-  const carla = adotanteMap.get("Carla Rocha");
-  const marcos = adotanteMap.get("Marcos Lima");
-  const patricia = adotanteMap.get("Patrícia Menezes");
-  const juliana = adotanteMap.get("Juliana Santos");
+  const petMap = new Map();
+  pets.forEach(p => petMap.set(p.nome, p));
 
-  const fred = pets.find(p => p.nome === "Fred");
-  const luna = pets.find(p => p.nome === "Luna");
-  const zeca = pets.find(p => p.nome === "Zeca");
-  const amora = pets.find(p => p.nome === "Amora");
-  const toby = pets.find(p => p.nome === "Toby");
-  const nino = pets.find(p => p.nome === "Nino");
-  const rocky = pets.find(p => p.nome === "Rocky");
 
-  // Função auxiliar para realizar a adoção
-  async function realizarAdocao(adotante, pet) {
+  const adocoesData = [
+    { adotanteNome: "Mariana Costa", petNome: "Fred" },
+    { adotanteNome: "Lucas Pereira", petNome: "Luna" },
+    { adotanteNome: "Pedro Gomes", petNome: "Zeca" },
+    { adotanteNome: "Carla Rocha", petNome: "Amora" },
+    { adotanteNome: "Marcos Lima", petNome: "Toby" },
+    { adotanteNome: "Patrícia Menezes", petNome: "Nino" },
+    { adotanteNome: "Juliana Santos", petNome: "Rocky" },
+  ];
+
+  let newAdoptionsCount = 0;
+  // Itera sobre as adoções que DEVEM existir
+  for (const adocao of adocoesData) {
+    const adotante = adotanteMap.get(adocao.adotanteNome);
+    const pet = petMap.get(adocao.petNome);
+
     if (adotante && pet) {
-      await prisma.adocao.create({
-        data: {
+      // 3.1. Tenta encontrar a adoção existente para evitar duplicação
+      const existingAdocao = await prisma.adocao.findFirst({
+        where: {
           adotante_id: adotante.adotante_id,
-          pet_id: pet.pet_id
+          pet_id: pet.pet_id,
+        },
+      });
+
+      if (!existingAdocao) {
+        // Se a adoção não existe, cria
+        await prisma.adocao.create({
+          data: {
+            adotante_id: adotante.adotante_id,
+            pet_id: pet.pet_id,
+          }
+        });
+
+        // E atualiza o status do pet para ADOTADO
+        await prisma.pet.update({
+          where: { pet_id: pet.pet_id },
+          data: { status: 'ADOTADO' }
+        });
+
+        newAdoptionsCount++;
+        console.log(`Nova Adoção realizada: ${adotante.nome} e ${pet.nome}.`);
+      } else {
+        // A adoção já existe, apenas garante que o status do pet está correto.
+        if (pet.status !== 'ADOTADO') {
+          await prisma.pet.update({
+            where: { pet_id: pet.pet_id },
+            data: { status: 'ADOTADO' }
+          });
+          console.log(`Status do Pet ${pet.nome} atualizado para ADOTADO.`);
         }
-      });
-      await prisma.pet.update({
-        where: { pet_id: pet.pet_id },
-        data: { status: 'ADOTADO' }
-      });
-      console.log(`Adoção realizada: ${adotante.nome} e ${pet.nome}.`);
+      }
     } else {
-      console.log(`Adoção não realizada por falta de Adotante ou Pet.`);
+      console.warn(`[AVISO] Não foi possível encontrar Adotante (${adocao.adotanteNome}) ou Pet (${adocao.petNome}) para criar a adoção.`);
     }
   }
 
-  // Realiza as Adoções existentes
-  await realizarAdocao(mariana, fred);
-  await realizarAdocao(lucas, luna);
-  await realizarAdocao(pedro, zeca);
-  await realizarAdocao(carla, amora);
-  await realizarAdocao(marcos, toby);
-  await realizarAdocao(patricia, nino);
-  await realizarAdocao(juliana, rocky);
-
+  console.log(`${newAdoptionsCount} novas adoções criadas.`);
   console.log('Seeding finalizado com sucesso! 🐾');
 }
 
