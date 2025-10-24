@@ -14,7 +14,6 @@ import adocaoRoutes from './routes/adocaoRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js'; 
-import passport from './config/passport.js'; 
 
 const app = express();
 
