@@ -1,68 +1,72 @@
+// backend/src/app.js
+
+// Carrega as variáveis de ambiente PRIMEIRO
 import dotenv from 'dotenv'; 
 dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-
-// Importação das rotas
+import passport from './config/passport.js'; // Importa a configuração do Passport
 import authRoutes from './routes/authRoutes.js'; 
 import petRoutes from './routes/petRoutes.js';
 import adotanteRoutes from './routes/adotanteRoutes.js'; 
 import adocaoRoutes from './routes/adocaoRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js'; 
 import passport from './config/passport.js'; 
-import dashboardRoutes from './routes/dashboardRoutes.js';
-
 
 const app = express();
 
-// ------------------------------------------------------------------
-//  CONFIGURAÇÃO DE CORS SEGURA E ROBUSTA
-// ------------------------------------------------------------------
+const frontendURL = process.env.FRONTEND_URL; 
 
-const PRODUCTION_URL_HARDCODE = 'https://buscar-patas-sistema-de-adocao-de-p.vercel.app';
-
-// 1. Processa a variável de ambiente CLIENT_URL
-// Converte a string separada por vírgulas em um array e remove espaços em branco (trim)
-const ENV_ALLOWED_URLS = process.env.CLIENT_URL 
-  ? process.env.CLIENT_URL.split(',').map(url => url.trim())
-  : [];
-
-// O nome do seu projeto no Vercel (base para o Regex de previews)
-const VERCEL_PROJECT_NAME = 'buscar-patas-sistema-de-adocao-de-pets';
-
-// REGEX: Permite qualquer link de "preview" do Vercel (Resolve o link que está funcionando)
-const VERCEL_PREVIEW_REGEX = new RegExp(`^https://${VERCEL_PROJECT_NAME}-.*\\.vercel\\.app$`);
-
-
-// 2. Cria a lista final de origens (Strings e Regex)
+// Define as origens permitidas
 const allowedOrigins = [
-    ...ENV_ALLOWED_URLS, 
-    PRODUCTION_URL_HARDCODE, // Garante que o domínio de produção funcione
-    VERCEL_PREVIEW_REGEX 
+  'http://localhost:5173' // Para desenvolvimento local
 ];
+if (frontendURL) {
+  allowedOrigins.push(frontendURL); // Adiciona a URL de produção se estiver definida
+}
 
+// Define as opções do CORS
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Permite requisições sem 'origin' (como apps mobile ou curl) OU se a origem está na lista
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos HTTP permitidos
+  credentials: true, // Permite envio de cookies/cabeçalhos de autorização
+  optionsSuccessStatus: 204 // Para requisições pre-flight (OPTIONS)
+};
 
-// Aplica o middleware CORS
-app.use(cors({
-    origin: allowedOrigins, 
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, 
-    optionsSuccessStatus: 204
-}));
+app.use(cors(corsOptions)); // Aplica as opções configuradas
+// -----------------------------------------
 
+app.use(express.json()); // Middleware para parsear JSON
+app.use(passport.initialize()); // Inicializa o Passport
 
-app.use(express.json());
-app.use(passport.initialize());
-
-// Rotas
+// Rotas da API
 app.use('/auth', authRoutes);
 app.use('/upload', uploadRoutes);
 app.use('/profile', profileRoutes);
 app.use('/pets', petRoutes);
 app.use('/adotantes', adotanteRoutes); 
 app.use('/adocoes', adocaoRoutes);
-app.use('/dashboard', dashboardRoutes);
+app.use('/dashboard', dashboardRoutes); 
+
+// Middleware simples para tratar rotas não encontradas (404)
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Endpoint não encontrado' });
+});
+
+// Middleware para tratamento de erros genéricos (opcional, mas bom ter)
+app.use((err, req, res, next) => {
+  console.error("Erro não tratado:", err.stack);
+  res.status(500).json({ error: 'Ocorreu um erro interno no servidor.' });
+});
 
 export default app;
