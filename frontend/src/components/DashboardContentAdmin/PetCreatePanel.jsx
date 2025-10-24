@@ -38,13 +38,11 @@ export function PetCreatePanel({ onSuccess, onCancel }) {
         data.append(key, formData[key]);
       }
     });
-    // Adiciona imagem opcionalmente
     if (imageFile) {
        data.append('image', imageFile)
     }
 
     try {
-      // Usa API_URL
       const response = await fetch(`${API_URL}/pets`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
@@ -57,7 +55,7 @@ export function PetCreatePanel({ onSuccess, onCancel }) {
       }
 
       Swal.fire('Sucesso!', 'Pet cadastrado!', 'success').then(() => {
-        onSuccess(); // Chama onSuccess
+        onSuccess(); 
       })
     } catch (error) {
       Swal.fire('Erro!', error.message, 'error')

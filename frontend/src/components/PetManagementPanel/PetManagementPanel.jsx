@@ -11,6 +11,8 @@ import { PetEditPanel } from '../DashboardContentAdmin/PetEditPanel'
 import './PetManagementPanel.css'
 import { PaginationControls } from '../PaginationControls/PaginationControls'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export function PetManagementPanel() {
   const [pets, setPets] = useState([])
   const [pagination, setPagination] = useState(null);
@@ -19,7 +21,7 @@ export function PetManagementPanel() {
   const { token } = useAuth()
 
   const [filters, setFilters] = useState({
-    nome: '', especie: '', tamanho: '', personalidade: '', status: '', 
+    nome: '', especie: '', tamanho: '', personalidade: '', status: '',
     page: 1,
     limit: 8,
   })
@@ -46,7 +48,7 @@ export function PetManagementPanel() {
       const params = new URLSearchParams(activeFilters)
 
       const response = await fetch(
-        `http://localhost:3000/pets?${params.toString()}`,
+        `${API_URL}/pets?${params.toString()}`,
         { headers: { Authorization: `Bearer ${token}` } },
       )
       if (!response.ok) {
@@ -104,7 +106,7 @@ export function PetManagementPanel() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`http://localhost:3000/pets/${pet.pet_id}`, {
+          const response = await fetch(`${API_URL}/pets/${pet.pet_id}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` },
           })
@@ -116,7 +118,7 @@ export function PetManagementPanel() {
             throw new Error(errData.error || 'Falha ao excluir pet.')
           }
           Swal.fire('Excluído!', 'O pet foi removido.', 'success')
-          fetchAllPets(); 
+          fetchAllPets();
         } catch (err) {
           Swal.fire('Erro!', err.message, 'error')
         }
@@ -128,14 +130,14 @@ export function PetManagementPanel() {
     setSelectedPet(pet)
     setShowEditModal(true)
   }
-  const handleShowCreateModal = () => setShowCreateModal(true)
-
+  const handleShowCreateModal = () => {
+    setShowCreateModal(true)
+  }
   const handleCloseModals = () => {
     setShowCreateModal(false)
     setShowEditModal(false)
     setSelectedPet(null)
   }
-
   const handleSuccess = () => {
     handleCloseModals()
     fetchAllPets()
@@ -154,7 +156,7 @@ export function PetManagementPanel() {
     <Container className="p-4">
       <h2 className="mb-4">Gerenciar Pets</h2>
 
-      {/* Topo da página */}
+      {/* Paginação (Topo) */}
       <div className="mb-3">
         <PaginationControls
             pagination={pagination}
@@ -172,8 +174,8 @@ export function PetManagementPanel() {
         />
       </div>
 
+      {/* Lista de Pets */}
       <Row xs={1} md={2} lg={4} className="g-4 mt-3 mb-4">
-
         {/* Card de Adicionar */}
         <Col>
           <div className="pet-card-new" onClick={handleShowCreateModal}>
@@ -238,7 +240,7 @@ export function PetManagementPanel() {
       {/* Modal de Edição */}
       <Modal show={showEditModal} onHide={handleCloseModals} size="lg" backdrop="static">
         <Modal.Header closeButton>
-          <Modal.Title>Editar Pet: {selectedPet?.nome ? capitalizeFirstLetter(selectedPet.nome) : ''}</Modal.Title>
+           <Modal.Title>Editar Pet: {selectedPet?.nome ? capitalizeFirstLetter(selectedPet.nome) : ''}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
            {selectedPet && (

@@ -3,7 +3,6 @@ import { Modal, Button, Form, Spinner, Alert } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
 import Swal from 'sweetalert2'
 
-// 1. Definição da URL da API (usando import.meta.env para Vite)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
@@ -13,16 +12,14 @@ export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
   const [error, setError] = useState(null)
   const { token } = useAuth()
 
-  // Busca os pets disponíveis quando o modal é aberto
   useEffect(() => {
     if (show) {
       const fetchPetsDisponiveis = async () => {
         setLoading(true)
         setError(null)
         try {
-          // 2. CORREÇÃO: Usando API_URL
           const response = await fetch(
-            `${API_URL}/pets/disponiveis`, // URL corrigida
+            `${API_URL}/pets/disponiveis`, 
             {
               headers: { Authorization: `Bearer ${token}` },
             },
@@ -31,7 +28,6 @@ export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
 
           const data = await response.json()
           setPetsDisponiveis(data)
-          // Define o pet atual como o selecionado por padrão
           setNovoPetId(adocao.pet_id)
         } catch (err) {
           setError(err.message)
@@ -46,15 +42,13 @@ export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!novoPetId || novoPetId === adocao.pet_id) {
-      // Se não mudou, apenas fecha o modal
       onHide()
       return
     }
 
     try {
-      // 3. CORREÇÃO: Usando API_URL com o ID da adoção
       const response = await fetch(
-        `${API_URL}/adocoes/${adocao.adocao_id}`, // URL corrigida
+        `${API_URL}/adocoes/${adocao.adocao_id}`, 
         {
           method: 'PATCH',
           headers: {
@@ -71,7 +65,7 @@ export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
       }
 
       Swal.fire('Sucesso!', 'A adoção foi atualizada.', 'success')
-      onUpdateSuccess() // Chama a função do pai para atualizar a lista
+      onUpdateSuccess() 
       onHide()
     } catch (err) {
       Swal.fire('Erro!', err.message, 'error')
@@ -99,15 +93,15 @@ export function AdocaoEditModal({ show, onHide, adocao, onUpdateSuccess }) {
                 value={novoPetId}
                 onChange={(e) => setNovoPetId(e.target.value)}
               >
-                {/* 1. Opção para o pet que JÁ está na adoção */}
+                {/* Opção para o pet que JÁ está na adoção */}
                 <option value={adocao?.pet_id}>
                   Atual: {adocao?.pet.nome} ({adocao?.pet.especie})
                 </option>
                 <option disabled>--- PETS DISPONÍVEIS ---</option>
 
-                {/* 2. Lista de outros pets disponíveis */}
+                {/* Lista de outros pets disponíveis */}
                 {petsDisponiveis
-                  .filter((pet) => pet.pet_id !== adocao?.pet_id) // Não repete o pet atual
+                  .filter((pet) => pet.pet_id !== adocao?.pet_id) 
                   .map((pet) => (
                     <option key={pet.pet_id} value={pet.pet_id}>
                       {pet.nome} ({pet.especie})

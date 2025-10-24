@@ -5,13 +5,12 @@ import { PetList } from '../PetList/PetList'
 import { PaginationControls } from '../PaginationControls/PaginationControls'
 import { PetDetailModal } from '../PetDetailModal/PetDetailModal'
 
-// DEFINIÇÃO DA URL DA API (Mantido do Updated upstream)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 export function BuscarPets() {
   const [pets, setPets] = useState([])
   const [pagination, setPagination] = useState(null)
-  const [loading, setLoading] = useState(false) // Inicial false, define true no fetch
+  const [loading, setLoading] = useState(false) 
   const [filters, setFilters] = useState({
     page: 1, limit: 8,
   })
@@ -22,7 +21,6 @@ export function BuscarPets() {
   useEffect(() => {
     async function fetchPets() {
       setLoading(true)
-      // Lógica de activeFilters mantida do Stashed changes
       const activeFilters = { status: 'DISPONIVEL' };
       Object.keys(filters).forEach(key => {
         if (filters[key]) {
@@ -33,7 +31,6 @@ export function BuscarPets() {
       activeFilters.limit = filters.limit || 8;
 
       const queryParams = new URLSearchParams(activeFilters).toString()
-      // URL usa API_URL (do Updated upstream)
       const url = `${API_URL}/pets?${queryParams}`
 
       try {
@@ -55,7 +52,6 @@ export function BuscarPets() {
 
   const handleFilterChange = (newFilters) => {
     setFilters((prevFilters) => {
-      // Formato mantido do Stashed changes
       const baseFilters = { limit: prevFilters.limit, page: 1 }
       return { ...baseFilters, ...newFilters }
     })
@@ -78,7 +74,6 @@ export function BuscarPets() {
   }
   const handleAdocaoConcluida = () => {
     handleCloseModal()
-    // Linha mantida do Stashed changes (sem comentário)
     setFilters((currentFilters) => ({ ...currentFilters }))
   }
 
