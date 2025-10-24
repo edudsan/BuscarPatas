@@ -119,7 +119,6 @@ export function AdotantesPanel() {
           user.adotante_id === adotanteId ? updatedUser : user,
         ),
       )
-      // Não precisa de Swal.fire aqui, a mudança visual no toggle já é um feedback
     } catch (err) {
       Swal.fire('Erro!', err.message, 'error')
     }

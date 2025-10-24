@@ -1,4 +1,39 @@
 .pet-card-img {
-    height: 200px;
-    object-fit: cover;
+  height: 160px;
+  object-fit: cover;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.pet-card .card-title {
+  color: var(--cor-azul);
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.pet-card-description {
+  font-size: 0.85em; 
+  margin-bottom: 0.5rem; 
+}
+
+.badge-attribute {
+  font-size: 0.7em; 
+  padding: 0.3em 0.5em; 
+}
+
+.pet-status-container-admin {
+ margin-left: -1rem; 
+ margin-right: -1rem; 
+ margin-bottom: -1rem; 
+ padding: 0.75rem 1rem 0.75rem 1rem; 
+ border-top: 1px solid #eee; 
+}
+
+.pet-status-badge-fullwidth {
+  font-size: 0.8em;
+  padding: 0.4em 0.6em;
+  text-transform: uppercase;
+  font-weight: 600;
+  width: 100%; 
+  text-align: center; 
 }

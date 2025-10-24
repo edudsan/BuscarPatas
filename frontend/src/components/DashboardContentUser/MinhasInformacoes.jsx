@@ -45,7 +45,6 @@ export function MinhasInformacoes() {
     e.preventDefault()
     setLoading(true)
     try {
-      // CORREÇÃO: Usando API_URL para a rota PATCH /profile/me
       const response = await fetch(`${API_URL}/profile/me`, {
         method: 'PATCH',
         headers: {
@@ -59,7 +58,7 @@ export function MinhasInformacoes() {
         throw new Error(errorData.error || 'Falha ao atualizar.')
       }
       const updatedUser = await response.json()
-      setUser((prevUser) => ({ ...prevUser, ...updatedUser })) // Atualiza o usuário no contexto global
+      setUser((prevUser) => ({ ...prevUser, ...updatedUser })) 
       Swal.fire('Sucesso!', 'Suas informações foram atualizadas.', 'success')
     } catch (error) {
       Swal.fire(

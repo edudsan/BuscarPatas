@@ -1,0 +1,68 @@
+.pet-card-new {
+  border-radius: 15px;
+  border: 2px dashed var(--cor-azul);
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-height: 300px; 
+}
+
+.pet-card-new:hover {
+  background-color: #e9ecef;
+  border-color: #0056b3;
+}
+
+.pet-card-new-icon {
+  font-size: 2.5rem;
+  color: var(--cor-azul);
+  margin-bottom: 0.75rem;
+}
+
+.pet-card-new-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--cor-azul);
+}
+
+.pet-card-admin-footer {
+  background-color: #fff;
+  border-top: 1px solid #f0f0f0;
+  border-bottom-left-radius: 15px; 
+  border-bottom-right-radius: 15px;
+  padding: 0.75rem 1rem; 
+}
+
+.action-buttons-group {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 0;
+  width: 100%;
+}
+
+.action-btn-card {
+  font-size: 1rem; 
+  padding: 0.25rem;
+  margin-left: 0.5rem; 
+  cursor: pointer;
+  color: #6c757d;
+  transition: all 0.2s;
+}
+
+.action-btn-card.edit:hover {
+  color: var(--cor-azul);
+}
+
+.action-btn-card.delete {
+  color: #dc3545;
+}
+
+.action-btn-card.delete:hover {
+  filter: brightness(0.9);
+}
