@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap'
 import { useAuth } from '../../contexts/AuthContext'
-import logoBuscarPatas from '../../assets/logo.png'; 
+import logoBuscarPatas from '../../assets/logo.png';
 
-// DEFINIÇÃO DA URL DA API (Usando import.meta.env para Vite)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const formatarData = (dataISO) => {
   if (!dataISO) return 'Data não informada';
@@ -22,13 +21,8 @@ export function MinhasAdocoes() {
     const fetchAdocoes = async () => {
       if (!token) { setLoading(false); return; }
       try {
-<<<<<<< Updated upstream
-        // CORREÇÃO: Usando API_URL para a rota /adocoes/me
-        const response = await fetch(`${API_URL}/adocoes/me`, {
-=======
         setLoading(true);
-        const response = await fetch('http://localhost:3000/adocoes/me', {
->>>>>>> Stashed changes
+        const response = await fetch(`${API_URL}/adocoes/me`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (!response.ok) {
@@ -36,7 +30,7 @@ export function MinhasAdocoes() {
            setAdocoes([]);
         } else {
            const data = await response.json()
-           setAdocoes(data)
+           setAdocoes(Array.isArray(data) ? data : []) 
         }
       } catch (error) {
         console.error("Erro de rede ou JSON:", error)
@@ -58,26 +52,7 @@ export function MinhasAdocoes() {
       ) : (
         <Row xs={1} md={2} lg={3} className="g-4">
           {adocoes.map((adocao) => (
-<<<<<<< Updated upstream
-            <Col key={adocao.adocao_id}>
-              <Card>
-                <Card.Img
-                  variant="top"
-                  src={
-                    adocao.pet.imagem_url1 || 'https://via.placeholder.com/150'
-                  }
-                />
-                <Card.Body>
-                  <Card.Title>{adocao.pet.nome}</Card.Title>
-                  <Card.Text>
-                    Adotado em:
-                    {formatarData(adocao.data_adocao)}
-                  </Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-=======
-             (adocao.pet) && (
+             (adocao && adocao.pet) && ( 
                 <Col key={adocao.adocao_id}>
                   <Card>
                     <Card.Img
@@ -91,7 +66,7 @@ export function MinhasAdocoes() {
                       }}
                     />
                     <Card.Body>
-                      <Card.Title>{adocao.pet.nome}</Card.Title>
+                      <Card.Title>{adocao.pet.nome || 'Nome Indisponível'}</Card.Title>
                       <Card.Text>
                         Adotado em: {formatarData(adocao.data_adocao)}
                       </Card.Text>
@@ -99,7 +74,6 @@ export function MinhasAdocoes() {
                   </Card>
                 </Col>
             )
->>>>>>> Stashed changes
           ))}
         </Row>
       )}
